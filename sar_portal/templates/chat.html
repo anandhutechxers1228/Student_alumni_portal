@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .coming-wrap {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+    }
+
+    .coming-icon { font-size: 64px; margin-bottom: 20px; }
+
+    .coming-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 32px;
+        color: var(--primary);
+        margin-bottom: 12px;
+    }
+
+    .coming-sub {
+        font-size: 16px;
+        color: var(--muted);
+        max-width: 420px;
+        margin: 0 auto 32px;
+        line-height: 1.7;
+    }
+
+    .coming-badge {
+        display: inline-block;
+        background: var(--accent-light);
+        color: #8a6d15;
+        padding: 8px 22px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+        .page { padding: 20px; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="coming-wrap">
+        <div class="coming-icon">💬</div>
+        <h2 class="coming-title">Community Chat</h2>
+        <p class="coming-sub">Stream-specific channels, batch groups, and direct messaging with alumni are coming soon.</p>
+        <span class="coming-badge">🚧 Coming Soon</span>
+    </div>
+</div>
+{% endblock %}

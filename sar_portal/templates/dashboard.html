@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .welcome-bar {
+        background: linear-gradient(130deg, #1B4332 0%, #2D6A4F 60%, #40916C 100%);
+        border-radius: 20px;
+        padding: 36px 40px;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-bar::after {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+        right: -60px;
+        top: -60px;
+        pointer-events: none;
+    }
+
+    .welcome-left h1 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: white;
+        margin-bottom: 6px;
+    }
+
+    .welcome-left p {
+        font-size: 14px;
+        color: rgba(255,255,255,0.65);
+    }
+
+    .welcome-badge {
+        background: rgba(201,168,76,0.2);
+        border: 1px solid rgba(201,168,76,0.4);
+        color: #F9E4A0;
+        padding: 8px 18px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 22px 24px;
+        border: 1px solid #E0E9E1;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    }
+
+    .stat-icon {
+        font-size: 26px;
+        margin-bottom: 10px;
+    }
+
+    .stat-val {
+        font-family: 'DM Serif Display', serif;
+        font-size: 30px;
+        color: var(--primary);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .stat-lbl {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+    .two-col {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 22px;
+        margin-bottom: 22px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        overflow: hidden;
+    }
+
+    .card-head {
+        padding: 18px 24px;
+        border-bottom: 1px solid #f0f4f1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-head h3 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 17px;
+        color: var(--primary);
+    }
+
+    .card-head a {
+        font-size: 13px;
+        color: var(--primary-mid);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    .placeholder-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .placeholder-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: #F5F7F5;
+        border-radius: 10px;
+    }
+
+    .row-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .row-text .rtitle {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 2px;
+    }
+
+    .row-text .rsub {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .row-tag {
+        margin-left: auto;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        background: #E8F4EE;
+        color: var(--primary-mid);
+    }
+
+    .quick-links {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .quick-link {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border: 1.5px solid #E0E9E1;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--text);
+        transition: all 0.2s;
+    }
+
+    .quick-link:hover {
+        border-color: var(--primary-mid);
+        background: #f0f7f3;
+        transform: translateX(3px);
+    }
+
+    .ql-icon {
+        font-size: 22px;
+        width: 36px;
+        text-align: center;
+    }
+
+    .ql-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .ql-desc {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .ql-arrow {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .coming-tag {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 700;
+        background: var(--accent-light);
+        color: #8a6d15;
+        padding: 3px 9px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        overflow: hidden;
+        margin-bottom: 22px;
+    }
+
+    .profile-banner {
+        height: 80px;
+        background: linear-gradient(130deg, #1B4332, #40916C);
+    }
+
+    .profile-info {
+        padding: 0 24px 24px;
+    }
+
+    .profile-avatar-wrap {
+        margin-top: -32px;
+        margin-bottom: 14px;
+    }
+
+    .p-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 3px solid white;
+        background: var(--accent);
+        color: var(--primary);
+        font-size: 24px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        font-family: 'DM Serif Display', serif;
+    }
+
+    .p-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .p-name {
+        font-family: 'DM Serif Display', serif;
+        font-size: 18px;
+        color: var(--primary);
+        margin-bottom: 2px;
+    }
+
+    .p-sub {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.6;
+    }
+
+    .p-badge {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        background: #E8F4EE;
+        color: var(--primary-mid);
+    }
+
+    .p-badge.alumni {
+        background: var(--accent-light);
+        color: #8a6d15;
+    }
+
+    @media (max-width: 1024px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .two-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+        .page { padding: 20px; }
+        .welcome-bar { flex-direction: column; gap: 16px; text-align: center; padding: 28px 24px; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+    <div class="welcome-bar">
+        <div class="welcome-left">
+            <h1>Welcome back, {{ user.name|truncatechars:20 }} 👋</h1>
+            <p>{{ user.stream }} &nbsp;•&nbsp; {{ user.status|capfirst }}{% if user.status == 'student' %} — {{ user.current_year }} Year{% endif %} &nbsp;•&nbsp; Batch of {{ user.admission_year }}</p>
+        </div>
+        <div class="welcome-badge">🎓 {{ user.status|capfirst }}</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">💼</div>
+            <div class="stat-val">—</div>
+            <div class="stat-lbl">Jobs Available</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-val">—</div>
+            <div class="stat-lbl">Internships</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🤝</div>
+            <div class="stat-val">—</div>
+            <div class="stat-lbl">Mentors</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-val">—</div>
+            <div class="stat-lbl">Connections</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div>
+            <div class="card" style="margin-bottom:22px;">
+                <div class="card-head">
+                    <h3>Recent Opportunities</h3>
+                    <a href="/jobs/">View all →</a>
+                </div>
+                <div class="card-body">
+                    <div class="placeholder-rows">
+                        <div class="placeholder-row">
+                            <div class="row-icon">💼</div>
+                            <div class="row-text">
+                                <div class="rtitle">Software Engineer — TCS</div>
+                                <div class="rsub">Posted by Alumni · 2 days ago</div>
+                            </div>
+                            <span class="row-tag">Full-Time</span>
+                        </div>
+                        <div class="placeholder-row">
+                            <div class="row-icon">💼</div>
+                            <div class="row-text">
+                                <div class="rtitle">Data Analyst — Infosys</div>
+                                <div class="rsub">Posted by Alumni · 4 days ago</div>
+                            </div>
+                            <span class="row-tag">Full-Time</span>
+                        </div>
+                        <div class="placeholder-row">
+                            <div class="row-icon">🚀</div>
+                            <div class="row-text">
+                                <div class="rtitle">Frontend Intern — Startup</div>
+                                <div class="rsub">Posted by Alumni · 5 days ago</div>
+                            </div>
+                            <span class="row-tag">Internship</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head">
+                    <h3>Upcoming Mentorship Sessions</h3>
+                    <a href="/mentorship/">Find a mentor →</a>
+                </div>
+                <div class="card-body">
+                    <div class="placeholder-rows">
+                        <div class="placeholder-row">
+                            <div class="row-icon">🤝</div>
+                            <div class="row-text">
+                                <div class="rtitle">Career Guidance Session</div>
+                                <div class="rsub">With Alumni Mentor · Placeholder</div>
+                            </div>
+                        </div>
+                        <div class="placeholder-row">
+                            <div class="row-icon">🤝</div>
+                            <div class="row-text">
+                                <div class="rtitle">Interview Prep Workshop</div>
+                                <div class="rsub">Group Session · Placeholder</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="profile-card">
+                <div class="profile-banner"></div>
+                <div class="profile-info">
+                    <div class="profile-avatar-wrap">
+                        <div class="p-avatar">
+                            {% if user.profile_pic %}
+                            <img src="/media/{{ user.profile_pic }}" alt="{{ user.name }}">
+                            {% else %}
+                            {{ user.name|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="p-name">{{ user.name }}</div>
+                    <div class="p-sub">{{ user.email }}<br>{{ user.stream }}</div>
+                    <span class="p-badge {% if user.status == 'alumni' %}alumni{% endif %}">{{ user.status|capfirst }}</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head">
+                    <h3>Quick Links</h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-links">
+                        <a href="/jobs/" class="quick-link">
+                            <span class="ql-icon">💼</span>
+                            <div><div class="ql-label">Job Portal</div><div class="ql-desc">Browse job listings</div></div>
+                            <span class="ql-arrow">›</span>
+                        </a>
+                        <a href="/internships/" class="quick-link">
+                            <span class="ql-icon">🚀</span>
+                            <div><div class="ql-label">Internships</div><div class="ql-desc">Find opportunities</div></div>
+                            <span class="ql-arrow">›</span>
+                        </a>
+                        <a href="/mentorship/" class="quick-link">
+                            <span class="ql-icon">🤝</span>
+                            <div><div class="ql-label">Mentorship</div><div class="ql-desc">Connect with alumni</div></div>
+                            <span class="coming-tag">SOON</span>
+                        </a>
+                        <a href="/chat/" class="quick-link">
+                            <span class="ql-icon">💬</span>
+                            <div><div class="ql-label">Community Chat</div><div class="ql-desc">Talk to peers</div></div>
+                            <span class="coming-tag">SOON</span>
+                        </a>
+                        <a href="/profile/" class="quick-link">
+                            <span class="ql-icon">👤</span>
+                            <div><div class="ql-label">My Profile</div><div class="ql-desc">Edit your details</div></div>
+                            <span class="ql-arrow">›</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SAR Portal{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #1B4332;
+            --primary-mid: #2D6A4F;
+            --primary-light: #40916C;
+            --accent: #C9A84C;
+            --accent-light: #F9F1D8;
+            --bg: #F5F7F5;
+            --white: #FFFFFF;
+            --text: #1A2E1F;
+            --muted: #6B7B6E;
+            --danger: #B5302A;
+            --success: #2D6A4F;
+            --border: #DDE5DD;
+            --nav-h: 68px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--primary);
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 16px rgba(27, 67, 50, 0.18);
+        }
+
+        .nav-brand {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            color: var(--white);
+            text-decoration: none;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            margin-right: 40px;
+        }
+
+        .nav-brand span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.78);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 7px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-left: auto;
+        }
+
+        .nav-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            overflow: hidden;
+            border: 2px solid rgba(201,168,76,0.4);
+            flex-shrink: 0;
+        }
+
+        .nav-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nav-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(27,67,50,0.15);
+            min-width: 180px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .nav-dropdown:hover .nav-dropdown-menu {
+            display: block;
+        }
+
+        .dd-item {
+            display: block;
+            padding: 11px 18px;
+            font-size: 14px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        .dd-item:hover {
+            background: #f0f5f1;
+        }
+
+        .dd-item.danger {
+            color: var(--danger);
+            border-top: 1px solid var(--border);
+        }
+
+        .dd-name {
+            padding: 12px 18px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .main-content {
+            min-height: calc(100vh - var(--nav-h));
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            margin-left: auto;
+            margin-right: 10px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu {
+            display: none;
+            background: var(--primary);
+            padding: 12px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .mobile-menu.open {
+            display: block;
+        }
+
+        .mobile-menu .nav-link {
+            display: block;
+            padding: 10px 14px;
+            margin-bottom: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; position: relative; }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .nav-right .nav-avatar { display: flex; }
+        }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="nav-brand">SAR <span>Portal</span></a>
+    <div class="nav-links">
+        <a href="/dashboard/" class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}">Dashboard</a>
+        <a href="/jobs/" class="nav-link {% if request.path == '/jobs/' %}active{% endif %}">Jobs</a>
+        <a href="/internships/" class="nav-link {% if request.path == '/internships/' %}active{% endif %}">Internships</a>
+        <a href="/mentorship/" class="nav-link {% if request.path == '/mentorship/' %}active{% endif %}">Mentorship</a>
+        <a href="/chat/" class="nav-link {% if request.path == '/chat/' %}active{% endif %}">Chat</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-dropdown">
+            <a href="/profile/" class="nav-avatar">
+                {% if user.profile_pic %}
+                <img src="/media/{{ user.profile_pic }}" alt="{{ user.name }}">
+                {% else %}
+                {{ user.name|slice:":1"|upper }}
+                {% endif %}
+            </a>
+            <div class="nav-dropdown-menu">
+                <div class="dd-name">{{ user.name }}</div>
+                <a href="/profile/" class="dd-item">My Profile</a>
+                <a href="/logout/" class="dd-item danger">Logout</a>
+            </div>
+        </div>
+    </div>
+    <div class="hamburger" onclick="toggleMobile()">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="/dashboard/" class="nav-link">Dashboard</a>
+    <a href="/jobs/" class="nav-link">Jobs</a>
+    <a href="/internships/" class="nav-link">Internships</a>
+    <a href="/mentorship/" class="nav-link">Mentorship</a>
+    <a href="/chat/" class="nav-link">Chat</a>
+    <a href="/profile/" class="nav-link">Profile</a>
+    <a href="/logout/" class="nav-link" style="color:#f9a8a8;">Logout</a>
+</div>
+
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+    function toggleMobile() {
+        document.getElementById('mobileMenu').classList.toggle('open');
+    }
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

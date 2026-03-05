@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — SAR Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #1B4332;
+            --primary-mid: #2D6A4F;
+            --accent: #C9A84C;
+            --bg: #F5F7F5;
+            --white: #FFFFFF;
+            --text: #1A2E1F;
+            --muted: #6B7B6E;
+            --danger: #B5302A;
+            --border: #DDE5DD;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-wrap {
+            flex: 1;
+            display: flex;
+        }
+
+        .left-panel {
+            width: 380px;
+            background: linear-gradient(160deg, #0d2b1e 0%, #1B4332 50%, #2D6A4F 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
+            top: -60px;
+            right: -60px;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(64,145,108,0.15) 0%, transparent 70%);
+            bottom: -40px;
+            left: -40px;
+        }
+
+        .brand {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 48px;
+        }
+
+        .brand span { color: var(--accent); }
+
+        .left-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 26px;
+            color: white;
+            text-align: center;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 2;
+            line-height: 1.3;
+        }
+
+        .left-title em { color: var(--accent); font-style: italic; }
+
+        .left-desc {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            line-height: 1.7;
+            position: relative;
+            z-index: 2;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 48px 40px;
+            overflow-y: auto;
+        }
+
+        .form-box {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .form-box h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .form-subtitle {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 30px;
+        }
+
+        .form-subtitle a {
+            color: var(--primary-mid);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .form-subtitle a:hover { text-decoration: underline; }
+
+        .error-box {
+            background: #fdf0ee;
+            border: 1px solid #f5c6c2;
+            color: var(--danger);
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            background: var(--white);
+            transition: border-color 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-mid);
+            box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+        }
+
+        .select-wrap {
+            position: relative;
+        }
+
+        .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+            font-size: 14px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .radio-option {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .radio-option input[type="radio"] {
+            accent-color: var(--primary-mid);
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
+
+        .radio-option:has(input:checked) {
+            border-color: var(--primary-mid);
+            background: #f0f7f3;
+        }
+
+        #current_year_group {
+            display: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            margin-top: 6px;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-mid);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 900px) {
+            .left-panel { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            .right-panel { padding: 30px 20px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+    <div class="left-panel">
+        <a href="/" class="brand">SAR <span>Portal</span></a>
+        <h2 class="left-title">Join the <em>Alumni Network</em> Today</h2>
+        <p class="left-desc">Connect with graduates, explore opportunities, and build your future with the college community.</p>
+    </div>
+
+    <div class="right-panel">
+        <div class="form-box">
+            <h2>Create Account</h2>
+            <div class="form-subtitle">Already have an account? <a href="/login/">Login here</a></div>
+
+            {% if error %}
+            <div class="error-box">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" name="phone" placeholder="+91 00000 00000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Admission Year</label>
+                        <input type="number" name="admission_year" placeholder="e.g. 2021" min="1990" max="2030" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Stream</label>
+                    <div class="select-wrap">
+                        <select name="stream" required>
+                            <option value="" disabled selected>Select your stream</option>
+                            {% for s in streams %}
+                            <option value="{{ s }}">{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="status" value="student" checked onchange="toggleCurrentYear(this)">
+                                Student
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="status" value="alumni" onchange="toggleCurrentYear(this)">
+                                Alumni
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <div class="select-wrap">
+                            <select name="gender" required>
+                                <option value="" disabled selected>Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="current_year_group">
+                    <label>Current Year</label>
+                    <div class="select-wrap">
+                        <select name="current_year">
+                            <option value="" disabled selected>Select year</option>
+                            <option value="First">First Year</option>
+                            <option value="Second">Second Year</option>
+                            <option value="Third">Third Year</option>
+                            <option value="Fourth">Fourth Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Create a strong password" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Create My Account →</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleCurrentYear(radio) {
+        var group = document.getElementById('current_year_group');
+        group.style.display = radio.value === 'student' ? 'flex' : 'none';
+    }
+    toggleCurrentYear({ value: 'student' });
+</script>
+</body>
+</html>
