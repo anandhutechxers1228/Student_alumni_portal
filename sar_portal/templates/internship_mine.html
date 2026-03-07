@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}My Internships — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page { padding: 36px 48px; max-width: 900px; margin: 0 auto; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--primary-mid); text-decoration: none; font-weight: 600; margin-bottom: 24px; }
+    .back-link:hover { text-decoration: underline; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--primary); }
+    .counter-text { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .counter-text strong { color: var(--primary); }
+    .btn-primary { padding: 10px 22px; background: var(--primary); color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .btn-primary:hover { background: var(--primary-mid); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .profiles-list { display: flex; flex-direction: column; gap: 16px; }
+    .profile-card { background: white; border-radius: 16px; border: 1px solid #E0E9E1; overflow: hidden; }
+    .card-hero { background: linear-gradient(130deg, #1B4332, #2D6A4F); padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .hero-left { display: flex; align-items: center; gap: 16px; }
+    .hero-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: var(--primary); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 24px; border: 3px solid rgba(255,255,255,0.25); flex-shrink: 0; }
+    .hero-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: white; margin-bottom: 3px; }
+    .hero-sub { font-size: 12px; color: rgba(255,255,255,0.65); }
+    .card-actions { display: flex; gap: 10px; flex-shrink: 0; }
+    .btn-edit { padding: 8px 18px; background: var(--accent); color: var(--primary); border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; }
+    .btn-edit:hover { background: #d4b055; }
+    .btn-delete { padding: 8px 18px; background: rgba(181,48,42,0.15); color: #f5a09d; border: 1px solid rgba(181,48,42,0.3); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; }
+    .btn-delete:hover { background: rgba(181,48,42,0.25); }
+    .card-body { padding: 20px 28px; }
+    .section { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f0f4f1; }
+    .section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 8px; }
+    .pills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #f0f7f3; color: var(--primary); border: 1px solid #d0e8d8; font-weight: 500; }
+    .pill.lang { background: #f5f0ff; color: #5b3fa0; border-color: #d8ccf5; }
+    .pill.location { background: #eef4ff; color: #2d5fb0; border-color: #c5d8f5; }
+    .desc-text { font-size: 13px; color: var(--text); line-height: 1.7; }
+    .meta-row { display: flex; gap: 20px; flex-wrap: wrap; }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+    .meta-val { font-size: 13px; color: var(--text); font-weight: 500; }
+    .empty-state { text-align: center; padding: 80px 40px; background: white; border-radius: 20px; border: 1px solid #E0E9E1; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--primary); margin-bottom: 8px; }
+    .empty-sub { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+    @media (max-width: 768px) { .page { padding: 20px; } .card-hero { flex-direction: column; align-items: flex-start; } .card-actions { width: 100%; } }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/internships/" class="back-link">← Back to Internship Portal</a>
+
+    <div class="page-header">
+        <div class="page-title">My Internships</div>
+        {% if profiles|length < 5 %}
+        <a href="/internships/add/" class="btn-primary">+ Add New</a>
+        {% else %}
+        <button class="btn-primary" disabled>Limit Reached</button>
+        {% endif %}
+    </div>
+    <p class="counter-text"><strong>{{ profiles|length }}/5</strong> internship profiles posted</p>
+
+    {% if profiles %}
+    <div class="profiles-list">
+        {% for p in profiles %}
+        <div class="profile-card">
+            <div class="card-hero">
+                <div class="hero-left">
+                    <div class="hero-avatar">{{ p.name|slice:":1"|upper }}</div>
+                    <div>
+                        <div class="hero-name">{{ p.name }}</div>
+                        <div class="hero-sub">
+                            {% if p.role_title %}{{ p.role_title }} · {% endif %}
+                            {{ p.stream }} · {{ p.current_year }} · {{ p.created_at_str }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="/internships/edit/{{ p.id }}/" class="btn-edit">Edit</a>
+                    <form method="POST" action="/internships/delete/{{ p.id }}/" style="margin:0;" onsubmit="return confirm('Delete this profile?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-delete">Delete</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if p.current_location %}
+                <div class="section">
+                    <div class="section-title">Location</div>
+                    <div class="meta-row">
+                        <div class="meta-item">
+                            <div class="meta-label">Currently In</div>
+                            <div class="meta-val">{{ p.current_location }}</div>
+                        </div>
+                    </div>
+                    {% if p.relocatable_locations %}
+                    <div style="margin-top:10px;">
+                        <div class="meta-label" style="margin-bottom:6px;">Open to Relocate</div>
+                        <div class="pills-wrap">
+                            {% for loc in p.relocatable_locations %}<span class="pill location">{{ loc }}</span>{% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if p.skills %}
+                <div class="section">
+                    <div class="section-title">Skills</div>
+                    <div class="pills-wrap">{% for s in p.skills %}<span class="pill">{{ s }}</span>{% endfor %}</div>
+                </div>
+                {% endif %}
+                {% if p.languages %}
+                <div class="section">
+                    <div class="section-title">Languages</div>
+                    <div class="pills-wrap">{% for l in p.languages %}<span class="pill lang">{{ l }}</span>{% endfor %}</div>
+                </div>
+                {% endif %}
+                {% if p.description %}
+                <div class="section">
+                    <div class="section-title">Why I Need This Internship</div>
+                    <p class="desc-text">{{ p.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon"></div>
+        <div class="empty-title">No Profiles Yet</div>
+        <p class="empty-sub">Post your internship profile so alumni can find you!</p>
+        <a href="/internships/add/" class="btn-primary">+ Post Internship</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

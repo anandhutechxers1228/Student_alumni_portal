@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Job — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 780px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--primary-mid);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+        margin-bottom: 28px;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 18px;
+        border: 1px solid #E0E9E1;
+        padding: 36px;
+    }
+
+    .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--muted);
+        margin-bottom: 16px;
+        margin-top: 28px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f0f4f1;
+    }
+
+    .section-label:first-child { margin-top: 0; }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 11px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
+        font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        background: white;
+        transition: border-color 0.2s;
+        resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-mid);
+        box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    }
+
+    .opt-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 400;
+        margin-left: 4px;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .tag-section { margin-bottom: 16px; }
+
+    .tag-section-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .tags-display {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-height: 32px;
+        margin-bottom: 8px;
+    }
+
+    .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f0f7f3;
+        color: var(--primary);
+        border: 1px solid #d0e8d8;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .tag-pill.location {
+        background: #eef4ff;
+        color: #2d5fb0;
+        border-color: #c5d8f5;
+    }
+
+    .tag-pill button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        color: inherit;
+        opacity: 0.6;
+        padding: 0;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .tag-pill button:hover { opacity: 1; }
+
+    .tag-add-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .tag-add-row input {
+        flex: 1;
+        padding: 9px 13px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        transition: border-color 0.2s;
+    }
+
+    .tag-add-row input:focus {
+        outline: none;
+        border-color: var(--primary-mid);
+        box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    }
+
+    .tag-add-btn {
+        padding: 9px 16px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+        transition: background 0.2s;
+    }
+
+    .tag-add-btn:hover { background: var(--primary-mid); }
+
+    .img-upload-area {
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        padding: 28px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        position: relative;
+    }
+
+    .img-upload-area:hover { border-color: var(--primary-mid); }
+    .img-upload-area input { display: none; }
+
+    .img-preview {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin: 0 auto 12px;
+        display: block;
+    }
+
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-label { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+        justify-content: flex-end;
+    }
+
+    .btn-cancel {
+        padding: 12px 28px;
+        background: white;
+        color: var(--muted);
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel:hover { background: #f5f7f5; }
+
+    .btn-submit {
+        padding: 12px 32px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-submit:hover {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    .error-box {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        color: var(--danger);
+        padding: 11px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .page { padding: 20px; }
+        .form-card { padding: 24px 20px; }
+        .form-row { grid-template-columns: 1fr; }
+        .form-actions { flex-direction: column-reverse; }
+        .btn-submit, .btn-cancel { width: 100%; text-align: center; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/jobs/mine/" class="back-link">← Back to My Jobs</a>
+    <div class="page-title">Edit Job</div>
+
+    <div class="form-card">
+        {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="section-label">Job Details</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" name="title" value="{{ job.title }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" name="company_name" value="{{ job.company_name }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Job Description <span class="opt-label">(optional)</span></label>
+                <textarea name="description" rows="4">{{ job.description }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Company Description <span class="opt-label">(optional)</span></label>
+                <textarea name="company_description" rows="3">{{ job.company_description }}</textarea>
+            </div>
+
+            <div class="section-label">Compensation & Experience</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Experience Required</label>
+                    <input type="text" name="experience_required" value="{{ job.experience_required }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Salary</label>
+                    <input type="text" name="salary" value="{{ job.salary }}" required>
+                </div>
+            </div>
+
+            <div class="section-label">Locations</div>
+
+            <div class="tag-section">
+                <div class="tags-display" id="locations-tags"></div>
+                <div class="tag-add-row">
+                    <input type="text" id="locations-input" placeholder="Type a city or location and press Add...">
+                    <button type="button" class="tag-add-btn" onclick="addTag('locations')">+ Add</button>
+                </div>
+                <input type="hidden" id="locations-json" name="locations_json" value="{{ job.locations_json }}">
+            </div>
+
+            <div class="section-label">Eligibility / Skills Required</div>
+
+            <div class="tag-section">
+                <div class="tags-display" id="eligibility-tags"></div>
+                <div class="tag-add-row">
+                    <input type="text" id="eligibility-input" placeholder="Type a skill and press Add...">
+                    <button type="button" class="tag-add-btn" onclick="addTag('eligibility')">+ Add</button>
+                </div>
+                <input type="hidden" id="eligibility-json" name="eligibility_json" value="{{ job.eligibility_json }}">
+            </div>
+
+            <div class="section-label">Job Poster / Image <span class="opt-label">(optional — leave blank to keep existing)</span></div>
+
+            <div class="img-upload-area" onclick="document.getElementById('jobImgInput').click()">
+                {% if job.image %}
+                <img class="img-preview" id="imgPreview" src="/media/{{ job.image }}" alt="Current image">
+                <div class="upload-icon" id="uploadIcon" style="display:none;">🖼️</div>
+                {% else %}
+                <img class="img-preview" id="imgPreview" src="#" alt="Preview" style="display:none;">
+                <div class="upload-icon" id="uploadIcon">🖼️</div>
+                {% endif %}
+                <div class="upload-label">Click to replace the image<br><small>JPG, PNG, WEBP — max 5MB</small></div>
+                <input type="file" name="job_image" id="jobImgInput" accept="image/*" onchange="previewImg(this)">
+            </div>
+
+            <div class="form-actions">
+                <a href="/jobs/mine/" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">Save Changes →</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var tagsData = {
+        locations: JSON.parse(document.getElementById('locations-json').value || '[]'),
+        eligibility: JSON.parse(document.getElementById('eligibility-json').value || '[]')
+    };
+
+    renderTags('locations');
+    renderTags('eligibility');
+
+    function addTag(name) {
+        var input = document.getElementById(name + '-input');
+        var val = input.value.trim();
+        if (val && !tagsData[name].includes(val)) {
+            tagsData[name].push(val);
+            renderTags(name);
+            document.getElementById(name + '-json').value = JSON.stringify(tagsData[name]);
+        }
+        input.value = '';
+        input.focus();
+    }
+
+    function removeTag(name, idx) {
+        tagsData[name].splice(idx, 1);
+        renderTags(name);
+        document.getElementById(name + '-json').value = JSON.stringify(tagsData[name]);
+    }
+
+    function renderTags(name) {
+        var cls = name === 'locations' ? 'location' : '';
+        var display = document.getElementById(name + '-tags');
+        display.innerHTML = tagsData[name].map(function(t, i) {
+            return '<span class="tag-pill ' + cls + '">' + escHtml(t) + '<button type="button" onclick="removeTag(\'' + name + '\',' + i + ')">×</button></span>';
+        }).join('');
+    }
+
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    document.getElementById('locations-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addTag('locations'); }
+    });
+
+    document.getElementById('eligibility-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addTag('eligibility'); }
+    });
+
+    function previewImg(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var preview = document.getElementById('imgPreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                document.getElementById('uploadIcon').style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

@@ -5,61 +5,312 @@
 {% block extra_css %}
     .page {
         padding: 36px 48px;
-        max-width: 1000px;
+        max-width: 1100px;
         margin: 0 auto;
     }
 
-    .coming-wrap {
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        padding: 10px 22px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline {
+        padding: 10px 22px;
+        background: white;
+        color: var(--primary);
+        border: 1.5px solid var(--primary);
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+        background: #f0f7f3;
+    }
+
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .job-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        overflow: hidden;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .job-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 32px rgba(27,67,50,0.1);
+    }
+
+    .job-img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .job-img-placeholder {
+        width: 100%;
+        height: 150px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 44px;
+    }
+
+    .job-body {
+        padding: 20px;
+        flex: 1;
+    }
+
+    .job-company {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary-mid);
+        margin-bottom: 4px;
+    }
+
+    .job-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 19px;
+        color: var(--primary);
+        margin-bottom: 12px;
+        line-height: 1.3;
+    }
+
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary-mid);
+        font-weight: 500;
+    }
+
+    .meta-badge.salary {
+        background: var(--accent-light);
+        color: #8a6d15;
+    }
+
+    .pills-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+
+    .pill {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary);
+        border: 1px solid #d0e8d8;
+        font-weight: 500;
+    }
+
+    .pill.location {
+        background: #eef4ff;
+        color: #2d5fb0;
+        border-color: #c5d8f5;
+    }
+
+    .job-desc {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-top: 8px;
+    }
+
+    .job-footer {
+        padding: 12px 20px;
+        border-top: 1px solid #f0f4f1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .job-poster {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .job-date {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .empty-state {
         text-align: center;
         padding: 80px 40px;
         background: white;
         border-radius: 20px;
         border: 1px solid #E0E9E1;
+        grid-column: 1 / -1;
     }
 
-    .coming-icon {
-        font-size: 64px;
-        margin-bottom: 20px;
+    .empty-icon {
+        font-size: 56px;
+        margin-bottom: 16px;
     }
 
-    .coming-title {
+    .empty-title {
         font-family: 'DM Serif Display', serif;
-        font-size: 32px;
+        font-size: 24px;
         color: var(--primary);
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
 
-    .coming-sub {
-        font-size: 16px;
+    .empty-sub {
+        font-size: 15px;
         color: var(--muted);
-        max-width: 420px;
-        margin: 0 auto 32px;
-        line-height: 1.7;
-    }
-
-    .coming-badge {
-        display: inline-block;
-        background: var(--accent-light);
-        color: #8a6d15;
-        padding: 8px 22px;
-        border-radius: 30px;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
+        margin-bottom: 24px;
     }
 
     @media (max-width: 768px) {
         .page { padding: 20px; }
+        .jobs-grid { grid-template-columns: 1fr; }
     }
 {% endblock %}
 
 {% block content %}
 <div class="page">
-    <div class="coming-wrap">
-        <div class="coming-icon">💼</div>
-        <h2 class="coming-title">Job Portal</h2>
-        <p class="coming-sub">Exclusive job listings shared by our alumni network are coming soon. Get notified when this feature launches.</p>
-        <span class="coming-badge">🚧 Coming Soon</span>
+    <div class="page-header">
+        {% if user.status == 'alumni' %}
+        <div class="header-actions">
+            <a href="/jobs/add/" class="btn-primary">+ Post a Job</a>
+            <a href="/jobs/mine/" class="btn-outline">My Posted Jobs</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="jobs-grid">
+        {% if jobs %}
+            {% for job in jobs %}
+            <a href="/jobs/{{ job.id }}/" class="job-card">
+                {% if job.image %}
+                <img class="job-img" src="/media/{{ job.image }}" alt="{{ job.title }}">
+                {% else %}
+                <div class="job-img-placeholder">💼</div>
+                {% endif %}
+                <div class="job-body">
+                    <div class="job-company">{{ job.company_name }}</div>
+                    <div class="job-title">{{ job.title }}</div>
+                    <div class="job-meta">
+                        {% if job.experience_required %}
+                        <span class="meta-badge">🕐 {{ job.experience_required }}</span>
+                        {% endif %}
+                        {% if job.salary %}
+                        <span class="meta-badge salary">₹ {{ job.salary }}</span>
+                        {% endif %}
+                    </div>
+                    {% if job.locations %}
+                    <div class="pills-wrap">
+                        {% for loc in job.locations %}
+                        <span class="pill location">{{ loc }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if job.eligibility %}
+                    <div class="pills-wrap">
+                        {% for skill in job.eligibility %}
+                        <span class="pill">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if job.description %}
+                    <p class="job-desc">{{ job.description|truncatechars:120 }}</p>
+                    {% endif %}
+                </div>
+                <div class="job-footer">
+                    <span class="job-poster">Posted by {{ job.posted_by_name }}</span>
+                    <span class="job-date">{{ job.posted_at_str }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">💼</div>
+            <div class="empty-title">No Jobs Yet</div>
+            <p class="empty-sub">
+                {% if user.status == 'alumni' %}
+                Be the first to post a job for students!
+                {% else %}
+                Check back soon — alumni will post opportunities here.
+                {% endif %}
+            </p>
+            {% if user.status == 'alumni' %}
+            <a href="/jobs/add/" class="btn-primary">+ Post a Job</a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

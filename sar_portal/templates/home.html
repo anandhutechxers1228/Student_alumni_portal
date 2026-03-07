@@ -77,11 +77,30 @@
             border-radius: 8px;
             transition: all 0.2s;
             white-space: nowrap;
+            position: relative;
         }
 
         .nav-link:hover {
             background: rgba(255,255,255,0.12);
             color: white;
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: #e53e3e;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            line-height: 1;
         }
 
         .nav-right {
@@ -146,16 +165,15 @@
             display: none;
             position: absolute;
             right: 0;
-            top: calc(100% + 10px);
+            top: calc(100% + 8px);
             background: var(--white);
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(27,67,50,0.15);
             min-width: 180px;
             overflow: hidden;
             border: 1px solid var(--border);
+            z-index: 300;
         }
-
-        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
 
         .dd-name {
             padding: 12px 18px 8px;
@@ -510,10 +528,10 @@
         <a href="/jobs/" class="nav-link">Jobs</a>
         <a href="/internships/" class="nav-link">Internships</a>
         <a href="/mentorship/" class="nav-link">Mentorship</a>
-        <a href="/chat/" class="nav-link">Chat</a>
+        <a href="/chat/" class="nav-link">Chat<span class="chat-badge" id="chatBadge"></span></a>
     </div>
     <div class="nav-right">
-        <div class="nav-dropdown">
+        <div class="nav-dropdown" id="navDropdown">
             <div class="nav-avatar">
                 {% if user.profile_pic %}
                 <img src="/media/{{ user.profile_pic }}" alt="{{ user.name }}">
@@ -521,7 +539,7 @@
                 {{ user.name|slice:":1"|upper }}
                 {% endif %}
             </div>
-            <div class="nav-dropdown-menu">
+            <div class="nav-dropdown-menu" id="navDropdownMenu">
                 <div class="dd-name">{{ user.name }}</div>
                 <a href="/profile/" class="dd-item">My Profile</a>
                 <a href="/logout/" class="dd-item danger">Logout</a>
@@ -650,6 +668,36 @@
         var m = document.getElementById('mobileMenu');
         if (m) m.classList.toggle('open');
     }
+
+    (function() {
+        var dropdown = document.getElementById('navDropdown');
+        var menu = document.getElementById('navDropdownMenu');
+        if (!dropdown || !menu) return;
+        var hideTimer = null;
+        function showMenu() { clearTimeout(hideTimer); menu.style.display = 'block'; }
+        function hideMenu() { hideTimer = setTimeout(function() { menu.style.display = ''; }, 180); }
+        dropdown.addEventListener('mouseenter', showMenu);
+        dropdown.addEventListener('mouseleave', hideMenu);
+        menu.addEventListener('mouseenter', showMenu);
+        menu.addEventListener('mouseleave', hideMenu);
+    })();
+
+    function updateChatBadge() {
+        fetch('/chat/api/unread/')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var badge = document.getElementById('chatBadge');
+                if (!badge) return;
+                if (d.count > 0) {
+                    badge.textContent = d.count > 99 ? '99+' : d.count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(function() {});
+    }
+    {% if user %}updateChatBadge(); setInterval(updateChatBadge, 30000);{% endif %}
 </script>
 </body>
 </html>

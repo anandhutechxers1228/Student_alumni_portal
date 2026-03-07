@@ -3,60 +3,114 @@
 {% block title %}Mentorship — SAR Portal{% endblock %}
 
 {% block extra_css %}
-    .page {
-        padding: 36px 48px;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-
-    .coming-wrap {
-        text-align: center;
-        padding: 80px 40px;
-        background: white;
-        border-radius: 20px;
-        border: 1px solid #E0E9E1;
-    }
-
-    .coming-icon { font-size: 64px; margin-bottom: 20px; }
-
-    .coming-title {
-        font-family: 'DM Serif Display', serif;
-        font-size: 32px;
-        color: var(--primary);
-        margin-bottom: 12px;
-    }
-
-    .coming-sub {
-        font-size: 16px;
-        color: var(--muted);
-        max-width: 420px;
-        margin: 0 auto 32px;
-        line-height: 1.7;
-    }
-
-    .coming-badge {
-        display: inline-block;
-        background: var(--accent-light);
-        color: #8a6d15;
-        padding: 8px 22px;
-        border-radius: 30px;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }
-
-    @media (max-width: 768px) {
-        .page { padding: 20px; }
-    }
+    .page { padding: 36px 48px; max-width: 860px; margin: 0 auto; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--primary); }
+    .btn-ask { padding: 10px 22px; background: var(--primary); color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .btn-ask:hover { background: var(--primary-mid); transform: translateY(-1px); }
+    .questions-list { display: flex; flex-direction: column; gap: 0; }
+    .question-row { background: white; border: 1px solid #E0E9E1; border-radius: 0; padding: 20px 24px; transition: background 0.15s; cursor: pointer; text-decoration: none; color: inherit; display: block; border-bottom: none; }
+    .questions-list .question-row:first-child { border-radius: 16px 16px 0 0; }
+    .questions-list .question-row:last-child { border-radius: 0 0 16px 16px; border-bottom: 1px solid #E0E9E1; }
+    .questions-list .question-row:only-child { border-radius: 16px; border-bottom: 1px solid #E0E9E1; }
+    .question-row:hover { background: #f9fbf9; }
+    .q-meta-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .q-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white; font-family: 'DM Serif Display', serif; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+    .q-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .q-author { font-size: 13px; font-weight: 600; color: var(--primary-mid); }
+    .q-date { font-size: 12px; color: var(--muted); }
+    .q-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--primary); margin-bottom: 6px; line-height: 1.3; }
+    .q-body { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .q-footer { display: flex; align-items: center; gap: 16px; }
+    .q-stat { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+    .q-stat.up { color: #2D6A4F; }
+    .q-stat.down { color: var(--danger); }
+    .empty-state { text-align: center; padding: 80px 40px; background: white; border-radius: 20px; border: 1px solid #E0E9E1; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--primary); margin-bottom: 8px; }
+    .empty-sub { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,35,20,0.55); z-index: 500; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 20px; width: 100%; max-width: 600px; box-shadow: 0 20px 60px rgba(27,67,50,0.2); margin: auto; }
+    .modal-head { padding: 22px 28px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-head h3 { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--primary); }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 6px; transition: background 0.15s; }
+    .modal-close:hover { background: #f0f4f1; }
+    .modal-body { padding: 24px 28px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group textarea { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); background: white; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-mid); box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .modal-actions { padding: 18px 28px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+    .btn-cancel { padding: 11px 24px; background: white; color: var(--muted); border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .btn-cancel:hover { background: #f5f7f5; }
+    .btn-save { padding: 11px 28px; background: var(--primary); color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .btn-save:hover { background: var(--primary-mid); transform: translateY(-1px); }
+    @media (max-width: 768px) { .page { padding: 20px; } }
 {% endblock %}
 
 {% block content %}
 <div class="page">
-    <div class="coming-wrap">
-        <div class="coming-icon">🤝</div>
-        <h2 class="coming-title">Mentorship Portal</h2>
-        <p class="coming-sub">One-on-one mentorship with alumni who have been in your shoes is coming soon. Find your guide.</p>
-        <span class="coming-badge">🚧 Coming Soon</span>
+    <div class="page-header">
+        <button class="btn-ask" onclick="document.getElementById('askModal').classList.add('open')">+ Ask a Question</button>
+    </div>
+
+    {% if questions %}
+    <div class="questions-list">
+        {% for q in questions %}
+        <a href="/mentorship/{{ q.id }}/" class="question-row">
+            <div class="q-meta-top">
+                <div class="q-avatar">
+                    {% if q.posted_by_pic %}<img src="/media/{{ q.posted_by_pic }}" alt="">{% else %}{{ q.posted_by_name|slice:":1"|upper }}{% endif %}
+                </div>
+                <span class="q-author">{{ q.posted_by_name }}</span>
+                <span class="q-date">· {{ q.posted_at_str }}</span>
+            </div>
+            <div class="q-title">{{ q.title }}</div>
+            {% if q.body %}
+            <p class="q-body">{{ q.body|truncatechars:180 }}</p>
+            {% endif %}
+            <div class="q-footer">
+                <span class="q-stat up">▲ {{ q.up_count }}</span>
+                <span class="q-stat down">▼ {{ q.down_count }}</span>
+                <span class="q-stat">💬 {{ q.reply_count }} replies</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-title">No Questions Yet</div>
+        <p class="empty-sub">Be the first to ask a question! Students and alumni can both post and reply.</p>
+        <button class="btn-ask" onclick="document.getElementById('askModal').classList.add('open')">+ Ask a Question</button>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal-overlay" id="askModal">
+    <div class="modal">
+        <div class="modal-head">
+            <h3>Ask a Question</h3>
+            <button class="modal-close" onclick="document.getElementById('askModal').classList.remove('open')">×</button>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Question Title</label>
+                    <input type="text" name="title" placeholder="What's your question?" required>
+                </div>
+                <div class="form-group">
+                    <label>Details</label>
+                    <textarea name="body" placeholder="Add more context or details about your question..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="document.getElementById('askModal').classList.remove('open')">Cancel</button>
+                <button type="submit" class="btn-save">Post Question →</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

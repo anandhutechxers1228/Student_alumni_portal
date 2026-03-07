@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'sar_portal',
 ]
 
@@ -46,6 +47,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'sar_portal.wsgi.application'
+ASGI_APPLICATION = 'sar_portal.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
 
 DATABASES = {
     'default': {

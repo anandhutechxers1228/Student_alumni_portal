@@ -24,12 +24,7 @@
             --nav-h: 68px;
         }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
         .navbar {
             background: var(--primary);
@@ -50,19 +45,12 @@
             text-decoration: none;
             letter-spacing: 0.3px;
             white-space: nowrap;
-            margin-right: 40px;
+            margin-right: 32px;
         }
 
-        .nav-brand span {
-            color: var(--accent);
-        }
+        .nav-brand span { color: var(--accent); }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex: 1;
-        }
+        .nav-links { display: flex; align-items: center; gap: 4px; flex: 1; }
 
         .nav-link {
             color: rgba(255,255,255,0.78);
@@ -73,22 +61,129 @@
             border-radius: 8px;
             transition: all 0.2s;
             white-space: nowrap;
+            position: relative;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.12); color: #fff; }
+        .nav-link.active { color: var(--accent); }
+
+        .chat-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: #e53e3e;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+        .nav-search-wrap { position: relative; }
+
+        .nav-search-btn {
+            width: 36px;
+            height: 36px;
             background: rgba(255,255,255,0.12);
-            color: #fff;
-        }
-
-        .nav-link.active {
-            color: var(--accent);
-        }
-
-        .nav-right {
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-left: auto;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .nav-search-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+        .nav-search-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            width: 320px;
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(27,67,50,0.18);
+            border: 1px solid var(--border);
+            z-index: 400;
+            overflow: hidden;
+        }
+
+        .nav-search-panel.open { display: block; }
+
+        .nav-search-input-wrap {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            gap: 8px;
+        }
+
+        .nav-search-input-wrap span { color: var(--muted); font-size: 16px; }
+
+        .nav-search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+
+        .nav-search-results { max-height: 300px; overflow-y: auto; }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            transition: background 0.15s;
+        }
+
+        .search-result-item:hover { background: #f0f5f1; }
+
+        .search-avatar-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .search-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+
+        .search-result-info { flex: 1; min-width: 0; }
+
+        .search-result-name { font-weight: 600; font-size: 14px; color: var(--text); }
+
+        .search-result-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+        .search-hint {
+            padding: 14px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
         }
 
         .nav-avatar {
@@ -109,104 +204,43 @@
             flex-shrink: 0;
         }
 
-        .nav-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-        .nav-dropdown {
-            position: relative;
-        }
+        .nav-dropdown { position: relative; }
 
         .nav-dropdown-menu {
             display: none;
             position: absolute;
             right: 0;
-            top: calc(100% + 10px);
+            top: calc(100% + 8px);
             background: var(--white);
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(27,67,50,0.15);
             min-width: 180px;
             overflow: hidden;
             border: 1px solid var(--border);
+            z-index: 300;
         }
 
-        .nav-dropdown:hover .nav-dropdown-menu {
-            display: block;
-        }
+        .dd-item { display: block; padding: 11px 18px; font-size: 14px; color: var(--text); text-decoration: none; transition: background 0.15s; }
+        .dd-item:hover { background: #f0f5f1; }
+        .dd-item.danger { color: var(--danger); border-top: 1px solid var(--border); }
+        .dd-name { padding: 12px 18px 8px; font-size: 13px; font-weight: 600; color: var(--primary); border-bottom: 1px solid var(--border); }
 
-        .dd-item {
-            display: block;
-            padding: 11px 18px;
-            font-size: 14px;
-            color: var(--text);
-            text-decoration: none;
-            transition: background 0.15s;
-        }
+        .main-content { min-height: calc(100vh - var(--nav-h)); }
 
-        .dd-item:hover {
-            background: #f0f5f1;
-        }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; margin-left: auto; margin-right: 10px; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: white; border-radius: 2px; transition: all 0.3s; }
 
-        .dd-item.danger {
-            color: var(--danger);
-            border-top: 1px solid var(--border);
-        }
-
-        .dd-name {
-            padding: 12px 18px 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--primary);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .main-content {
-            min-height: calc(100vh - var(--nav-h));
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            padding: 6px;
-            margin-left: auto;
-            margin-right: 10px;
-        }
-
-        .hamburger span {
-            display: block;
-            width: 22px;
-            height: 2px;
-            background: white;
-            border-radius: 2px;
-            transition: all 0.3s;
-        }
-
-        .mobile-menu {
-            display: none;
-            background: var(--primary);
-            padding: 12px 20px 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .mobile-menu.open {
-            display: block;
-        }
-
-        .mobile-menu .nav-link {
-            display: block;
-            padding: 10px 14px;
-            margin-bottom: 2px;
-        }
+        .mobile-menu { display: none; background: var(--primary); padding: 12px 20px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .mobile-menu.open { display: block; }
+        .mobile-menu .nav-link { display: block; padding: 10px 14px; margin-bottom: 2px; }
 
         @media (max-width: 768px) {
             .navbar { padding: 0 20px; position: relative; }
             .nav-links { display: none; }
             .hamburger { display: flex; }
-            .nav-right .nav-avatar { display: flex; }
+            .nav-search-panel { width: 280px; right: -40px; }
         }
 
         {% block extra_css %}{% endblock %}
@@ -221,10 +255,22 @@
         <a href="/jobs/" class="nav-link {% if request.path == '/jobs/' %}active{% endif %}">Jobs</a>
         <a href="/internships/" class="nav-link {% if request.path == '/internships/' %}active{% endif %}">Internships</a>
         <a href="/mentorship/" class="nav-link {% if request.path == '/mentorship/' %}active{% endif %}">Mentorship</a>
-        <a href="/chat/" class="nav-link {% if request.path == '/chat/' %}active{% endif %}">Chat</a>
+        <a href="/chat/" class="nav-link {% if request.path == '/chat/' or '/chat/' in request.path %}active{% endif %}">Chat<span class="chat-badge" id="chatBadge"></span></a>
     </div>
     <div class="nav-right">
-        <div class="nav-dropdown">
+        <div class="nav-search-wrap" id="navSearchWrap">
+            <button class="nav-search-btn" onclick="toggleSearch(event)" title="Find People">🔍</button>
+            <div class="nav-search-panel" id="navSearchPanel">
+                <div class="nav-search-input-wrap">
+                    <span>🔍</span>
+                    <input type="text" class="nav-search-input" id="navSearchInput" placeholder="Search people by name..." autocomplete="off">
+                </div>
+                <div class="nav-search-results" id="navSearchResults">
+                    <div class="search-hint">Type at least 4 letters to search</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-dropdown" id="navDropdown">
             <a href="/profile/" class="nav-avatar">
                 {% if user.profile_pic %}
                 <img src="/media/{{ user.profile_pic }}" alt="{{ user.name }}">
@@ -232,7 +278,7 @@
                 {{ user.name|slice:":1"|upper }}
                 {% endif %}
             </a>
-            <div class="nav-dropdown-menu">
+            <div class="nav-dropdown-menu" id="navDropdownMenu">
                 <div class="dd-name">{{ user.name }}</div>
                 <a href="/profile/" class="dd-item">My Profile</a>
                 <a href="/logout/" class="dd-item danger">Logout</a>
@@ -262,6 +308,89 @@
     function toggleMobile() {
         document.getElementById('mobileMenu').classList.toggle('open');
     }
+
+    function toggleSearch(e) {
+        e.stopPropagation();
+        var panel = document.getElementById('navSearchPanel');
+        panel.classList.toggle('open');
+        if (panel.classList.contains('open')) {
+            document.getElementById('navSearchInput').focus();
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        var wrap = document.getElementById('navSearchWrap');
+        if (!wrap.contains(e.target)) {
+            document.getElementById('navSearchPanel').classList.remove('open');
+        }
+    });
+
+    (function() {
+        var dropdown = document.getElementById('navDropdown');
+        var menu = document.getElementById('navDropdownMenu');
+        if (!dropdown || !menu) return;
+        var hideTimer = null;
+        function showMenu() { clearTimeout(hideTimer); menu.style.display = 'block'; }
+        function hideMenu() { hideTimer = setTimeout(function() { menu.style.display = ''; }, 180); }
+        dropdown.addEventListener('mouseenter', showMenu);
+        dropdown.addEventListener('mouseleave', hideMenu);
+        menu.addEventListener('mouseenter', showMenu);
+        menu.addEventListener('mouseleave', hideMenu);
+    })();
+
+    var searchTimer = null;
+    document.getElementById('navSearchInput').addEventListener('input', function() {
+        var q = this.value.trim();
+        var results = document.getElementById('navSearchResults');
+        clearTimeout(searchTimer);
+        if (q.length < 4) {
+            results.innerHTML = '<div class="search-hint">Type at least 4 letters to search</div>';
+            return;
+        }
+        results.innerHTML = '<div class="search-hint">Searching...</div>';
+        searchTimer = setTimeout(function() {
+            fetch('/search/?q=' + encodeURIComponent(q))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.users || data.users.length === 0) {
+                        results.innerHTML = '<div class="search-hint">No users found</div>';
+                        return;
+                    }
+                    results.innerHTML = data.users.map(function(u) {
+                        var avatar = u.profile_pic
+                            ? '<img src="/media/' + u.profile_pic + '" alt="">'
+                            : '<span>' + u.name.charAt(0).toUpperCase() + '</span>';
+                        return '<a href="/users/' + u.id + '/" class="search-result-item">' +
+                            '<div class="search-avatar-sm">' + avatar + '</div>' +
+                            '<div class="search-result-info">' +
+                            '<div class="search-result-name">' + u.name + '</div>' +
+                            '<div class="search-result-sub">' + (u.stream || '') + ' &middot; ' + (u.status || '') + '</div>' +
+                            '</div></a>';
+                    }).join('');
+                })
+                .catch(function() {
+                    results.innerHTML = '<div class="search-hint">Search failed</div>';
+                });
+        }, 300);
+    });
+
+    function updateChatBadge() {
+        fetch('/chat/api/unread/')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var badge = document.getElementById('chatBadge');
+                if (!badge) return;
+                if (d.count > 0) {
+                    badge.textContent = d.count > 99 ? '99+' : d.count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(function() {});
+    }
+    updateChatBadge();
+    setInterval(updateChatBadge, 30000);
 </script>
 
 {% block extra_js %}{% endblock %}

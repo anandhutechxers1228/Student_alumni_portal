@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}My Posted Jobs — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--primary-mid);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+    }
+
+    .btn-primary {
+        padding: 10px 22px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    .jobs-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .job-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        display: flex;
+        gap: 0;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+
+    .job-card:hover {
+        box-shadow: 0 6px 24px rgba(27,67,50,0.09);
+    }
+
+    .job-img-side {
+        width: 120px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+    }
+
+    .job-img-side img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .job-body {
+        flex: 1;
+        padding: 20px 24px;
+    }
+
+    .job-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .job-main { flex: 1; }
+
+    .job-company {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary-mid);
+        margin-bottom: 3px;
+    }
+
+    .job-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        color: var(--primary);
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary-mid);
+        font-weight: 500;
+    }
+
+    .meta-badge.salary {
+        background: var(--accent-light);
+        color: #8a6d15;
+    }
+
+    .pills-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .pill {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary);
+        border: 1px solid #d0e8d8;
+        font-weight: 500;
+    }
+
+    .pill.location {
+        background: #eef4ff;
+        color: #2d5fb0;
+        border-color: #c5d8f5;
+    }
+
+    .job-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-edit {
+        padding: 8px 20px;
+        background: var(--accent);
+        color: var(--primary);
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        text-align: center;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: #d4b055;
+        transform: translateY(-1px);
+    }
+
+    .job-date {
+        font-size: 11px;
+        color: var(--muted);
+        text-align: right;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+    }
+
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+
+    .empty-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 24px;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-sub {
+        font-size: 15px;
+        color: var(--muted);
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .page { padding: 20px; }
+        .job-card { flex-direction: column; }
+        .job-img-side { width: 100%; height: 100px; }
+        .job-top { flex-direction: column; }
+        .job-actions { flex-direction: row; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/jobs/" class="back-link">← Back to Job Portal</a>
+    <div class="page-header">
+        <div class="page-title">My Posted Jobs</div>
+        <a href="/jobs/add/" class="btn-primary">+ Post a New Job</a>
+    </div>
+
+    {% if jobs %}
+    <div class="jobs-list">
+        {% for job in jobs %}
+        <div class="job-card">
+            <div class="job-img-side">
+                {% if job.image %}
+                <img src="/media/{{ job.image }}" alt="{{ job.title }}">
+                {% else %}
+                💼
+                {% endif %}
+            </div>
+            <div class="job-body">
+                <div class="job-top">
+                    <div class="job-main">
+                        <div class="job-company">{{ job.company_name }}</div>
+                        <div class="job-title">{{ job.title }}</div>
+                        <div class="job-meta">
+                            {% if job.experience_required %}
+                            <span class="meta-badge">{{ job.experience_required }}</span>
+                            {% endif %}
+                            {% if job.salary %}
+                            <span class="meta-badge salary">₹ {{ job.salary }}</span>
+                            {% endif %}
+                        </div>
+                        {% if job.locations %}
+                        <div class="pills-wrap" style="margin-bottom:6px;">
+                            {% for loc in job.locations %}
+                            <span class="pill location">{{ loc }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if job.eligibility %}
+                        <div class="pills-wrap">
+                            {% for skill in job.eligibility %}
+                            <span class="pill">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="job-actions">
+                        <a href="/jobs/edit/{{ job.id }}/" class="btn-edit">Edit</a>
+                        <div class="job-date">{{ job.posted_at_str }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">💼</div>
+        <div class="empty-title">No Jobs Posted Yet</div>
+        <p class="empty-sub">Post your first job and help students find great opportunities.</p>
+        <a href="/jobs/add/" class="btn-primary">+ Post a Job</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

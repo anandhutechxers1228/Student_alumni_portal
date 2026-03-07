@@ -3,60 +3,112 @@
 {% block title %}Internships — SAR Portal{% endblock %}
 
 {% block extra_css %}
-    .page {
-        padding: 36px 48px;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-
-    .coming-wrap {
-        text-align: center;
-        padding: 80px 40px;
-        background: white;
-        border-radius: 20px;
-        border: 1px solid #E0E9E1;
-    }
-
-    .coming-icon { font-size: 64px; margin-bottom: 20px; }
-
-    .coming-title {
-        font-family: 'DM Serif Display', serif;
-        font-size: 32px;
-        color: var(--primary);
-        margin-bottom: 12px;
-    }
-
-    .coming-sub {
-        font-size: 16px;
-        color: var(--muted);
-        max-width: 420px;
-        margin: 0 auto 32px;
-        line-height: 1.7;
-    }
-
-    .coming-badge {
-        display: inline-block;
-        background: var(--accent-light);
-        color: #8a6d15;
-        padding: 8px 22px;
-        border-radius: 30px;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }
-
-    @media (max-width: 768px) {
-        .page { padding: 20px; }
-    }
+    .page { padding: 36px 48px; max-width: 1100px; margin: 0 auto; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--primary); }
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-primary { padding: 10px 22px; background: var(--primary); color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .btn-primary:hover { background: var(--primary-mid); transform: translateY(-1px); }
+    .btn-outline { padding: 10px 22px; background: white; color: var(--primary); border: 1.5px solid var(--primary); border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .btn-outline:hover { background: #f0f7f3; }
+    .profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .profile-card { background: white; border-radius: 16px; border: 1px solid #E0E9E1; padding: 24px; transition: all 0.2s; text-decoration: none; color: inherit; display: block; }
+    .profile-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(27,67,50,0.1); border-color: var(--primary-mid); }
+    .card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .card-avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-mid)); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 22px; color: white; flex-shrink: 0; overflow: hidden; }
+    .card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .card-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--primary); margin-bottom: 2px; }
+    .card-stream { font-size: 12px; color: var(--muted); }
+    .location-row { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .pills-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #f0f7f3; color: var(--primary); border: 1px solid #d0e8d8; font-weight: 500; }
+    .pill.lang { background: #f5f0ff; color: #5b3fa0; border-color: #d8ccf5; }
+    .pill.location { background: #eef4ff; color: #2d5fb0; border-color: #c5d8f5; }
+    .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f4f1; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f0f4f1; }
+    .card-year { font-size: 11px; color: var(--muted); }
+    .card-batch { font-size: 11px; color: var(--primary-mid); font-weight: 600; }
+    .section-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); margin-bottom: 6px; }
+    .role-title { font-size: 13px; font-weight: 600; color: var(--primary-mid); margin-bottom: 10px; }
+    .alumni-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--accent-light); color: #8a6d15; border: 1px solid rgba(201,168,76,0.3); margin-left: 6px; }
+    .empty-state { text-align: center; padding: 80px 40px; background: white; border-radius: 20px; border: 1px solid #E0E9E1; grid-column: 1 / -1; }
+    .empty-icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--primary); margin-bottom: 8px; }
+    .empty-sub { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+    @media (max-width: 768px) { .page { padding: 20px; } .profiles-grid { grid-template-columns: 1fr; } }
 {% endblock %}
 
 {% block content %}
 <div class="page">
-    <div class="coming-wrap">
-        <div class="coming-icon">🚀</div>
-        <h2 class="coming-title">Internship Portal</h2>
-        <p class="coming-sub">Internship opportunities curated by alumni and partner companies are coming soon. Stay tuned!</p>
-        <span class="coming-badge">🚧 Coming Soon</span>
+    <div class="page-header">
+        <div class="header-actions">
+            <a href="/internships/add/" class="btn-primary">+ Post Internship</a>
+            <a href="/internships/mine/" class="btn-outline">My Internships</a>
+        </div>
+    </div>
+
+    <div class="profiles-grid">
+        {% if profiles %}
+            {% for p in profiles %}
+            <a href="/internships/{{ p.id }}/" class="profile-card">
+                <div class="card-header">
+                    <div class="card-avatar">{{ p.name|slice:":1"|upper }}</div>
+                    <div>
+                        <div class="card-name">
+                            {{ p.name }}
+                            {% if p.user_status == 'alumni' %}<span class="alumni-badge">Alumni</span>{% endif %}
+                        </div>
+                        <div class="card-stream">{{ p.stream }}</div>
+                    </div>
+                </div>
+
+                {% if p.role_title %}
+                <div class="role-title">{{ p.role_title }}</div>
+                {% endif %}
+
+                {% if p.current_location %}
+                <div class="location-row">Currently in {{ p.current_location }}</div>
+                {% endif %}
+
+                {% if p.relocatable_locations %}
+                <div class="section-tag">Open to relocate</div>
+                <div class="pills-wrap">
+                    {% for loc in p.relocatable_locations %}<span class="pill location">{{ loc }}</span>{% endfor %}
+                </div>
+                {% endif %}
+
+                {% if p.skills %}
+                <div class="section-tag">Skills</div>
+                <div class="pills-wrap">
+                    {% for skill in p.skills %}<span class="pill">{{ skill }}</span>{% endfor %}
+                </div>
+                {% endif %}
+
+                {% if p.languages %}
+                <div class="section-tag">Languages</div>
+                <div class="pills-wrap">
+                    {% for lang in p.languages %}<span class="pill lang">{{ lang }}</span>{% endfor %}
+                </div>
+                {% endif %}
+
+                {% if p.description %}
+                <p class="card-desc">{{ p.description|truncatechars:140 }}</p>
+                {% endif %}
+
+                <div class="card-footer">
+                    <span class="card-year">{{ p.current_year }}</span>
+                    <span class="card-batch">Batch {{ p.admission_year }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"></div>
+            <div class="empty-title">No Profiles Yet</div>
+            <p class="empty-sub">Be the first to post an internship profile!</p>
+            <a href="/internships/add/" class="btn-primary">+ Post Internship</a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

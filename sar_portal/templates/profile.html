@@ -3,429 +3,112 @@
 {% block title %}Profile — SAR Portal{% endblock %}
 
 {% block extra_css %}
-    .page {
-        padding: 36px 48px;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-
-    .page-title {
-        font-family: 'DM Serif Display', serif;
-        font-size: 28px;
-        color: var(--primary);
-        margin-bottom: 28px;
-    }
-
-    .profile-hero {
-        background: linear-gradient(130deg, #1B4332, #2D6A4F);
-        border-radius: 20px;
-        padding: 40px;
-        display: flex;
-        align-items: center;
-        gap: 32px;
-        margin-bottom: 28px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .profile-hero::after {
-        content: '';
-        position: absolute;
-        width: 280px;
-        height: 280px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
-        right: -40px;
-        top: -40px;
-        pointer-events: none;
-    }
-
-    .avatar-wrap {
-        position: relative;
-        flex-shrink: 0;
-        z-index: 2;
-    }
-
-    .avatar-img {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        border: 3px solid rgba(255,255,255,0.3);
-        background: var(--accent);
-        color: var(--primary);
-        font-family: 'DM Serif Display', serif;
-        font-size: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        cursor: pointer;
-    }
-
-    .avatar-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .avatar-upload-btn {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 28px;
-        height: 28px;
-        background: var(--accent);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-        cursor: pointer;
-        border: 2px solid white;
-    }
-
-    .hero-info {
-        flex: 1;
-        z-index: 2;
-    }
-
-    .hero-name {
-        font-family: 'DM Serif Display', serif;
-        font-size: 26px;
-        color: white;
-        margin-bottom: 4px;
-    }
-
-    .hero-sub {
-        font-size: 14px;
-        color: rgba(255,255,255,0.65);
-        line-height: 1.6;
-        margin-bottom: 12px;
-    }
-
-    .hero-tags {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .hero-tag {
-        background: rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.85);
-        padding: 5px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-        border: 1px solid rgba(255,255,255,0.18);
-    }
-
-    .hero-tag.gold {
-        background: rgba(201,168,76,0.2);
-        color: #F9E4A0;
-        border-color: rgba(201,168,76,0.35);
-    }
-
-    .hero-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        z-index: 2;
-    }
-
-    .btn-edit {
-        padding: 10px 24px;
-        background: var(--accent);
-        color: var(--primary);
-        border: none;
-        border-radius: 9px;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        font-family: 'DM Sans', sans-serif;
-        white-space: nowrap;
-        transition: all 0.2s;
-    }
-
-    .btn-edit:hover {
-        background: #d4b055;
-        transform: translateY(-1px);
-    }
-
-    .btn-pw {
-        padding: 10px 24px;
-        background: rgba(255,255,255,0.12);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.25);
-        border-radius: 9px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        font-family: 'DM Sans', sans-serif;
-        white-space: nowrap;
-        transition: all 0.2s;
-    }
-
-    .btn-pw:hover {
-        background: rgba(255,255,255,0.2);
-    }
-
-    .details-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 22px;
-    }
-
-    .card {
-        background: white;
-        border-radius: 16px;
-        border: 1px solid #E0E9E1;
-        overflow: hidden;
-    }
-
-    .card-head {
-        padding: 18px 24px;
-        border-bottom: 1px solid #f0f4f1;
-    }
-
-    .card-head h3 {
-        font-family: 'DM Serif Display', serif;
-        font-size: 17px;
-        color: var(--primary);
-    }
-
-    .card-body {
-        padding: 24px;
-    }
-
-    .info-row {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        margin-bottom: 18px;
-        padding-bottom: 18px;
-        border-bottom: 1px solid #f0f4f1;
-    }
-
-    .info-row:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .info-label {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        color: var(--muted);
-    }
-
-    .info-value {
-        font-size: 15px;
-        color: var(--text);
-        font-weight: 500;
-    }
-
-    .alert {
-        padding: 11px 16px;
-        border-radius: 9px;
-        font-size: 14px;
-        margin-bottom: 20px;
-    }
-
-    .alert-success {
-        background: #e8f7ed;
-        border: 1px solid #b8e6c8;
-        color: #1B5E35;
-    }
-
-    .alert-danger {
-        background: #fdf0ee;
-        border: 1px solid #f5c6c2;
-        color: var(--danger);
-    }
-
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.45);
-        z-index: 500;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .modal-overlay.open {
-        display: flex;
-    }
-
-    .modal {
-        background: white;
-        border-radius: 18px;
-        padding: 32px;
-        width: 100%;
-        max-width: 560px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 12px 48px rgba(27,67,50,0.2);
-    }
-
-    .modal-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 24px;
-    }
-
-    .modal-head h3 {
-        font-family: 'DM Serif Display', serif;
-        font-size: 22px;
-        color: var(--primary);
-    }
-
-    .modal-close {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #f0f4f1;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--muted);
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        margin-bottom: 16px;
-    }
-
-    .form-group label {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .form-group input,
-    .form-group select {
-        padding: 11px 14px;
-        border: 1.5px solid var(--border);
-        border-radius: 9px;
-        font-size: 14px;
-        font-family: 'DM Sans', sans-serif;
-        color: var(--text);
-        background: white;
-        transition: border-color 0.2s;
-        appearance: none;
-        -webkit-appearance: none;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-        outline: none;
-        border-color: var(--primary-mid);
-        box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
-    }
-
-    .select-wrap {
-        position: relative;
-    }
-
-    .select-wrap::after {
-        content: '▾';
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--muted);
-        pointer-events: none;
-        font-size: 14px;
-    }
-
-    .pic-upload-area {
-        border: 2px dashed var(--border);
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: border-color 0.2s, background 0.2s;
-        margin-bottom: 16px;
-    }
-
-    .pic-upload-area:hover {
-        border-color: var(--primary-mid);
-        background: #f0f7f3;
-    }
-
-    .pic-upload-area input[type="file"] {
-        display: none;
-    }
-
-    .pic-upload-icon { font-size: 28px; margin-bottom: 6px; }
-
-    .pic-upload-label {
-        font-size: 13px;
-        color: var(--muted);
-    }
-
-    .pic-preview {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin: 0 auto 8px;
-        display: none;
-    }
-
-    .modal-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-        margin-top: 8px;
-    }
-
-    .btn-cancel {
-        padding: 10px 22px;
-        background: #f0f4f1;
-        color: var(--text);
-        border: none;
-        border-radius: 9px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        font-family: 'DM Sans', sans-serif;
-    }
-
-    .btn-save {
-        padding: 10px 26px;
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 9px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: 'DM Sans', sans-serif;
-        transition: background 0.2s;
-    }
-
-    .btn-save:hover { background: var(--primary-mid); }
-
-    #edit_current_year_group { display: none; }
-
+    .page { padding: 36px 48px; max-width: 1000px; margin: 0 auto; }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--primary); margin-bottom: 28px; }
+    .profile-hero { background: linear-gradient(130deg, #1B4332, #2D6A4F); border-radius: 20px; padding: 40px; display: flex; align-items: center; gap: 32px; margin-bottom: 28px; position: relative; overflow: hidden; }
+    .profile-hero::after { content: ''; position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%); right: -40px; top: -40px; pointer-events: none; }
+    .avatar-wrap { position: relative; flex-shrink: 0; z-index: 2; }
+    .avatar-img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); background: var(--accent); color: var(--primary); font-family: 'DM Serif Display', serif; font-size: 36px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+    .avatar-img img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-upload-btn { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; border: 2px solid white; }
+    .hero-info { flex: 1; z-index: 2; }
+    .hero-name { font-family: 'DM Serif Display', serif; font-size: 26px; color: white; margin-bottom: 4px; }
+    .hero-sub { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 12px; }
+    .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .hero-tag { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid rgba(255,255,255,0.18); }
+    .hero-tag.gold { background: rgba(201,168,76,0.2); color: #F9E4A0; border-color: rgba(201,168,76,0.35); }
+    .hero-actions { display: flex; flex-direction: column; gap: 10px; z-index: 2; }
+    .btn-edit { padding: 10px 24px; background: var(--accent); color: var(--primary); border: none; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.2s; }
+    .btn-edit:hover { background: #d4b055; transform: translateY(-1px); }
+    .btn-pw { padding: 10px 24px; background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.25); border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.2s; }
+    .btn-pw:hover { background: rgba(255,255,255,0.2); }
+    .btn-full-profile { padding: 10px 24px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.2); border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.2s; }
+    .btn-full-profile:hover { background: rgba(255,255,255,0.16); }
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 22px; }
+    .card { background: white; border-radius: 16px; border: 1px solid #E0E9E1; overflow: hidden; }
+    .card-full { grid-column: 1 / -1; }
+    .card-head { padding: 18px 24px; border-bottom: 1px solid #f0f4f1; display: flex; align-items: center; justify-content: space-between; }
+    .card-head h3 { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--primary); }
+    .card-body { padding: 24px; }
+    .info-row { display: flex; flex-direction: column; gap: 3px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #f0f4f1; }
+    .info-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .info-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+    .info-value { font-size: 15px; color: var(--text); font-weight: 500; }
+    .pills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .pill { font-size: 12px; padding: 4px 12px; border-radius: 20px; background: #f0f7f3; color: var(--primary); border: 1px solid #d0e8d8; font-weight: 500; }
+    .exp-entry { padding: 16px; border: 1px solid #E0E9E1; border-radius: 12px; margin-bottom: 12px; background: #fafcfa; }
+    .exp-entry:last-child { margin-bottom: 0; }
+    .exp-company { font-weight: 700; font-size: 15px; color: var(--primary); margin-bottom: 3px; }
+    .exp-years { font-size: 13px; color: var(--primary-mid); margin-bottom: 4px; }
+    .exp-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .ach-entry { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid #E0E9E1; border-radius: 12px; margin-bottom: 10px; background: #fafcfa; }
+    .ach-entry:last-child { margin-bottom: 0; }
+    .ach-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .ach-name { font-weight: 600; font-size: 14px; color: var(--primary); margin-bottom: 2px; }
+    .ach-years { font-size: 12px; color: var(--muted); }
+    .startup-card { background: var(--accent-light); border: 1px solid rgba(201,168,76,0.3); border-radius: 12px; padding: 16px 20px; }
+    .startup-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--primary); margin-bottom: 4px; }
+    .startup-year { font-size: 13px; color: #8a6d15; margin-bottom: 8px; }
+    .startup-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .empty-card-msg { font-size: 14px; color: var(--muted); font-style: italic; }
+    .alert { padding: 11px 16px; border-radius: 9px; font-size: 14px; margin-bottom: 20px; }
+    .alert-success { background: #e8f7ed; border: 1px solid #b8dfc7; color: var(--success); }
+    .alert-danger { background: #fdf0ee; border: 1px solid #f5c6c2; color: var(--danger); }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,35,20,0.55); z-index: 500; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 20px; width: 100%; max-width: 620px; box-shadow: 0 20px 60px rgba(27,67,50,0.2); margin: auto; }
+    .modal-head { padding: 22px 28px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-head h3 { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--primary); }
+    .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 6px; transition: background 0.15s; }
+    .modal-close:hover { background: #f0f4f1; }
+    .modal-body { padding: 24px 28px; }
+    .modal-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 14px; margin-top: 24px; padding-bottom: 8px; border-bottom: 1px solid #f0f4f1; }
+    .modal-section-label:first-child { margin-top: 0; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group select { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); background: white; transition: border-color 0.2s; resize: unset; overflow-y: unset; }
+    .form-group textarea { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); background: white; transition: border-color 0.2s; resize: none; overflow-y: hidden; min-height: 80px; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary-mid); box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
+    .input-with-btn { display: flex; gap: 6px; align-items: stretch; }
+    .input-with-btn input { flex: 1; }
+    .present-btn { padding: 0 12px; background: #f0f7f3; color: var(--primary-mid); border: 1.5px solid #c8e6d4; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.2s; line-height: 1; }
+    .present-btn:hover { background: #d8f0e4; border-color: var(--primary-mid); }
+    .present-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 13px; }
+    .select-wrap select { appearance: none; -webkit-appearance: none; padding-right: 32px; }
+    .radio-group { display: flex; gap: 10px; }
+    .radio-option { flex: 1; border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: all 0.2s; }
+    .radio-option input[type="radio"] { accent-color: var(--primary-mid); width: 16px; height: 16px; margin: 0; padding: 0; border: none; box-shadow: none; }
+    .radio-option:has(input:checked) { border-color: var(--primary-mid); background: #f0f7f3; }
+    .tags-display { display: flex; flex-wrap: wrap; gap: 8px; min-height: 28px; margin-bottom: 8px; }
+    .tag-pill { display: inline-flex; align-items: center; gap: 6px; background: #f0f7f3; color: var(--primary); border: 1px solid #d0e8d8; padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .tag-pill button { background: none; border: none; cursor: pointer; font-size: 14px; color: inherit; opacity: 0.6; padding: 0; line-height: 1; display: flex; align-items: center; }
+    .tag-pill button:hover { opacity: 1; }
+    .tag-add-row { display: flex; gap: 8px; }
+    .tag-add-row input { flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); transition: border-color 0.2s; }
+    .tag-add-row input:focus { outline: none; border-color: var(--primary-mid); box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
+    .tag-add-btn { padding: 9px 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: background 0.2s; }
+    .tag-add-btn:hover { background: var(--primary-mid); }
+    .dynamic-list { margin-top: 10px; }
+    .dynamic-entry { border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; position: relative; background: #fafcfa; }
+    .dynamic-entry .remove-btn { position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 16px; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: 5px; transition: all 0.15s; }
+    .dynamic-entry .remove-btn:hover { background: #fdf0ee; color: var(--danger); }
+    .add-entry-btn { padding: 9px 18px; background: white; color: var(--primary); border: 1.5px dashed var(--primary-mid); border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; width: 100%; text-align: center; margin-top: 4px; }
+    .add-entry-btn:hover { background: #f0f7f3; border-style: solid; }
+    .modal-actions { padding: 18px 28px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+    .btn-cancel { padding: 11px 24px; background: white; color: var(--muted); border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .btn-cancel:hover { background: #f5f7f5; }
+    .btn-save { padding: 11px 28px; background: var(--primary); color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .btn-save:hover { background: var(--primary-mid); transform: translateY(-1px); }
+    .pic-upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; margin-bottom: 16px; }
+    .pic-upload-area:hover { border-color: var(--primary-mid); }
+    .pic-upload-area input { display: none; }
+    .pic-preview { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px; display: block; }
+    .pic-upload-icon { font-size: 26px; margin-bottom: 6px; }
+    .pic-upload-label { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .section-divider { height: 1px; background: #f0f4f1; margin: 4px 0 16px; }
     @media (max-width: 768px) {
         .page { padding: 20px; }
         .profile-hero { flex-direction: column; text-align: center; gap: 20px; }
@@ -433,7 +116,8 @@
         .hero-actions { flex-direction: row; flex-wrap: wrap; justify-content: center; }
         .details-grid { grid-template-columns: 1fr; }
         .form-row { grid-template-columns: 1fr; }
-        .modal { padding: 24px 20px; }
+        .modal { margin: 0; border-radius: 16px; }
+        .modal-overlay { padding: 20px 12px; }
     }
 {% endblock %}
 
@@ -466,8 +150,9 @@
             </div>
         </div>
         <div class="hero-actions">
-            <button class="btn-edit" onclick="document.getElementById('editModal').classList.add('open')">✏️ Edit Profile</button>
-            <button class="btn-pw" onclick="document.getElementById('pwModal').classList.add('open')">🔒 Change Password</button>
+            <button class="btn-edit" onclick="document.getElementById('editModal').classList.add('open')">Edit Profile</button>
+            <button class="btn-full-profile" onclick="openFullProfileModal()">Update Full Profile</button>
+            <button class="btn-pw" onclick="document.getElementById('pwModal').classList.add('open')">Change Password</button>
         </div>
     </div>
 
@@ -475,50 +160,101 @@
         <div class="card">
             <div class="card-head"><h3>Personal Information</h3></div>
             <div class="card-body">
-                <div class="info-row">
-                    <div class="info-label">Full Name</div>
-                    <div class="info-value">{{ user.name }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Email Address</div>
-                    <div class="info-value">{{ user.email }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Phone Number</div>
-                    <div class="info-value">{{ user.phone|default:"—" }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Gender</div>
-                    <div class="info-value">{{ user.gender|default:"—" }}</div>
-                </div>
+                <div class="info-row"><div class="info-label">Full Name</div><div class="info-value">{{ user.name }}</div></div>
+                <div class="info-row"><div class="info-label">Email Address</div><div class="info-value">{{ user.email }}</div></div>
+                <div class="info-row"><div class="info-label">Phone Number</div><div class="info-value">{{ user.phone|default:"—" }}</div></div>
+                <div class="info-row"><div class="info-label">Gender</div><div class="info-value">{{ user.gender|default:"—" }}</div></div>
             </div>
         </div>
 
         <div class="card">
             <div class="card-head"><h3>Academic Information</h3></div>
             <div class="card-body">
-                <div class="info-row">
-                    <div class="info-label">Stream</div>
-                    <div class="info-value">{{ user.stream|default:"—" }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Status</div>
-                    <div class="info-value">{{ user.status|capfirst }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Admission Year</div>
-                    <div class="info-value">{{ user.admission_year|default:"—" }}</div>
-                </div>
+                <div class="info-row"><div class="info-label">Stream</div><div class="info-value">{{ user.stream|default:"—" }}</div></div>
+                <div class="info-row"><div class="info-label">Status</div><div class="info-value">{{ user.status|capfirst }}</div></div>
+                <div class="info-row"><div class="info-label">Admission Year</div><div class="info-value">{{ user.admission_year|default:"—" }}</div></div>
                 {% if user.status == 'student' %}
-                <div class="info-row">
-                    <div class="info-label">Current Year</div>
-                    <div class="info-value">{{ user.current_year|default:"—" }}</div>
-                </div>
+                <div class="info-row"><div class="info-label">Current Year</div><div class="info-value">{{ user.current_year|default:"—" }}</div></div>
                 {% endif %}
             </div>
         </div>
-    </div>
 
+        {% if user.skills %}
+        <div class="card card-full">
+            <div class="card-head"><h3>Skills</h3></div>
+            <div class="card-body">
+                <div class="pills-wrap">{% for skill in user.skills %}<span class="pill">{{ skill }}</span>{% endfor %}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if user.status == 'alumni' %}
+            {% if user.current_status %}
+            <div class="card">
+                <div class="card-head"><h3>Current Position</h3></div>
+                <div class="card-body">
+                    <div class="info-row"><div class="info-label">Status</div><div class="info-value">{% if user.current_status == 'working' %}Working at a Company{% else %}Owning a Company{% endif %}</div></div>
+                    {% if user.current_company_name %}<div class="info-row"><div class="info-label">Company</div><div class="info-value">{{ user.current_company_name }}</div></div>{% endif %}
+                    {% if user.current_company_year %}<div class="info-row"><div class="info-label">{% if user.current_status == 'working' %}Joined{% else %}Started{% endif %} Year</div><div class="info-value">{{ user.current_company_year }}</div></div>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if user.previously_owned %}
+            <div class="card">
+                <div class="card-head"><h3>Previously Owned Companies</h3></div>
+                <div class="card-body">
+                    {% for co in user.previously_owned %}
+                    <div class="info-row"><div class="info-label">Company</div><div class="info-value">{{ co.name }} &nbsp;·&nbsp; Since {{ co.started_year }}</div></div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if user.experience %}
+            <div class="card card-full">
+                <div class="card-head"><h3>Experience</h3></div>
+                <div class="card-body">
+                    {% for exp in user.experience %}
+                    <div class="exp-entry">
+                        <div class="exp-company">{{ exp.company }}</div>
+                        <div class="exp-years">{{ exp.from_year }} — {{ exp.to_year }}</div>
+                        {% if exp.description %}<div class="exp-desc">{{ exp.description }}</div>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        {% elif user.status == 'student' %}
+            {% if user.achievements %}
+            <div class="card card-full">
+                <div class="card-head"><h3>Achievements</h3></div>
+                <div class="card-body">
+                    {% for ach in user.achievements %}
+                    <div class="ach-entry">
+                        <div class="ach-icon">🏆</div>
+                        <div><div class="ach-name">{{ ach.name }}</div><div class="ach-years">{{ ach.start_year }} — {{ ach.end_year }}</div></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if user.startup %}
+            <div class="card card-full">
+                <div class="card-head"><h3>Startup</h3></div>
+                <div class="card-body">
+                    <div class="startup-card">
+                        <div class="startup-name">{{ user.startup.name }}</div>
+                        <div class="startup-year">🚀 Started {{ user.startup.started_year }}</div>
+                        {% if user.startup.description %}<div class="startup-desc">{{ user.startup.description }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
 </div>
 
 <div class="modal-overlay" id="editModal">
@@ -527,85 +263,76 @@
             <h3>Edit Profile</h3>
             <button class="modal-close" onclick="document.getElementById('editModal').classList.remove('open')">✕</button>
         </div>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="update_profile">
+        <div class="modal-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
 
-            <div class="pic-upload-area" onclick="document.getElementById('picInput').click()">
-                <img class="pic-preview" id="picPreview" src="#" alt="Preview">
-                <div class="pic-upload-icon">📸</div>
-                <div class="pic-upload-label">Click to upload profile picture<br><small>JPG, PNG, WEBP accepted</small></div>
-                <input type="file" name="profile_pic" id="picInput" accept="image/*" onchange="previewPic(this)">
-            </div>
+                <div class="pic-upload-area" onclick="document.getElementById('picInput').click()">
+                    {% if user.profile_pic %}
+                    <img class="pic-preview" id="picPreview" src="/media/{{ user.profile_pic }}" alt="Current photo">
+                    {% else %}
+                    <img class="pic-preview" id="picPreview" src="#" alt="Preview" style="display:none;">
+                    <div class="pic-upload-icon" id="picUploadIcon">📸</div>
+                    <div class="pic-upload-label" id="picUploadLabel">Click to upload profile picture<br><small>JPG, PNG, WEBP accepted</small></div>
+                    {% endif %}
+                    <input type="file" name="profile_pic" id="picInput" accept="image/*" onchange="previewPic(this)">
+                </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" name="name" value="{{ user.name }}" required>
+                <div class="form-row">
+                    <div class="form-group"><label>Full Name</label><input type="text" name="name" value="{{ user.name }}" required></div>
+                    <div class="form-group"><label>Phone</label><input type="text" name="phone" value="{{ user.phone }}"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Admission Year</label><input type="number" name="admission_year" value="{{ user.admission_year }}" min="1990" max="2030"></div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <div class="select-wrap">
+                            <select name="gender">
+                                <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                                <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+                                <option value="Prefer not to say" {% if user.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" name="phone" value="{{ user.phone }}">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Admission Year</label>
-                    <input type="number" name="admission_year" value="{{ user.admission_year }}" min="1990" max="2030">
-                </div>
-                <div class="form-group">
-                    <label>Gender</label>
+                    <label>Stream</label>
                     <div class="select-wrap">
-                        <select name="gender">
-                            <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
-                            <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
-                            <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
-                            <option value="Prefer not to say" {% if user.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+                        <select name="stream">
+                            {% for s in streams %}<option value="{{ s }}" {% if user.stream == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
                         </select>
                     </div>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label>Stream</label>
-                <div class="select-wrap">
-                    <select name="stream">
-                        {% for s in streams %}
-                        <option value="{{ s }}" {% if user.stream == s %}selected{% endif %}>{{ s }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Status</label>
-                    <div class="select-wrap">
-                        <select name="status" id="editStatus" onchange="toggleEditCurrentYear(this)">
-                            <option value="student" {% if user.status == 'student' %}selected{% endif %}>Student</option>
-                            <option value="alumni" {% if user.status == 'alumni' %}selected{% endif %}>Alumni</option>
-                        </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div class="select-wrap">
+                            <select name="status" id="editStatus" onchange="toggleEditCurrentYear(this)">
+                                <option value="student" {% if user.status == 'student' %}selected{% endif %}>Student</option>
+                                <option value="alumni" {% if user.status == 'alumni' %}selected{% endif %}>Alumni</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" id="edit_current_year_group">
+                        <label>Current Year</label>
+                        <div class="select-wrap">
+                            <select name="current_year">
+                                <option value="First" {% if user.current_year == 'First' %}selected{% endif %}>First Year</option>
+                                <option value="Second" {% if user.current_year == 'Second' %}selected{% endif %}>Second Year</option>
+                                <option value="Third" {% if user.current_year == 'Third' %}selected{% endif %}>Third Year</option>
+                                <option value="Fourth" {% if user.current_year == 'Fourth' %}selected{% endif %}>Fourth Year</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group" id="edit_current_year_group">
-                    <label>Current Year</label>
-                    <div class="select-wrap">
-                        <select name="current_year">
-                            <option value="First" {% if user.current_year == 'First' %}selected{% endif %}>First Year</option>
-                            <option value="Second" {% if user.current_year == 'Second' %}selected{% endif %}>Second Year</option>
-                            <option value="Third" {% if user.current_year == 'Third' %}selected{% endif %}>Third Year</option>
-                            <option value="Fourth" {% if user.current_year == 'Fourth' %}selected{% endif %}>Fourth Year</option>
-                        </select>
-                    </div>
+                <div class="modal-actions" style="padding:0;border:none;margin-top:8px;">
+                    <button type="button" class="btn-cancel" onclick="document.getElementById('editModal').classList.remove('open')">Cancel</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
                 </div>
-            </div>
-
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="document.getElementById('editModal').classList.remove('open')">Cancel</button>
-                <button type="submit" class="btn-save">Save Changes</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -615,26 +342,112 @@
             <h3>Change Password</h3>
             <button class="modal-close" onclick="document.getElementById('pwModal').classList.remove('open')">✕</button>
         </div>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="change_password">
-            <div class="form-group">
-                <label>Current Password</label>
-                <input type="password" name="old_password" required>
-            </div>
-            <div class="form-group">
-                <label>New Password</label>
-                <input type="password" name="new_password" required>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="document.getElementById('pwModal').classList.remove('open')">Cancel</button>
-                <button type="submit" class="btn-save">Update Password</button>
-            </div>
-        </form>
+        <div class="modal-body">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+                <div class="form-group"><label>Current Password</label><input type="password" name="old_password" required></div>
+                <div class="form-group"><label>New Password</label><input type="password" name="new_password" required></div>
+                <div class="modal-actions" style="padding:0;border:none;margin-top:8px;">
+                    <button type="button" class="btn-cancel" onclick="document.getElementById('pwModal').classList.remove('open')">Cancel</button>
+                    <button type="submit" class="btn-save">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="fullProfileModal">
+    <div class="modal" style="max-width:680px;">
+        <div class="modal-head">
+            <h3>Update Full Profile</h3>
+            <button class="modal-close" onclick="document.getElementById('fullProfileModal').classList.remove('open')">✕</button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" id="fullProfileForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_full_profile">
+
+                {% if user.status == 'alumni' %}
+                <div class="modal-section-label">Current Status</div>
+                <div class="form-group">
+                    <label>Work Status</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="current_status" value="working" {% if user.current_status == 'working' %}checked{% endif %} onchange="toggleAlumniStatus(this)">
+                            Working at Company
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="current_status" value="owning" {% if user.current_status == 'owning' %}checked{% endif %} onchange="toggleAlumniStatus(this)">
+                            Owning a Company
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Company Name</label><input type="text" name="current_company_name" value="{{ user.current_company_name|default:'' }}" placeholder="Company name"></div>
+                    <div class="form-group"><label id="currentCompanyYearLabel">{% if user.current_status == 'owning' %}Started Year{% else %}Joined Year{% endif %}</label><input type="text" name="current_company_year" value="{{ user.current_company_year|default:'' }}" placeholder="e.g. 2022"></div>
+                </div>
+                <div class="modal-section-label">Previously Owned Companies</div>
+                <div class="dynamic-list" id="prevOwnedList"></div>
+                <button type="button" class="add-entry-btn" onclick="addPrevOwned()">+ Add Previously Owned Company</button>
+                <input type="hidden" id="previously_owned_json" name="previously_owned_json" value="{{ user.previously_owned_json_str }}">
+                <div class="modal-section-label">Work Experience</div>
+                <div class="dynamic-list" id="experienceList"></div>
+                <button type="button" class="add-entry-btn" onclick="addExperience()">+ Add Experience</button>
+                <input type="hidden" id="experience_json" name="experience_json" value="{{ user.experience_json_str }}">
+
+                {% elif user.status == 'student' %}
+                <div class="modal-section-label">Achievements</div>
+                <div class="dynamic-list" id="achievementsList"></div>
+                <button type="button" class="add-entry-btn" onclick="addAchievement()">+ Add Achievement</button>
+                <input type="hidden" id="achievements_json" name="achievements_json" value="{{ user.achievements_json_str }}">
+                <div class="modal-section-label">Startup</div>
+                <div class="form-group">
+                    <label>Have you started a startup?</label>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="has_startup" value="no" {% if not user.startup %}checked{% endif %} onchange="toggleStartup(this)">No</label>
+                        <label class="radio-option"><input type="radio" name="has_startup" value="yes" {% if user.startup %}checked{% endif %} onchange="toggleStartup(this)">Yes</label>
+                    </div>
+                </div>
+                <div id="startupFields" style="display:{% if user.startup %}block{% else %}none{% endif %};">
+                    <div class="form-row">
+                        <div class="form-group"><label>Startup Name</label><input type="text" name="startup_name" value="{{ user.startup.name|default:'' }}" placeholder="Your startup name"></div>
+                        <div class="form-group"><label>Started Year</label><input type="text" name="startup_started_year" value="{{ user.startup.started_year|default:'' }}" placeholder="e.g. 2023"></div>
+                    </div>
+                    <div class="form-group"><label>Description <span style="font-size:11px;color:var(--muted);text-transform:none;font-weight:400;">(optional)</span></label><textarea name="startup_description" rows="3" placeholder="Brief description of your startup...">{{ user.startup.description|default:'' }}</textarea></div>
+                </div>
+                {% endif %}
+
+                <div class="modal-section-label">Skills</div>
+                <div class="tags-display" id="skills-tags"></div>
+                <div class="tag-add-row" style="margin-bottom:4px;">
+                    <input type="text" id="skills-input" placeholder="Type a skill and press Add...">
+                    <button type="button" class="tag-add-btn" onclick="addSkillTag()">+ Add</button>
+                </div>
+                <input type="hidden" id="skills-json" name="skills_json" value="{{ user.skills_json_str }}">
+
+                <div class="modal-actions" style="padding:0;border:none;margin-top:20px;">
+                    <button type="button" class="btn-cancel" onclick="document.getElementById('fullProfileModal').classList.remove('open')">Cancel</button>
+                    <button type="submit" class="btn-save">Save Full Profile</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
+    function autoResizeTextarea(el) {
+        el.style.height = 'auto';
+        var newH = Math.min(el.scrollHeight, 300);
+        el.style.height = newH + 'px';
+        el.style.overflowY = el.scrollHeight > 300 ? 'auto' : 'hidden';
+    }
+
+    document.querySelectorAll('textarea').forEach(function(ta) {
+        autoResizeTextarea(ta);
+        ta.addEventListener('input', function() { autoResizeTextarea(this); });
+    });
+
     function toggleEditCurrentYear(sel) {
         document.getElementById('edit_current_year_group').style.display = sel.value === 'student' ? 'flex' : 'none';
     }
@@ -643,17 +456,20 @@
     function previewPic(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
-            var preview = document.getElementById('picPreview');
             reader.onload = function(e) {
+                var preview = document.getElementById('picPreview');
                 preview.src = e.target.result;
                 preview.style.display = 'block';
-                preview.previousElementSibling.style.display = 'none';
+                var icon = document.getElementById('picUploadIcon');
+                var lbl = document.getElementById('picUploadLabel');
+                if (icon) icon.style.display = 'none';
+                if (lbl) lbl.style.display = 'none';
             };
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    ['editModal', 'pwModal'].forEach(function(id) {
+    ['editModal', 'pwModal', 'fullProfileModal'].forEach(function(id) {
         document.getElementById(id).addEventListener('click', function(e) {
             if (e.target === this) this.classList.remove('open');
         });
@@ -662,6 +478,271 @@
     {% if success %}
     document.getElementById('editModal').classList.remove('open');
     document.getElementById('pwModal').classList.remove('open');
+    document.getElementById('fullProfileModal').classList.remove('open');
     {% endif %}
+
+    function toggleAlumniStatus(radio) {
+        var label = document.getElementById('currentCompanyYearLabel');
+        if (label) label.textContent = radio.value === 'owning' ? 'Started Year' : 'Joined Year';
+    }
+
+    function toggleStartup(radio) {
+        var fields = document.getElementById('startupFields');
+        if (fields) fields.style.display = radio.value === 'yes' ? 'block' : 'none';
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function setPresentBtn(inputEl, btnEl) {
+        if (inputEl.value === 'Present') {
+            btnEl.classList.add('active');
+        } else {
+            btnEl.classList.remove('active');
+        }
+    }
+
+    function togglePresent(inputId, btnEl) {
+        var input = document.getElementById(inputId);
+        if (input.value === 'Present') {
+            input.value = '';
+            btnEl.classList.remove('active');
+        } else {
+            input.value = 'Present';
+            btnEl.classList.add('active');
+        }
+        input.dispatchEvent(new Event('input'));
+    }
+
+    var skillsData = [];
+
+    function initSkills(data) {
+        skillsData = data || [];
+        renderSkillTags();
+        document.getElementById('skills-json').value = JSON.stringify(skillsData);
+    }
+
+    function addSkillTag() {
+        var input = document.getElementById('skills-input');
+        var val = input.value.trim();
+        if (val && !skillsData.includes(val)) {
+            skillsData.push(val);
+            renderSkillTags();
+            document.getElementById('skills-json').value = JSON.stringify(skillsData);
+        }
+        input.value = '';
+        input.focus();
+    }
+
+    function removeSkillTag(idx) {
+        skillsData.splice(idx, 1);
+        renderSkillTags();
+        document.getElementById('skills-json').value = JSON.stringify(skillsData);
+    }
+
+    function renderSkillTags() {
+        var display = document.getElementById('skills-tags');
+        if (!display) return;
+        display.innerHTML = skillsData.map(function(t, i) {
+            return '<span class="tag-pill">' + escHtml(t) + '<button type="button" onclick="removeSkillTag(' + i + ')">×</button></span>';
+        }).join('');
+    }
+
+    document.getElementById('skills-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addSkillTag(); }
+    });
+
+    document.getElementById('fullProfileForm').addEventListener('submit', function() {
+        var skillInput = document.getElementById('skills-input');
+        if (skillInput && skillInput.value.trim()) addSkillTag();
+    });
+
+    {% if user.status == 'alumni' %}
+    var prevOwnedData = [];
+    var experienceData = [];
+
+    function initPrevOwned(data) {
+        prevOwnedData = data || [];
+        renderPrevOwned();
+        document.getElementById('previously_owned_json').value = JSON.stringify(prevOwnedData);
+    }
+
+    function addPrevOwned() {
+        prevOwnedData.push({name:'', started_year:''});
+        renderPrevOwned();
+        document.getElementById('previously_owned_json').value = JSON.stringify(prevOwnedData);
+    }
+
+    function removePrevOwned(idx) {
+        prevOwnedData.splice(idx, 1);
+        renderPrevOwned();
+        document.getElementById('previously_owned_json').value = JSON.stringify(prevOwnedData);
+    }
+
+    function renderPrevOwned() {
+        var list = document.getElementById('prevOwnedList');
+        if (!list) return;
+        list.innerHTML = prevOwnedData.map(function(co, i) {
+            return '<div class="dynamic-entry">' +
+                '<button type="button" class="remove-btn" onclick="removePrevOwned(' + i + ')">×</button>' +
+                '<div class="form-row"><div class="form-group"><label>Company Name</label>' +
+                '<input type="text" placeholder="Company name" value="' + escHtml(co.name) + '" oninput="prevOwnedData[' + i + '].name=this.value;syncPrevOwned()"></div>' +
+                '<div class="form-group"><label>Started Year</label>' +
+                '<input type="text" placeholder="e.g. 2018" value="' + escHtml(co.started_year) + '" oninput="prevOwnedData[' + i + '].started_year=this.value;syncPrevOwned()"></div></div></div>';
+        }).join('');
+    }
+
+    function syncPrevOwned() {
+        document.getElementById('previously_owned_json').value = JSON.stringify(prevOwnedData);
+    }
+
+    function initExperience(data) {
+        experienceData = data || [];
+        renderExperience();
+        document.getElementById('experience_json').value = JSON.stringify(experienceData);
+    }
+
+    function addExperience() {
+        experienceData.push({company:'', from_year:'', to_year:'', description:''});
+        renderExperience();
+        document.getElementById('experience_json').value = JSON.stringify(experienceData);
+    }
+
+    function removeExperience(idx) {
+        experienceData.splice(idx, 1);
+        renderExperience();
+        document.getElementById('experience_json').value = JSON.stringify(experienceData);
+    }
+
+    function renderExperience() {
+        var list = document.getElementById('experienceList');
+        if (!list) return;
+        list.innerHTML = experienceData.map(function(exp, i) {
+            var toId = 'exp_to_' + i;
+            var isPresent = exp.to_year === 'Present';
+            return '<div class="dynamic-entry">' +
+                '<button type="button" class="remove-btn" onclick="removeExperience(' + i + ')">×</button>' +
+                '<div class="form-group"><label>Company Name</label>' +
+                '<input type="text" placeholder="Company name" value="' + escHtml(exp.company) + '" oninput="experienceData[' + i + '].company=this.value;syncExperience()"></div>' +
+                '<div class="form-row">' +
+                '<div class="form-group"><label>From Year</label>' +
+                '<input type="text" placeholder="e.g. 2020" value="' + escHtml(exp.from_year) + '" oninput="experienceData[' + i + '].from_year=this.value;syncExperience()"></div>' +
+                '<div class="form-group"><label>To Year</label>' +
+                '<div class="input-with-btn">' +
+                '<input type="text" id="' + toId + '" placeholder="e.g. 2023" value="' + escHtml(exp.to_year) + '" oninput="experienceData[' + i + '].to_year=this.value;syncExperience();updatePresentBtn(\'' + toId + '\',\'exp_topresent_' + i + '\')">' +
+                '<button type="button" id="exp_topresent_' + i + '" class="present-btn' + (isPresent ? ' active' : '') + '" onclick="togglePresentExp(' + i + ',\'' + toId + '\',this)">Present</button>' +
+                '</div></div></div>' +
+                '<div class="form-group"><label>Description <span style="font-size:11px;color:var(--muted);text-transform:none;font-weight:400;">(optional)</span></label>' +
+                '<textarea rows="2" placeholder="Brief description..." oninput="experienceData[' + i + '].description=this.value;syncExperience();autoResizeTextarea(this)">' + escHtml(exp.description) + '</textarea></div></div>';
+        }).join('');
+        list.querySelectorAll('textarea').forEach(function(ta) { autoResizeTextarea(ta); });
+    }
+
+    function togglePresentExp(idx, inputId, btnEl) {
+        var input = document.getElementById(inputId);
+        if (experienceData[idx].to_year === 'Present') {
+            experienceData[idx].to_year = '';
+            input.value = '';
+            btnEl.classList.remove('active');
+        } else {
+            experienceData[idx].to_year = 'Present';
+            input.value = 'Present';
+            btnEl.classList.add('active');
+        }
+        syncExperience();
+    }
+
+    function updatePresentBtn(inputId, btnId) {
+        var input = document.getElementById(inputId);
+        var btn = document.getElementById(btnId);
+        if (!input || !btn) return;
+        if (input.value === 'Present') { btn.classList.add('active'); } else { btn.classList.remove('active'); }
+    }
+
+    function syncExperience() {
+        document.getElementById('experience_json').value = JSON.stringify(experienceData);
+    }
+
+    {% elif user.status == 'student' %}
+    var achievementsData = [];
+
+    function initAchievements(data) {
+        achievementsData = data || [];
+        renderAchievements();
+        document.getElementById('achievements_json').value = JSON.stringify(achievementsData);
+    }
+
+    function addAchievement() {
+        achievementsData.push({name:'', start_year:'', end_year:''});
+        renderAchievements();
+        document.getElementById('achievements_json').value = JSON.stringify(achievementsData);
+    }
+
+    function removeAchievement(idx) {
+        achievementsData.splice(idx, 1);
+        renderAchievements();
+        document.getElementById('achievements_json').value = JSON.stringify(achievementsData);
+    }
+
+    function renderAchievements() {
+        var list = document.getElementById('achievementsList');
+        if (!list) return;
+        list.innerHTML = achievementsData.map(function(ach, i) {
+            var endId = 'ach_end_' + i;
+            var isPresent = ach.end_year === 'Present';
+            return '<div class="dynamic-entry">' +
+                '<button type="button" class="remove-btn" onclick="removeAchievement(' + i + ')">×</button>' +
+                '<div class="form-group"><label>Achievement</label>' +
+                '<input type="text" placeholder="e.g. Best Paper Award" value="' + escHtml(ach.name) + '" oninput="achievementsData[' + i + '].name=this.value;syncAchievements()"></div>' +
+                '<div class="form-row"><div class="form-group"><label>Start Year</label>' +
+                '<input type="text" placeholder="e.g. 2022" value="' + escHtml(ach.start_year) + '" oninput="achievementsData[' + i + '].start_year=this.value;syncAchievements()"></div>' +
+                '<div class="form-group"><label>End Year</label>' +
+                '<div class="input-with-btn">' +
+                '<input type="text" id="' + endId + '" placeholder="e.g. 2023" value="' + escHtml(ach.end_year) + '" oninput="achievementsData[' + i + '].end_year=this.value;syncAchievements();updateAchPresentBtn(\'' + endId + '\',\'ach_endpresent_' + i + '\')">' +
+                '<button type="button" id="ach_endpresent_' + i + '" class="present-btn' + (isPresent ? ' active' : '') + '" onclick="togglePresentAch(' + i + ',\'' + endId + '\',this)">Present</button>' +
+                '</div></div></div></div>';
+        }).join('');
+    }
+
+    function togglePresentAch(idx, inputId, btnEl) {
+        var input = document.getElementById(inputId);
+        if (achievementsData[idx].end_year === 'Present') {
+            achievementsData[idx].end_year = '';
+            input.value = '';
+            btnEl.classList.remove('active');
+        } else {
+            achievementsData[idx].end_year = 'Present';
+            input.value = 'Present';
+            btnEl.classList.add('active');
+        }
+        syncAchievements();
+    }
+
+    function updateAchPresentBtn(inputId, btnId) {
+        var input = document.getElementById(inputId);
+        var btn = document.getElementById(btnId);
+        if (!input || !btn) return;
+        if (input.value === 'Present') { btn.classList.add('active'); } else { btn.classList.remove('active'); }
+    }
+
+    function syncAchievements() {
+        document.getElementById('achievements_json').value = JSON.stringify(achievementsData);
+    }
+    {% endif %}
+
+    function openFullProfileModal() {
+        {% if user.status == 'alumni' %}
+        try { initPrevOwned(JSON.parse('{{ user.previously_owned_json_str|escapejs }}')); } catch(e) { initPrevOwned([]); }
+        try { initExperience(JSON.parse('{{ user.experience_json_str|escapejs }}')); } catch(e) { initExperience([]); }
+        {% elif user.status == 'student' %}
+        try { initAchievements(JSON.parse('{{ user.achievements_json_str|escapejs }}')); } catch(e) { initAchievements([]); }
+        {% endif %}
+        try { initSkills(JSON.parse('{{ user.skills_json_str|escapejs }}')); } catch(e) { initSkills([]); }
+        document.getElementById('fullProfileModal').classList.add('open');
+        setTimeout(function() {
+            document.getElementById('fullProfileModal').querySelectorAll('textarea').forEach(function(ta) { autoResizeTextarea(ta); });
+        }, 50);
+    }
 </script>
 {% endblock %}

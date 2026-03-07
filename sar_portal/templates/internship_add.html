@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if existing %}Edit{% else %}Add{% endif %} Internship Profile — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 780px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--primary-mid);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+        margin-bottom: 6px;
+    }
+
+    .page-sub {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 28px;
+        line-height: 1.6;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 18px;
+        border: 1px solid #E0E9E1;
+        padding: 36px;
+    }
+
+    .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--muted);
+        margin-bottom: 16px;
+        margin-top: 28px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f0f4f1;
+    }
+
+    .section-label:first-child { margin-top: 0; }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 11px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
+        font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        background: white;
+        transition: border-color 0.2s;
+        resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-mid);
+        box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    }
+
+    .tags-display {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-height: 32px;
+        margin-bottom: 8px;
+    }
+
+    .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f0f7f3;
+        color: var(--primary);
+        border: 1px solid #d0e8d8;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .tag-pill.lang {
+        background: #f5f0ff;
+        color: #5b3fa0;
+        border-color: #d8ccf5;
+    }
+
+    .tag-pill.location {
+        background: #eef4ff;
+        color: #2d5fb0;
+        border-color: #c5d8f5;
+    }
+
+    .tag-pill button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        color: inherit;
+        opacity: 0.6;
+        padding: 0;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .tag-pill button:hover { opacity: 1; }
+
+    .tag-add-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .tag-add-row input {
+        flex: 1;
+        padding: 9px 13px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        transition: border-color 0.2s;
+    }
+
+    .tag-add-row input:focus {
+        outline: none;
+        border-color: var(--primary-mid);
+        box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    }
+
+    .tag-add-btn {
+        padding: 9px 16px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+        transition: background 0.2s;
+    }
+
+    .tag-add-btn:hover { background: var(--primary-mid); }
+
+    .tag-section { margin-bottom: 16px; }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+        justify-content: flex-end;
+    }
+
+    .btn-cancel {
+        padding: 12px 28px;
+        background: white;
+        color: var(--muted);
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel:hover { background: #f5f7f5; }
+
+    .btn-submit {
+        padding: 12px 32px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-submit:hover {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    .error-box {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        color: var(--danger);
+        padding: 11px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .page { padding: 20px; }
+        .form-card { padding: 24px 20px; }
+        .form-row { grid-template-columns: 1fr; }
+        .form-actions { flex-direction: column-reverse; }
+        .btn-submit, .btn-cancel { width: 100%; text-align: center; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/internships/" class="back-link">← Back to Internship Portal</a>
+    <div class="page-title">{% if existing %}Edit{% else %}Add{% endif %} My Internship Profile</div>
+    <p class="page-sub">Let alumni know you're looking for internships. Fill in your details so they can find you.</p>
+
+    <div class="form-card">
+        {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="section-label">Basic Info</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" name="name" value="{% if existing %}{{ existing.name }}{% endif %}" placeholder="Your full name" required>
+                </div>
+                <div class="form-group">
+                    <label>Current Location</label>
+                    <input type="text" name="current_location" value="{% if existing %}{{ existing.current_location }}{% endif %}" placeholder="e.g. Kochi, Kerala" required>
+                </div>
+            </div>
+
+            <div class="section-label">Locations Open to Relocate</div>
+
+            <div class="tag-section">
+                <div class="tags-display" id="relocatable-tags"></div>
+                <div class="tag-add-row">
+                    <input type="text" id="relocatable-input" placeholder="Type a city/location and press Add...">
+                    <button type="button" class="tag-add-btn" onclick="addTag('relocatable')">+ Add</button>
+                </div>
+                <input type="hidden" id="relocatable-json" name="relocatable_json" value="{% if existing %}{{ existing.relocatable_json }}{% else %}[]{% endif %}">
+            </div>
+
+            <div class="section-label">Skills</div>
+
+            <div class="tag-section">
+                <div class="tags-display" id="skills-tags"></div>
+                <div class="tag-add-row">
+                    <input type="text" id="skills-input" placeholder="Type a skill and press Add...">
+                    <button type="button" class="tag-add-btn" onclick="addTag('skills')">+ Add</button>
+                </div>
+                <input type="hidden" id="skills-json" name="skills_json" value="{% if existing %}{{ existing.skills_json }}{% else %}[]{% endif %}">
+            </div>
+
+            <div class="section-label">Languages Known</div>
+
+            <div class="tag-section">
+                <div class="tags-display" id="languages-tags"></div>
+                <div class="tag-add-row">
+                    <input type="text" id="languages-input" placeholder="Type a language and press Add...">
+                    <button type="button" class="tag-add-btn" onclick="addTag('languages')">+ Add</button>
+                </div>
+                <input type="hidden" id="languages-json" name="languages_json" value="{% if existing %}{{ existing.languages_json }}{% else %}[]{% endif %}">
+            </div>
+
+            <div class="section-label">Why You Need This Internship</div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="5" placeholder="Tell alumni about yourself, your goals, and why you're looking for an internship..." required>{% if existing %}{{ existing.description }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="/internships/" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">{% if existing %}Save Changes{% else %}Post Profile{% endif %} →</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var tagsData = {
+        skills: JSON.parse(document.getElementById('skills-json').value || '[]'),
+        languages: JSON.parse(document.getElementById('languages-json').value || '[]'),
+        relocatable: JSON.parse(document.getElementById('relocatable-json').value || '[]')
+    };
+
+    renderTags('skills');
+    renderTags('languages');
+    renderTags('relocatable');
+
+    function addTag(name) {
+        var input = document.getElementById(name + '-input');
+        var val = input.value.trim();
+        if (val && !tagsData[name].includes(val)) {
+            tagsData[name].push(val);
+            renderTags(name);
+            document.getElementById(name + '-json').value = JSON.stringify(tagsData[name]);
+        }
+        input.value = '';
+        input.focus();
+    }
+
+    function removeTag(name, idx) {
+        tagsData[name].splice(idx, 1);
+        renderTags(name);
+        document.getElementById(name + '-json').value = JSON.stringify(tagsData[name]);
+    }
+
+    function renderTags(name) {
+        var cls = name === 'languages' ? 'lang' : name === 'relocatable' ? 'location' : '';
+        var display = document.getElementById(name + '-tags');
+        display.innerHTML = tagsData[name].map(function(t, i) {
+            return '<span class="tag-pill ' + cls + '">' + escHtml(t) + '<button type="button" onclick="removeTag(\'' + name + '\',' + i + ')">×</button></span>';
+        }).join('');
+    }
+
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    ['skills', 'languages', 'relocatable'].forEach(function(name) {
+        document.getElementById(name + '-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); addTag(name); }
+        });
+    });
+</script>
+{% endblock %}

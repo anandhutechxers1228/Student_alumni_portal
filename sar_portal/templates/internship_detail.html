@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile.name }} — Internship Profile{% endblock %}
+
+{% block extra_css %}
+    .page { padding: 36px 48px; max-width: 860px; margin: 0 auto; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--primary-mid); text-decoration: none; font-weight: 600; margin-bottom: 24px; }
+    .back-link:hover { text-decoration: underline; }
+    .hero-card { background: linear-gradient(130deg, #1B4332, #2D6A4F); border-radius: 20px; padding: 36px; display: flex; align-items: center; gap: 28px; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .hero-card::after { content: ''; position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%); right: -40px; top: -40px; pointer-events: none; }
+    .hero-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); color: var(--primary); font-family: 'DM Serif Display', serif; font-size: 32px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255,255,255,0.25); flex-shrink: 0; z-index: 2; font-weight: 700; }
+    .hero-info { flex: 1; z-index: 2; }
+    .hero-name { font-family: 'DM Serif Display', serif; font-size: 26px; color: white; margin-bottom: 4px; }
+    .hero-sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 10px; }
+    .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .hero-tag { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid rgba(255,255,255,0.18); }
+    .hero-tag.gold { background: rgba(201,168,76,0.2); color: #F9E4A0; border-color: rgba(201,168,76,0.35); }
+    .section-card { background: white; border-radius: 16px; border: 1px solid #E0E9E1; padding: 24px 28px; margin-bottom: 16px; }
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f4f1; }
+    .pills-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill { font-size: 12px; padding: 4px 12px; border-radius: 20px; background: #f0f7f3; color: var(--primary); border: 1px solid #d0e8d8; font-weight: 500; }
+    .pill.lang { background: #f5f0ff; color: #5b3fa0; border-color: #d8ccf5; }
+    .pill.location { background: #eef4ff; color: #2d5fb0; border-color: #c5d8f5; }
+    .desc-text { font-size: 14px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+    .meta-row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+    .meta-val { font-size: 14px; color: var(--text); font-weight: 500; }
+    @media (max-width: 768px) { .page { padding: 20px; } .hero-card { flex-direction: column; } }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/internships/" class="back-link">← Back to Internships</a>
+
+    <div class="hero-card">
+        <div class="hero-avatar">{{ profile.name|slice:":1"|upper }}</div>
+        <div class="hero-info">
+            <div class="hero-name">{{ profile.name }}</div>
+            <div class="hero-sub">
+                {{ profile.stream }}{% if profile.admission_year %} · Batch {{ profile.admission_year }}{% endif %}
+            </div>
+            <div class="hero-tags">
+                {% if profile.role_title %}<span class="hero-tag gold">{{ profile.role_title }}</span>{% endif %}
+                <span class="hero-tag">{{ profile.current_year }}</span>
+                {% if profile.user_status == 'alumni' %}<span class="hero-tag gold">Alumni</span>{% endif %}
+                {% if profile.current_location %}<span class="hero-tag">{{ profile.current_location }}</span>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if profile.relocatable_locations %}
+    <div class="section-card">
+        <div class="section-label">Open to Relocate</div>
+        <div class="pills-wrap">
+            {% for loc in profile.relocatable_locations %}<span class="pill location">{{ loc }}</span>{% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if profile.skills %}
+    <div class="section-card">
+        <div class="section-label">Skills</div>
+        <div class="pills-wrap">{% for s in profile.skills %}<span class="pill">{{ s }}</span>{% endfor %}</div>
+    </div>
+    {% endif %}
+
+    {% if profile.languages %}
+    <div class="section-card">
+        <div class="section-label">Languages</div>
+        <div class="pills-wrap">{% for l in profile.languages %}<span class="pill lang">{{ l }}</span>{% endfor %}</div>
+    </div>
+    {% endif %}
+
+    {% if profile.description %}
+    <div class="section-card">
+        <div class="section-label">Why I Need This Internship</div>
+        <p class="desc-text">{{ profile.description }}</p>
+    </div>
+    {% endif %}
+
+    <div class="section-card">
+        <div class="section-label">Profile Details</div>
+        <div class="meta-row">
+            {% if profile.created_at_str %}<div class="meta-item"><div class="meta-label">Posted</div><div class="meta-val">{{ profile.created_at_str }}</div></div>{% endif %}
+            {% if profile.updated_at_str %}<div class="meta-item"><div class="meta-label">Updated</div><div class="meta-val">{{ profile.updated_at_str }}</div></div>{% endif %}
+        </div>
+    </div>
+
+    {% if user.id == profile.student_id %}
+    <div style="margin-top:4px;display:flex;gap:10px;">
+        <a href="/internships/edit/{{ profile.id }}/" style="padding:10px 22px;background:var(--primary);color:white;border-radius:9px;text-decoration:none;font-size:14px;font-weight:600;">Edit Profile</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page { padding: 36px 48px; max-width: 860px; margin: 0 auto; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--primary-mid); text-decoration: none; font-weight: 600; margin-bottom: 24px; }
+    .back-link:hover { text-decoration: underline; }
+    .job-hero { border-radius: 20px; overflow: hidden; background: white; border: 1px solid #E0E9E1; margin-bottom: 20px; }
+    .job-hero-img { width: 100%; height: 220px; object-fit: cover; }
+    .job-hero-placeholder { width: 100%; height: 180px; background: linear-gradient(130deg, #1B4332, #2D6A4F); display: flex; align-items: center; justify-content: center; font-size: 64px; }
+    .job-hero-body { padding: 28px 32px; }
+    .job-company { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--primary-mid); margin-bottom: 6px; }
+    .job-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--primary); margin-bottom: 16px; line-height: 1.2; word-break: break-word; overflow-wrap: break-word; }
+    .job-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .meta-badge { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; background: #f0f7f3; color: var(--primary); border: 1px solid #d0e8d8; }
+    .meta-badge.salary { background: var(--accent-light); color: #8a6d15; border-color: rgba(201,168,76,0.3); }
+    .pills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .pill { font-size: 12px; padding: 4px 12px; border-radius: 20px; background: #f0f7f3; color: var(--primary); border: 1px solid #d0e8d8; font-weight: 500; }
+    .pill.location { background: #eef4ff; color: #2d5fb0; border-color: #c5d8f5; }
+    .section-card { background: white; border-radius: 16px; border: 1px solid #E0E9E1; padding: 24px 28px; margin-bottom: 16px; }
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f4f1; }
+    .section-text { font-size: 14px; color: var(--text); line-height: 1.8; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
+    .poster-row { display: flex; align-items: center; gap: 12px; padding: 20px 28px; border-top: 1px solid #f0f4f1; }
+    .poster-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--primary); font-family: 'DM Serif Display', serif; font-size: 18px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+    .poster-name { font-size: 14px; font-weight: 600; color: var(--primary); }
+    .poster-date { font-size: 12px; color: var(--muted); }
+    @media (max-width: 768px) { .page { padding: 20px; } .job-hero-body { padding: 20px; } .section-card { padding: 20px; } }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/jobs/" class="back-link">← Back to Job Portal</a>
+
+    <div class="job-hero">
+        {% if job.image %}
+        <img class="job-hero-img" src="/media/{{ job.image }}" alt="{{ job.title }}">
+        {% else %}
+        <div class="job-hero-placeholder">💼</div>
+        {% endif %}
+
+        <div class="job-hero-body">
+            <div class="job-company">{{ job.company_name }}</div>
+            <div class="job-title">{{ job.title }}</div>
+
+            <div class="job-meta">
+                {% if job.experience_required %}
+                <span class="meta-badge">🕐 {{ job.experience_required }}</span>
+                {% endif %}
+                {% if job.salary %}
+                <span class="meta-badge salary">₹ {{ job.salary }}</span>
+                {% endif %}
+            </div>
+
+            {% if job.locations %}
+            <div class="pills-wrap">
+                {% for loc in job.locations %}
+                <span class="pill location">{{ loc }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if job.eligibility %}
+            <div class="pills-wrap">
+                {% for skill in job.eligibility %}
+                <span class="pill">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="poster-row">
+            <div class="poster-avatar">{{ job.posted_by_name|slice:":1"|upper }}</div>
+            <div>
+                <div class="poster-name">
+                    <a href="/users/{{ job.posted_by }}/" style="color:var(--primary);text-decoration:none;">{{ job.posted_by_name }}</a>
+                </div>
+                <div class="poster-date">Posted on {{ job.posted_at_str }}</div>
+            </div>
+        </div>
+    </div>
+
+    {% if job.description %}
+    <div class="section-card">
+        <div class="section-label">Job Description</div>
+        <p class="section-text">{{ job.description }}</p>
+    </div>
+    {% endif %}
+
+    {% if job.company_description %}
+    <div class="section-card">
+        <div class="section-label">About {{ job.company_name }}</div>
+        <p class="section-text">{{ job.company_description }}</p>
+    </div>
+    {% endif %}
+
+    {% if user.id == job.posted_by %}
+    <div style="margin-top:24px;display:flex;gap:10px;">
+        <a href="/jobs/edit/{{ job.id }}/" style="padding:10px 22px;background:var(--primary);color:white;border-radius:9px;text-decoration:none;font-size:14px;font-weight:600;">Edit Job</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
