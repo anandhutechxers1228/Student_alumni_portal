@@ -18,6 +18,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
         await self.channel_layer.group_add(self.room_group, self.channel_name)
         await self.accept()
+        last_read_id = await self.mark_messages_read()
+        if last_read_id:
+            await self.channel_layer.group_send(self.room_group, {
+                'type': 'chat_read_receipt',
+                'reader_id': self.user_id,
+                'last_read_id': last_read_id,
+            })
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.room_group, self.channel_name)
@@ -51,9 +58,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
             })
 
     async def chat_message(self, event):
+        msg = event['message']
+        if msg and msg.get('sender_id') != self.user_id:
+            read_id = await self.mark_single_message_read(msg['id'])
+            if read_id:
+                await self.channel_layer.group_send(self.room_group, {
+                    'type': 'chat_read_receipt',
+                    'reader_id': self.user_id,
+                    'last_read_id': read_id,
+                })
         await self.send(text_data=json.dumps({
             'type': 'message',
-            'message': event['message'],
+            'message': msg,
         }))
 
     async def chat_reaction(self, event):
@@ -63,12 +79,50 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'reactions': event['reactions'],
         }))
 
+    async def chat_read_receipt(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'read_receipt',
+            'reader_id': event['reader_id'],
+            'last_read_id': event['last_read_id'],
+        }))
+
     @database_sync_to_async
     def get_user_id_from_session(self):
         session = self.scope.get('session')
         if session is None:
             return None
         return session.get('user_id')
+
+    @database_sync_to_async
+    def mark_messages_read(self):
+        db = get_db()
+        parts = self.room_id.split('_')
+        other_ids = [p for p in parts if p != self.user_id]
+        latest = list(db.sar_chat_messages.find(
+            {'room_id': self.room_id, 'sender_id': {'$in': other_ids}, 'read': {'$ne': True}},
+            {'_id': 1}
+        ).sort('sent_at', -1).limit(1))
+        if not latest:
+            return None
+        db.sar_chat_messages.update_many(
+            {'room_id': self.room_id, 'sender_id': {'$in': other_ids}, 'read': {'$ne': True}},
+            {'$set': {'read': True}}
+        )
+        return str(latest[0]['_id'])
+
+    @database_sync_to_async
+    def mark_single_message_read(self, msg_id):
+        db = get_db()
+        try:
+            result = db.sar_chat_messages.update_one(
+                {'_id': ObjectId(msg_id), 'read': {'$ne': True}},
+                {'$set': {'read': True}}
+            )
+            if result.modified_count == 0:
+                return None
+        except Exception:
+            return None
+        return msg_id
 
     @database_sync_to_async
     def save_message(self, content):
@@ -86,6 +140,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'content': content,
             'sent_at': now_utc,
             'reactions': {},
+            'read': False,
         }
         result = db.sar_chat_messages.insert_one(msg_doc)
         parts = self.room_id.split('_')
@@ -110,6 +165,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'content': content,
             'sent_at': now_ist.strftime('%b %d, %Y %I:%M %p'),
             'reactions': {},
+            'read': False,
         }
 
     @database_sync_to_async

@@ -3,27 +3,193 @@
 {% block title %}Chat — SAR Portal{% endblock %}
 
 {% block extra_css %}
-    .page { padding: 36px 48px; max-width: 720px; margin: 0 auto; }
-    .page-header { margin-bottom: 28px; }
-    .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--primary); }
-    .page-sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
-    .convos-list { display: flex; flex-direction: column; gap: 0; background: white; border-radius: 16px; border: 1px solid #E0E9E1; overflow: hidden; }
-    .convo-item { display: flex; align-items: center; gap: 14px; padding: 16px 20px; text-decoration: none; color: inherit; transition: background 0.15s; border-bottom: 1px solid #f0f4f1; position: relative; }
-    .convo-item:last-child { border-bottom: none; }
-    .convo-item:hover { background: #f9fbf9; }
-    .convo-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white; font-family: 'DM Serif Display', serif; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-    .convo-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .convo-body { flex: 1; min-width: 0; }
-    .convo-name { font-weight: 600; font-size: 15px; color: var(--primary); margin-bottom: 2px; }
-    .convo-preview { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .convo-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-    .convo-time { font-size: 11px; color: var(--muted); }
-    .unread-badge { background: var(--primary); color: white; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
-    .empty-state { text-align: center; padding: 80px 40px; background: white; border-radius: 20px; border: 1px solid #E0E9E1; }
-    .empty-icon { font-size: 56px; margin-bottom: 16px; }
-    .empty-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--primary); margin-bottom: 8px; }
-    .empty-sub { font-size: 15px; color: var(--muted); }
-    @media (max-width: 768px) { .page { padding: 20px; } }
+    .page {
+        padding: 36px 48px;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 28px;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+    }
+
+    .page-sub {
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+
+    .convos-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        overflow: hidden;
+    }
+
+    .convo-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.15s;
+        border-bottom: 1px solid #f0f4f1;
+        position: relative;
+        min-width: 0;
+    }
+
+    .convo-item:last-child {
+        border-bottom: none;
+    }
+
+    .convo-item:hover {
+        background: #f9fbf9;
+    }
+
+    .convo-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        color: white;
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .convo-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .convo-body {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .convo-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--primary);
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .convo-preview {
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .convo-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .convo-time {
+        font-size: 11px;
+        color: var(--muted);
+        white-space: nowrap;
+    }
+
+    .unread-badge {
+        background: var(--primary);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 5px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+    }
+
+    .empty-icon {
+        font-size: 56px;
+        margin-bottom: 16px;
+    }
+
+    .empty-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 24px;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-sub {
+        font-size: 15px;
+        color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+        .page {
+            padding: 16px;
+        }
+        .convo-item {
+            padding: 14px 16px;
+            gap: 12px;
+        }
+        .convo-avatar {
+            width: 42px;
+            height: 42px;
+            font-size: 17px;
+        }
+        .empty-state {
+            padding: 48px 24px;
+        }
+        .empty-title {
+            font-size: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page {
+            padding: 12px;
+        }
+        .convo-item {
+            padding: 12px;
+            gap: 10px;
+        }
+        .convo-name {
+            font-size: 14px;
+        }
+        .convo-preview {
+            font-size: 12px;
+        }
+    }
 {% endblock %}
 
 {% block content %}

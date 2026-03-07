@@ -3,78 +3,470 @@
 {% block title %}{{ question.title }} — Mentorship{% endblock %}
 
 {% block extra_css %}
-    .page { padding: 36px 48px; max-width: 860px; margin: 0 auto; }
-    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--primary-mid); text-decoration: none; font-weight: 600; margin-bottom: 24px; }
-    .back-link:hover { text-decoration: underline; }
+    .page {
+        padding: 36px 48px;
+        max-width: 860px;
+        margin: 0 auto;
+    }
 
-    /* Question card */
-    .question-card { background: white; border-radius: 20px; border: 1px solid #E0E9E1; padding: 32px; margin-bottom: 24px; }
-    .q-author-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .q-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-mid)); color: white; font-family: 'DM Serif Display', serif; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-    .q-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .q-author-name { font-size: 14px; font-weight: 700; color: var(--primary); }
-    .q-author-date { font-size: 12px; color: var(--muted); }
-    .q-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--primary); margin-bottom: 12px; line-height: 1.3; }
-    .q-body { font-size: 15px; color: var(--text); line-height: 1.8; margin-bottom: 20px; white-space: pre-wrap; }
-    .vote-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .vote-btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; color: var(--muted); }
-    .vote-btn:hover:not(:disabled) { border-color: var(--primary-mid); color: var(--primary); }
-    .vote-btn.up.active { background: #e8f7ed; color: var(--success); border-color: #b8dfc7; }
-    .vote-btn.down.active { background: #fdf0ee; color: var(--danger); border-color: #f5c6c2; }
-    .vote-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .q-actions { margin-left: auto; display: flex; gap: 8px; }
-    .btn-sm-danger { padding: 7px 14px; background: #fdf0ee; color: var(--danger); border: 1px solid #f5c6c2; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-    .btn-sm-danger:hover { background: #fce0de; }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--primary-mid);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
 
-    /* Replies section */
-    .replies-header { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--primary); margin-bottom: 16px; }
-    .reply-card { background: white; border-radius: 14px; border: 1px solid #E0E9E1; padding: 20px 24px; margin-bottom: 12px; transition: background 0.4s; }
-    .reply-card.highlight { background: #fffbea; border-color: #f0d875; }
-    .reply-author-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .reply-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--primary-mid)); color: white; font-family: 'DM Serif Display', serif; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-    .reply-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .reply-author-name { font-size: 13px; font-weight: 700; color: var(--primary); }
-    .reply-date { font-size: 11px; color: var(--muted); }
-    .reply-body { font-size: 14px; color: var(--text); line-height: 1.7; margin-bottom: 12px; white-space: pre-wrap; }
-    .reply-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .reply-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 16px; border: 1px solid var(--border); background: white; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; color: var(--muted); }
-    .reply-btn:hover:not(:disabled) { border-color: var(--primary-mid); color: var(--primary); }
-    .reply-btn.up.active { background: #e8f7ed; color: var(--success); border-color: #b8dfc7; }
-    .reply-btn.down.active { background: #fdf0ee; color: var(--danger); border-color: #f5c6c2; }
-    .reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .reply-actions-right { margin-left: auto; display: flex; gap: 6px; }
+    .back-link:hover {
+        text-decoration: underline;
+    }
 
-    /* Sub-replies (nested) */
-    .subreplies { margin-top: 12px; margin-left: 24px; border-left: 3px solid #d0e8d8; padding-left: 16px; display: flex; flex-direction: column; gap: 10px; }
-    .subreply-card { background: #fafcfa; border-radius: 12px; border: 1px solid #eef4ef; padding: 16px 20px; transition: background 0.4s; }
-    .subreply-card.highlight { background: #fffbea; border-color: #f0d875; }
-    .subreply-author-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .subreply-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--primary); font-family: 'DM Serif Display', serif; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; font-weight: 700; }
-    .subreply-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .subreply-author-name { font-size: 12px; font-weight: 700; color: var(--primary); }
-    .subreply-date { font-size: 11px; color: var(--muted); }
-    .parent-ref { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--primary-mid); font-weight: 600; background: #f0f7f3; border: 1px solid #d0e8d8; padding: 2px 8px; border-radius: 10px; margin-bottom: 6px; cursor: pointer; text-decoration: none; }
-    .parent-ref:hover { background: #e0f0e8; }
-    .subreply-body { font-size: 13px; color: var(--text); line-height: 1.7; margin-bottom: 10px; white-space: pre-wrap; }
+    .question-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+        padding: 32px;
+        margin-bottom: 24px;
+    }
 
-    /* Reply form area */
-    .reply-form-card { background: white; border-radius: 16px; border: 1px solid #E0E9E1; padding: 24px; margin-top: 24px; }
-    .reply-form-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--primary); margin-bottom: 14px; }
-    .replying-to-badge { display: inline-flex; align-items: center; gap: 6px; background: #f0f7f3; border: 1px solid #d0e8d8; color: var(--primary-mid); padding: 5px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
-    .replying-to-badge button { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--muted); padding: 0 0 0 4px; line-height: 1; }
-    .reply-textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); resize: none; min-height: 90px; transition: border-color 0.2s; }
-    .reply-textarea:focus { outline: none; border-color: var(--primary-mid); box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
-    .reply-submit-row { display: flex; justify-content: flex-end; margin-top: 10px; }
-    .btn-reply-submit { padding: 10px 24px; background: var(--primary); color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-    .btn-reply-submit:hover { background: var(--primary-mid); transform: translateY(-1px); }
-    @media (max-width: 768px) { .page { padding: 20px; } .question-card { padding: 20px; } .reply-card { padding: 16px 18px; } .subreplies { margin-left: 12px; } }
+    .q-author-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .q-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        color: white;
+        font-family: 'DM Serif Display', serif;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .q-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .q-author-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .q-author-date {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .q-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 26px;
+        color: var(--primary);
+        margin-bottom: 12px;
+        line-height: 1.3;
+    }
+
+    .q-body {
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.8;
+        margin-bottom: 20px;
+        white-space: pre-wrap;
+    }
+
+    .vote-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .vote-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 7px 14px;
+        border-radius: 20px;
+        border: 1.5px solid var(--border);
+        background: white;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        color: var(--muted);
+    }
+
+    .vote-btn:hover:not(:disabled) {
+        border-color: var(--primary-mid);
+        color: var(--primary);
+    }
+
+    .vote-btn.up.active {
+        background: #e8f7ed;
+        color: var(--success);
+        border-color: #b8dfc7;
+    }
+
+    .vote-btn.down.active {
+        background: #fdf0ee;
+        color: var(--danger);
+        border-color: #f5c6c2;
+    }
+
+    .vote-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .q-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-sm-danger {
+        padding: 7px 14px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.15s;
+    }
+
+    .btn-sm-danger:hover {
+        background: #fce0de;
+    }
+
+    .replies-header {
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        color: var(--primary);
+        margin-bottom: 16px;
+    }
+
+    .reply-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #E0E9E1;
+        padding: 20px 24px;
+        margin-bottom: 12px;
+        transition: background 0.4s;
+    }
+
+    .reply-card.highlight {
+        background: #fffbea;
+        border-color: #f0d875;
+    }
+
+    .reply-author-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .reply-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-mid));
+        color: white;
+        font-family: 'DM Serif Display', serif;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .reply-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .reply-author-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .reply-date {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .reply-body {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.7;
+        margin-bottom: 12px;
+        white-space: pre-wrap;
+    }
+
+    .reply-footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .reply-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 12px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: white;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.15s;
+        color: var(--muted);
+    }
+
+    .reply-btn:hover:not(:disabled) {
+        border-color: var(--primary-mid);
+        color: var(--primary);
+    }
+
+    .reply-btn.up.active {
+        background: #e8f7ed;
+        color: var(--success);
+        border-color: #b8dfc7;
+    }
+
+    .reply-btn.down.active {
+        background: #fdf0ee;
+        color: var(--danger);
+        border-color: #f5c6c2;
+    }
+
+    .reply-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .reply-actions-right {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
+    }
+
+    .subreplies {
+        margin-top: 12px;
+        margin-left: 24px;
+        border-left: 3px solid #d0e8d8;
+        padding-left: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .subreply-card {
+        background: #fafcfa;
+        border-radius: 12px;
+        border: 1px solid #eef4ef;
+        padding: 16px 20px;
+        transition: background 0.4s;
+    }
+
+    .subreply-card.highlight {
+        background: #fffbea;
+        border-color: #f0d875;
+    }
+
+    .subreply-author-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .subreply-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--primary);
+        font-family: 'DM Serif Display', serif;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+        font-weight: 700;
+    }
+
+    .subreply-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .subreply-author-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .subreply-date {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .parent-ref {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--primary-mid);
+        font-weight: 600;
+        background: #f0f7f3;
+        border: 1px solid #d0e8d8;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .parent-ref:hover {
+        background: #e0f0e8;
+    }
+
+    .subreply-body {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.7;
+        margin-bottom: 10px;
+        white-space: pre-wrap;
+    }
+
+    .reply-form-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        padding: 24px;
+        margin-top: 24px;
+    }
+
+    .reply-form-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 18px;
+        color: var(--primary);
+        margin-bottom: 14px;
+    }
+
+    .replying-to-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f0f7f3;
+        border: 1px solid #d0e8d8;
+        color: var(--primary-mid);
+        padding: 5px 12px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .replying-to-badge button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--muted);
+        padding: 0 0 0 4px;
+        line-height: 1;
+    }
+
+    .reply-textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
+        font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        resize: none;
+        min-height: 90px;
+        transition: border-color 0.2s;
+    }
+
+    .reply-textarea:focus {
+        outline: none;
+        border-color: var(--primary-mid);
+        box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    }
+
+    .reply-submit-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+
+    .btn-reply-submit {
+        padding: 10px 24px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-reply-submit:hover {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .page {
+            padding: 20px;
+        }
+        .question-card {
+            padding: 20px;
+        }
+        .reply-card {
+            padding: 16px 18px;
+        }
+        .subreplies {
+            margin-left: 12px;
+        }
+    }
 {% endblock %}
 
 {% block content %}
 <div class="page">
     <a href="/mentorship/" class="back-link">← Back to Mentorship</a>
 
-    <!-- Question -->
     <div class="question-card">
         <div class="q-author-row">
             <div class="q-avatar">
@@ -114,7 +506,6 @@
         </div>
     </div>
 
-    <!-- Replies -->
     {% if top_replies %}
     <div class="replies-header">{{ top_replies|length }} Repl{% if top_replies|length == 1 %}y{% else %}ies{% endif %}</div>
 
@@ -212,7 +603,6 @@
     {% endfor %}
     {% endif %}
 
-    <!-- Reply form -->
     <div class="reply-form-card">
         <div class="reply-form-title">Write a Reply</div>
         <div id="replying-to-badge" style="display:none;" class="replying-to-badge">

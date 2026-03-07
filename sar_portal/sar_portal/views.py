@@ -6,7 +6,7 @@ from .db_connector import get_db
 from bson import ObjectId
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import json
 
 
@@ -16,6 +16,8 @@ STREAMS = [
     'Electrical',
     'Instrumentation',
 ]
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 
 def login_required(view_func):
@@ -751,16 +753,25 @@ def _get_room_id(uid1, uid2):
 
 def _serialize_message(msg, current_user_id):
     reactions = msg.get('reactions', {})
+    sent_at = msg.get('sent_at')
+    if sent_at:
+        if sent_at.tzinfo is None:
+            sent_at = sent_at.replace(tzinfo=timezone.utc)
+        sent_at_ist = sent_at.astimezone(IST)
+        sent_at_str = sent_at_ist.strftime('%b %d, %Y %I:%M %p')
+    else:
+        sent_at_str = ''
     return {
         'id': str(msg['_id']),
         'sender_id': msg.get('sender_id', ''),
         'sender_name': msg.get('sender_name', ''),
         'sender_pic': msg.get('sender_pic', ''),
         'content': msg.get('content', ''),
-        'sent_at': msg['sent_at'].strftime('%b %d, %Y %H:%M') if msg.get('sent_at') else '',
+        'sent_at': sent_at_str,
         'reactions': {k: len(v) for k, v in reactions.items()},
         'my_reactions': [k for k, v in reactions.items() if current_user_id in v],
         'is_mine': msg.get('sender_id') == current_user_id,
+        'read': msg.get('read', False),
     }
 
 

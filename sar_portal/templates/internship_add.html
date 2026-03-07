@@ -20,7 +20,9 @@
         margin-bottom: 24px;
     }
 
-    .back-link:hover { text-decoration: underline; }
+    .back-link:hover {
+        text-decoration: underline;
+    }
 
     .page-title {
         font-family: 'DM Serif Display', serif;
@@ -55,7 +57,9 @@
         border-bottom: 1px solid #f0f4f1;
     }
 
-    .section-label:first-child { margin-top: 0; }
+    .section-label:first-child {
+        margin-top: 0;
+    }
 
     .form-row {
         display: grid;
@@ -144,7 +148,9 @@
         align-items: center;
     }
 
-    .tag-pill button:hover { opacity: 1; }
+    .tag-pill button:hover {
+        opacity: 1;
+    }
 
     .tag-add-row {
         display: flex;
@@ -182,9 +188,13 @@
         transition: background 0.2s;
     }
 
-    .tag-add-btn:hover { background: var(--primary-mid); }
+    .tag-add-btn:hover {
+        background: var(--primary-mid);
+    }
 
-    .tag-section { margin-bottom: 16px; }
+    .tag-section {
+        margin-bottom: 16px;
+    }
 
     .form-actions {
         display: flex;
@@ -207,7 +217,9 @@
         transition: all 0.2s;
     }
 
-    .btn-cancel:hover { background: #f5f7f5; }
+    .btn-cancel:hover {
+        background: #f5f7f5;
+    }
 
     .btn-submit {
         padding: 12px 32px;
@@ -238,11 +250,22 @@
     }
 
     @media (max-width: 768px) {
-        .page { padding: 20px; }
-        .form-card { padding: 24px 20px; }
-        .form-row { grid-template-columns: 1fr; }
-        .form-actions { flex-direction: column-reverse; }
-        .btn-submit, .btn-cancel { width: 100%; text-align: center; }
+        .page {
+            padding: 20px;
+        }
+        .form-card {
+            padding: 24px 20px;
+        }
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+        .btn-submit, .btn-cancel {
+            width: 100%;
+            text-align: center;
+        }
     }
 {% endblock %}
 
