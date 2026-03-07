@@ -765,7 +765,6 @@ def _serialize_message(msg, current_user_id):
         'id': str(msg['_id']),
         'sender_id': msg.get('sender_id', ''),
         'sender_name': msg.get('sender_name', ''),
-        'sender_pic': msg.get('sender_pic', ''),
         'content': msg.get('content', ''),
         'sent_at': sent_at_str,
         'reactions': {k: len(v) for k, v in reactions.items()},
