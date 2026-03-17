@@ -59,6 +59,8 @@
         letter-spacing: 0.6px;
         color: var(--primary-mid);
         margin-bottom: 6px;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .job-title {
@@ -89,6 +91,10 @@
         background: #f0f7f3;
         color: var(--primary);
         border: 1px solid #d0e8d8;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .meta-badge.salary {
@@ -112,6 +118,9 @@
         color: var(--primary);
         border: 1px solid #d0e8d8;
         font-weight: 500;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     .pill.location {
@@ -143,9 +152,33 @@
         font-size: 14px;
         color: var(--text);
         line-height: 1.8;
-        white-space: pre-wrap;
         word-break: break-word;
         overflow-wrap: break-word;
+        max-height: calc(14px * 1.8 * 3);
+        overflow: hidden;
+    }
+
+    .section-text.expanded {
+        max-height: none;
+        overflow: visible;
+        white-space: pre-wrap;
+    }
+
+    .show-more-btn {
+        background: none;
+        border: none;
+        color: var(--primary-mid);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 0 0;
+        font-family: 'DM Sans', sans-serif;
+        display: block;
+        text-align: left;
+    }
+
+    .show-more-btn:hover {
+        text-decoration: underline;
     }
 
     .poster-row {
@@ -175,6 +208,8 @@
         font-size: 14px;
         font-weight: 600;
         color: var(--primary);
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .poster-date {
@@ -251,6 +286,7 @@
     <div class="section-card">
         <div class="section-label">Job Description</div>
         <p class="section-text">{{ job.description }}</p>
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
     </div>
     {% endif %}
 
@@ -258,6 +294,7 @@
     <div class="section-card">
         <div class="section-label">About {{ job.company_name }}</div>
         <p class="section-text">{{ job.company_description }}</p>
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
     </div>
     {% endif %}
 
@@ -267,4 +304,24 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    function toggleShowMore(btn) {
+        var el = btn.previousElementSibling;
+        if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            btn.textContent = 'Show more';
+        } else {
+            el.classList.add('expanded');
+            btn.textContent = 'Show less';
+        }
+    }
+
+    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
+        var el = btn.previousElementSibling;
+        if (el.scrollHeight <= el.clientHeight + 2) {
+            btn.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}

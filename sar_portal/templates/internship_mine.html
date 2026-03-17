@@ -103,6 +103,8 @@
         display: flex;
         align-items: center;
         gap: 16px;
+        min-width: 0;
+        flex: 1;
     }
 
     .hero-avatar {
@@ -120,16 +122,28 @@
         flex-shrink: 0;
     }
 
+    .hero-text {
+        min-width: 0;
+        flex: 1;
+    }
+
     .hero-name {
         font-family: 'DM Serif Display', serif;
         font-size: 20px;
         color: white;
         margin-bottom: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
     }
 
     .hero-sub {
         font-size: 12px;
         color: rgba(255,255,255,0.65);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .card-actions {
@@ -153,6 +167,7 @@
         align-items: center;
         gap: 5px;
         transition: all 0.2s;
+        white-space: nowrap;
     }
 
     .btn-edit:hover {
@@ -173,6 +188,7 @@
         align-items: center;
         gap: 5px;
         transition: all 0.2s;
+        white-space: nowrap;
     }
 
     .btn-delete:hover {
@@ -218,6 +234,9 @@
         color: var(--primary);
         border: 1px solid #d0e8d8;
         font-weight: 500;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     .pill.lang {
@@ -236,6 +255,32 @@
         font-size: 13px;
         color: var(--text);
         line-height: 1.7;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(13px * 1.7 * 3);
+        overflow: hidden;
+    }
+
+    .desc-text.expanded {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .show-more-btn {
+        background: none;
+        border: none;
+        color: var(--primary-mid);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 0 0;
+        font-family: 'DM Sans', sans-serif;
+        display: block;
+        text-align: left;
+    }
+
+    .show-more-btn:hover {
+        text-decoration: underline;
     }
 
     .meta-row {
@@ -262,6 +307,10 @@
         font-size: 13px;
         color: var(--text);
         font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 400px;
     }
 
     .empty-state {
@@ -325,7 +374,7 @@
             <div class="card-hero">
                 <div class="hero-left">
                     <div class="hero-avatar">{{ p.name|slice:":1"|upper }}</div>
-                    <div>
+                    <div class="hero-text">
                         <div class="hero-name">{{ p.name }}</div>
                         <div class="hero-sub">
                             {% if p.role_title %}{{ p.role_title }} · {% endif %}
@@ -377,6 +426,7 @@
                 <div class="section">
                     <div class="section-title">Why I Need This Internship</div>
                     <p class="desc-text">{{ p.description }}</p>
+                    <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
                 </div>
                 {% endif %}
             </div>
@@ -392,4 +442,24 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    function toggleShowMore(btn) {
+        var el = btn.previousElementSibling;
+        if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            btn.textContent = 'Show more';
+        } else {
+            el.classList.add('expanded');
+            btn.textContent = 'Show less';
+        }
+    }
+
+    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
+        var el = btn.previousElementSibling;
+        if (el.scrollHeight <= el.clientHeight + 2) {
+            btn.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}

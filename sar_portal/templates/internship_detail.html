@@ -68,6 +68,7 @@
     .hero-info {
         flex: 1;
         z-index: 2;
+        min-width: 0;
     }
 
     .hero-name {
@@ -75,12 +76,16 @@
         font-size: 26px;
         color: white;
         margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .hero-sub {
         font-size: 13px;
         color: rgba(255,255,255,0.65);
         margin-bottom: 10px;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .hero-tags {
@@ -97,6 +102,8 @@
         font-size: 12px;
         font-weight: 500;
         border: 1px solid rgba(255,255,255,0.18);
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .hero-tag.gold {
@@ -138,6 +145,9 @@
         color: var(--primary);
         border: 1px solid #d0e8d8;
         font-weight: 500;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     .pill.lang {
@@ -156,7 +166,33 @@
         font-size: 14px;
         color: var(--text);
         line-height: 1.8;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(14px * 1.8 * 3);
+        overflow: hidden;
+    }
+
+    .desc-text.expanded {
+        max-height: none;
+        overflow: visible;
         white-space: pre-wrap;
+    }
+
+    .show-more-btn {
+        background: none;
+        border: none;
+        color: var(--primary-mid);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 0 0;
+        font-family: 'DM Sans', sans-serif;
+        display: block;
+        text-align: left;
+    }
+
+    .show-more-btn:hover {
+        text-decoration: underline;
     }
 
     .meta-row {
@@ -242,6 +278,7 @@
     <div class="section-card">
         <div class="section-label">Why I Need This Internship</div>
         <p class="desc-text">{{ profile.description }}</p>
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
     </div>
     {% endif %}
 
@@ -259,4 +296,24 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    function toggleShowMore(btn) {
+        var el = btn.previousElementSibling;
+        if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            btn.textContent = 'Show more';
+        } else {
+            el.classList.add('expanded');
+            btn.textContent = 'Show less';
+        }
+    }
+
+    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
+        var el = btn.previousElementSibling;
+        if (el.scrollHeight <= el.clientHeight + 2) {
+            btn.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}

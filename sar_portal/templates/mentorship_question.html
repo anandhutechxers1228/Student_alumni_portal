@@ -64,6 +64,8 @@
         font-size: 14px;
         font-weight: 700;
         color: var(--primary);
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .q-author-date {
@@ -77,14 +79,49 @@
         color: var(--primary);
         margin-bottom: 12px;
         line-height: 1.3;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(26px * 1.3 * 2);
+        overflow: hidden;
+    }
+
+    .q-title.expanded {
+        max-height: none;
+        overflow: visible;
     }
 
     .q-body {
         font-size: 15px;
         color: var(--text);
         line-height: 1.8;
-        margin-bottom: 20px;
+        margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(15px * 1.8 * 2);
+        overflow: hidden;
+    }
+
+    .q-body.expanded {
+        max-height: none;
+        overflow: visible;
         white-space: pre-wrap;
+    }
+
+    .show-more-btn {
+        background: none;
+        border: none;
+        color: var(--primary-mid);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 0 16px;
+        font-family: 'DM Sans', sans-serif;
+        display: block;
+        text-align: left;
+    }
+
+    .show-more-btn:hover {
+        text-decoration: underline;
     }
 
     .vote-row {
@@ -208,6 +245,8 @@
         font-size: 13px;
         font-weight: 700;
         color: var(--primary);
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .reply-date {
@@ -219,7 +258,16 @@
         font-size: 14px;
         color: var(--text);
         line-height: 1.7;
-        margin-bottom: 12px;
+        margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(14px * 1.7 * 2);
+        overflow: hidden;
+    }
+
+    .reply-body.expanded {
+        max-height: none;
+        overflow: visible;
         white-space: pre-wrap;
     }
 
@@ -330,6 +378,8 @@
         font-size: 12px;
         font-weight: 700;
         color: var(--primary);
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .subreply-date {
@@ -361,7 +411,16 @@
         font-size: 13px;
         color: var(--text);
         line-height: 1.7;
-        margin-bottom: 10px;
+        margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(13px * 1.7 * 2);
+        overflow: hidden;
+    }
+
+    .subreply-body.expanded {
+        max-height: none;
+        overflow: visible;
         white-space: pre-wrap;
     }
 
@@ -480,7 +539,11 @@
             </div>
         </div>
         <div class="q-title">{{ question.title }}</div>
-        {% if question.body %}<p class="q-body">{{ question.body }}</p>{% endif %}
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
+        {% if question.body %}
+        <p class="q-body">{{ question.body }}</p>
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
+        {% endif %}
         <div class="vote-row">
             <button class="vote-btn up {% if question.user_vote == 'up' %}active{% endif %}"
                 id="qvote-up"
@@ -523,6 +586,7 @@
             </div>
         </div>
         <p class="reply-body">{{ reply.content }}</p>
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
         <div class="reply-footer">
             <button class="reply-btn up {% if reply.user_vote == 'up' %}active{% endif %}"
                 {% if reply.is_author %}disabled{% endif %}
@@ -570,6 +634,7 @@
                 </a>
                 {% endif %}
                 <p class="subreply-body">{{ sub.content }}</p>
+                <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
                 <div class="reply-footer">
                     <button class="reply-btn up {% if sub.user_vote == 'up' %}active{% endif %}"
                         {% if sub.is_author %}disabled{% endif %}
@@ -623,6 +688,24 @@
 </div>
 
 <script>
+    function toggleShowMore(btn) {
+        var el = btn.previousElementSibling;
+        if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            btn.textContent = 'Show more';
+        } else {
+            el.classList.add('expanded');
+            btn.textContent = 'Show less';
+        }
+    }
+
+    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
+        var el = btn.previousElementSibling;
+        if (el.scrollHeight <= el.clientHeight + 2) {
+            btn.style.display = 'none';
+        }
+    });
+
     function vote(itemType, itemId, voteDir, upBtnId, downBtnId, upCountId, downCountId) {
         fetch('/mentorship/vote/', {
             method: 'POST',

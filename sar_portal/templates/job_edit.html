@@ -104,6 +104,12 @@
         letter-spacing: 0;
     }
 
+    .field-hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 3px;
+    }
+
     .tag-section {
         margin-bottom: 16px;
     }
@@ -328,11 +334,11 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Job Title</label>
-                    <input type="text" name="title" value="{{ job.title }}" required>
+                    <input type="text" name="title" value="{{ job.title }}" maxlength="150" required>
                 </div>
                 <div class="form-group">
                     <label>Company Name</label>
-                    <input type="text" name="company_name" value="{{ job.company_name }}" required>
+                    <input type="text" name="company_name" value="{{ job.company_name }}" maxlength="150" required>
                 </div>
             </div>
 
@@ -350,12 +356,13 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Experience Required</label>
-                    <input type="text" name="experience_required" value="{{ job.experience_required }}" required>
+                    <label>Experience Required (Years)</label>
+                    <input type="number" name="experience_required" value="{{ job.experience_required }}" min="0" max="50" step="1" required>
+                    <span class="field-hint">Enter number of years (0 for fresher)</span>
                 </div>
                 <div class="form-group">
                     <label>Salary</label>
-                    <input type="text" name="salary" value="{{ job.salary }}" required>
+                    <input type="text" name="salary" value="{{ job.salary }}" maxlength="100" required>
                 </div>
             </div>
 
@@ -364,9 +371,10 @@
             <div class="tag-section">
                 <div class="tags-display" id="locations-tags"></div>
                 <div class="tag-add-row">
-                    <input type="text" id="locations-input" placeholder="Type a city or location and press Add...">
+                    <input type="text" id="locations-input" placeholder="Type a city or location and press Add..." maxlength="100">
                     <button type="button" class="tag-add-btn" onclick="addTag('locations')">+ Add</button>
                 </div>
+                <span class="field-hint">Max 100 characters per location</span>
                 <input type="hidden" id="locations-json" name="locations_json" value="{{ job.locations_json }}">
             </div>
 
@@ -375,9 +383,10 @@
             <div class="tag-section">
                 <div class="tags-display" id="eligibility-tags"></div>
                 <div class="tag-add-row">
-                    <input type="text" id="eligibility-input" placeholder="Type a skill and press Add...">
+                    <input type="text" id="eligibility-input" placeholder="Type a skill and press Add..." maxlength="75">
                     <button type="button" class="tag-add-btn" onclick="addTag('eligibility')">+ Add</button>
                 </div>
+                <span class="field-hint">Max 75 characters per skill</span>
                 <input type="hidden" id="eligibility-json" name="eligibility_json" value="{{ job.eligibility_json }}">
             </div>
 
@@ -404,6 +413,7 @@
 </div>
 
 <script>
+    var tagLimits = { locations: 100, eligibility: 75 };
     var tagsData = {
         locations: JSON.parse(document.getElementById('locations-json').value || '[]'),
         eligibility: JSON.parse(document.getElementById('eligibility-json').value || '[]')
@@ -415,7 +425,14 @@
     function addTag(name) {
         var input = document.getElementById(name + '-input');
         var val = input.value.trim();
-        if (val && !tagsData[name].includes(val)) {
+        if (!val) { input.focus(); return; }
+        var limit = tagLimits[name] || 75;
+        if (val.length > limit) {
+            alert('Too long! Maximum ' + limit + ' characters allowed.');
+            input.focus();
+            return;
+        }
+        if (!tagsData[name].includes(val)) {
             tagsData[name].push(val);
             renderTags(name);
             document.getElementById(name + '-json').value = JSON.stringify(tagsData[name]);

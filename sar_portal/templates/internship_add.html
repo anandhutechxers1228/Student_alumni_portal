@@ -249,6 +249,12 @@
         margin-bottom: 20px;
     }
 
+    .field-hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 3px;
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -286,11 +292,12 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Your Name</label>
-                    <input type="text" name="name" value="{% if existing %}{{ existing.name }}{% endif %}" placeholder="Your full name" required>
+                    <input type="text" name="name" value="{% if existing %}{{ existing.name }}{% endif %}" placeholder="Your full name" maxlength="100" required>
                 </div>
                 <div class="form-group">
                     <label>Current Location</label>
-                    <input type="text" name="current_location" value="{% if existing %}{{ existing.current_location }}{% endif %}" placeholder="e.g. Kochi, Kerala" required>
+                    <input type="text" name="current_location" value="{% if existing %}{{ existing.current_location }}{% endif %}" placeholder="e.g. Kochi, Kerala" maxlength="100" required>
+                    <span class="field-hint">Max 100 characters</span>
                 </div>
             </div>
 
@@ -299,9 +306,10 @@
             <div class="tag-section">
                 <div class="tags-display" id="relocatable-tags"></div>
                 <div class="tag-add-row">
-                    <input type="text" id="relocatable-input" placeholder="Type a city/location and press Add...">
+                    <input type="text" id="relocatable-input" placeholder="Type a city/location and press Add..." maxlength="100">
                     <button type="button" class="tag-add-btn" onclick="addTag('relocatable')">+ Add</button>
                 </div>
+                <span class="field-hint">Max 100 characters per location</span>
                 <input type="hidden" id="relocatable-json" name="relocatable_json" value="{% if existing %}{{ existing.relocatable_json }}{% else %}[]{% endif %}">
             </div>
 
@@ -310,9 +318,10 @@
             <div class="tag-section">
                 <div class="tags-display" id="skills-tags"></div>
                 <div class="tag-add-row">
-                    <input type="text" id="skills-input" placeholder="Type a skill and press Add...">
+                    <input type="text" id="skills-input" placeholder="Type a skill and press Add..." maxlength="75">
                     <button type="button" class="tag-add-btn" onclick="addTag('skills')">+ Add</button>
                 </div>
+                <span class="field-hint">Max 75 characters per skill</span>
                 <input type="hidden" id="skills-json" name="skills_json" value="{% if existing %}{{ existing.skills_json }}{% else %}[]{% endif %}">
             </div>
 
@@ -321,9 +330,10 @@
             <div class="tag-section">
                 <div class="tags-display" id="languages-tags"></div>
                 <div class="tag-add-row">
-                    <input type="text" id="languages-input" placeholder="Type a language and press Add...">
+                    <input type="text" id="languages-input" placeholder="Type a language and press Add..." maxlength="75">
                     <button type="button" class="tag-add-btn" onclick="addTag('languages')">+ Add</button>
                 </div>
+                <span class="field-hint">Max 75 characters per language</span>
                 <input type="hidden" id="languages-json" name="languages_json" value="{% if existing %}{{ existing.languages_json }}{% else %}[]{% endif %}">
             </div>
 
@@ -343,6 +353,8 @@
 </div>
 
 <script>
+    var tagLimits = { skills: 75, languages: 75, relocatable: 100 };
+
     var tagsData = {
         skills: JSON.parse(document.getElementById('skills-json').value || '[]'),
         languages: JSON.parse(document.getElementById('languages-json').value || '[]'),
@@ -356,7 +368,14 @@
     function addTag(name) {
         var input = document.getElementById(name + '-input');
         var val = input.value.trim();
-        if (val && !tagsData[name].includes(val)) {
+        if (!val) { input.focus(); return; }
+        var limit = tagLimits[name] || 75;
+        if (val.length > limit) {
+            alert('Too long! Maximum ' + limit + ' characters allowed.');
+            input.focus();
+            return;
+        }
+        if (!tagsData[name].includes(val)) {
             tagsData[name].push(val);
             renderTags(name);
             document.getElementById(name + '-json').value = JSON.stringify(tagsData[name]);

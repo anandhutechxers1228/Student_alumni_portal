@@ -54,6 +54,8 @@
         align-items: center;
         gap: 6px;
         transition: all 0.2s;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .btn-primary:hover {
@@ -100,6 +102,8 @@
     .job-body {
         flex: 1;
         padding: 20px 24px;
+        min-width: 0;
+        overflow: hidden;
     }
 
     .job-top {
@@ -112,6 +116,8 @@
 
     .job-main {
         flex: 1;
+        min-width: 0;
+        overflow: hidden;
     }
 
     .job-company {
@@ -121,6 +127,9 @@
         letter-spacing: 0.5px;
         color: var(--primary-mid);
         margin-bottom: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .job-title {
@@ -129,6 +138,9 @@
         color: var(--primary);
         margin-bottom: 10px;
         line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .job-meta {
@@ -148,6 +160,10 @@
         background: #f0f7f3;
         color: var(--primary-mid);
         font-weight: 500;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .meta-badge.salary {
@@ -169,6 +185,10 @@
         color: var(--primary);
         border: 1px solid #d0e8d8;
         font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 160px;
     }
 
     .pill.location {
@@ -209,6 +229,7 @@
         font-size: 11px;
         color: var(--muted);
         text-align: right;
+        white-space: nowrap;
     }
 
     .empty-state {
