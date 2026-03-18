@@ -1,0 +1,190 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Dashboard — SAR Admin{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+        margin-bottom: 6px;
+    }
+
+    .page-sub {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 32px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 36px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        padding: 24px;
+        transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 6px 24px rgba(27,67,50,0.09);
+    }
+
+    .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--muted);
+        margin-bottom: 10px;
+    }
+
+    .stat-val {
+        font-family: 'DM Serif Display', serif;
+        font-size: 36px;
+        color: var(--primary);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .stat-val.danger {
+        color: var(--danger);
+    }
+
+    .stat-desc {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .section-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        color: var(--primary);
+        margin-bottom: 16px;
+    }
+
+    .nav-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+    }
+
+    .nav-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #E0E9E1;
+        padding: 22px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+        display: block;
+    }
+
+    .nav-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 28px rgba(27,67,50,0.1);
+        border-color: var(--primary-mid);
+    }
+
+    .nav-card-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 17px;
+        color: var(--primary);
+        margin-bottom: 5px;
+    }
+
+    .nav-card-sub {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+        .page {
+            padding: 20px;
+        }
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="page-title">Dashboard</div>
+    <p class="page-sub">Overview of all portal content.</p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-val">{{ user_count }}</div>
+            <div class="stat-desc">registered accounts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Jobs</div>
+            <div class="stat-val">{{ job_count }}</div>
+            <div class="stat-desc">job postings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Internship Profiles</div>
+            <div class="stat-val">{{ internship_count }}</div>
+            <div class="stat-desc">profiles posted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Mentorship Questions</div>
+            <div class="stat-val">{{ question_count }}</div>
+            <div class="stat-desc">questions asked</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Flagged Jobs</div>
+            <div class="stat-val {% if flagged_jobs %}danger{% endif %}">{{ flagged_jobs }}</div>
+            <div class="stat-desc">flagged by admin</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Flagged Internships</div>
+            <div class="stat-val {% if flagged_internships %}danger{% endif %}">{{ flagged_internships }}</div>
+            <div class="stat-desc">flagged by admin</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Flagged Questions</div>
+            <div class="stat-val {% if flagged_questions %}danger{% endif %}">{{ flagged_questions }}</div>
+            <div class="stat-desc">flagged by admin</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Flagged Replies</div>
+            <div class="stat-val {% if flagged_replies %}danger{% endif %}">{{ flagged_replies }}</div>
+            <div class="stat-desc">flagged by admin</div>
+        </div>
+    </div>
+
+    <div class="section-title">Manage</div>
+    <div class="nav-cards">
+        <a href="/admin/users/" class="nav-card">
+            <div class="nav-card-title">Users</div>
+            <div class="nav-card-sub">View all registered users</div>
+        </a>
+        <a href="/admin/jobs/" class="nav-card">
+            <div class="nav-card-title">Jobs</div>
+            <div class="nav-card-sub">Delete or flag job postings</div>
+        </a>
+        <a href="/admin/internships/" class="nav-card">
+            <div class="nav-card-title">Internships</div>
+            <div class="nav-card-sub">Delete or flag internship profiles</div>
+        </a>
+        <a href="/admin/mentorship/" class="nav-card">
+            <div class="nav-card-title">Mentorship</div>
+            <div class="nav-card-sub">Delete or flag questions and replies</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

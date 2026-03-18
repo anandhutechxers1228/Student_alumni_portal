@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — SAR Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #1B4332;
+            --primary-mid: #2D6A4F;
+            --accent: #C9A84C;
+            --bg: #F5F7F5;
+            --white: #FFFFFF;
+            --text: #1A2E1F;
+            --muted: #6B7B6E;
+            --danger: #B5302A;
+            --border: #DDE5DD;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-wrap {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-brand-text {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            color: var(--white);
+            letter-spacing: 0.3px;
+        }
+
+        .login-brand-text span {
+            color: var(--accent);
+        }
+
+        .login-brand-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.45);
+            margin-top: 4px;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+
+        .login-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .login-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            background: var(--white);
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-mid);
+            box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-mid);
+            transform: translateY(-1px);
+        }
+
+        .error-box {
+            background: #fdf0ee;
+            border: 1px solid #f5c6c2;
+            color: var(--danger);
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="login-wrap">
+    <div class="login-brand">
+        <div class="login-brand-text">SAR <span>Admin</span></div>
+        <div class="login-brand-sub">Restricted access — administrators only</div>
+    </div>
+    <div class="login-card">
+        {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+        <div class="login-title">{% if admin_exists %}Sign In{% else %}Create Admin Account{% endif %}</div>
+        <p class="login-sub">{% if admin_exists %}Enter your admin credentials to continue.{% else %}No admin exists yet. Set up the first admin account.{% endif %}</p>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Admin username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-submit">{% if admin_exists %}Sign In{% else %}Create & Sign In{% endif %}</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

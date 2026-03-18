@@ -506,6 +506,20 @@
         transform: translateY(-1px);
     }
 
+    .flag-strip {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 5px 14px;
+        border-radius: 7px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -527,6 +541,7 @@
     <a href="/mentorship/" class="back-link">← Back to Mentorship</a>
 
     <div class="question-card">
+        {% if question.flagged %}<div class="flag-strip">Flagged by Admin</div>{% endif %}
         <div class="q-author-row">
             <div class="q-avatar">
                 {% if question.posted_by_pic %}<img src="/media/{{ question.posted_by_pic }}" alt="">{% else %}{{ question.posted_by_name|slice:":1"|upper }}{% endif %}
@@ -574,6 +589,7 @@
 
     {% for reply in top_replies %}
     <div class="reply-card" id="reply-{{ reply.id }}">
+        {% if reply.flagged %}<div class="flag-strip">Flagged by Admin</div>{% endif %}
         <div class="reply-author-row">
             <div class="reply-avatar">
                 {% if reply.posted_by_pic %}<img src="/media/{{ reply.posted_by_pic }}" alt="">{% else %}{{ reply.posted_by_name|slice:":1"|upper }}{% endif %}
@@ -617,6 +633,7 @@
         <div class="subreplies">
             {% for sub in reply.children %}
             <div class="subreply-card" id="reply-{{ sub.id }}">
+                {% if sub.flagged %}<div class="flag-strip">Flagged by Admin</div>{% endif %}
                 <div class="subreply-author-row">
                     <div class="subreply-avatar">
                         {% if sub.posted_by_pic %}<img src="/media/{{ sub.posted_by_pic }}" alt="">{% else %}{{ sub.posted_by_name|slice:":1"|upper }}{% endif %}

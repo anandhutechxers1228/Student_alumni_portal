@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'admin_base.html' %}
 
-{% block title %}{{ job.title }} — SAR Portal{% endblock %}
+{% block title %}{{ job.title }} — SAR Admin{% endblock %}
 
 {% block extra_css %}
     .page {
@@ -22,6 +22,70 @@
 
     .back-link:hover {
         text-decoration: underline;
+    }
+
+    .admin-actions-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .btn-flag {
+        padding: 9px 20px;
+        background: var(--accent-light);
+        color: #8a6d15;
+        border: 1px solid rgba(201,168,76,0.3);
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-flag:hover {
+        background: #f0e0a0;
+    }
+
+    .btn-flag.unflag {
+        background: #fdf0ee;
+        color: var(--danger);
+        border-color: #f5c6c2;
+    }
+
+    .btn-flag.unflag:hover {
+        background: #fce0de;
+    }
+
+    .btn-delete {
+        padding: 9px 20px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+        background: #fce0de;
+    }
+
+    .flag-banner {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        color: var(--danger);
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .job-hero {
@@ -217,20 +281,6 @@
         color: var(--muted);
     }
 
-    .flag-strip {
-        display: inline-block;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 5px 14px;
-        border-radius: 7px;
-        background: #fdf0ee;
-        color: var(--danger);
-        border: 1px solid #f5c6c2;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-    }
-
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -246,7 +296,20 @@
 
 {% block content %}
 <div class="page">
-    <a href="/jobs/" class="back-link">← Back to Job Portal</a>
+    <a href="/admin/jobs/" class="back-link">← Back to Jobs</a>
+
+    {% if job.flagged %}<div class="flag-banner">Flagged by Admin</div>{% endif %}
+
+    <div class="admin-actions-bar">
+        <form method="POST" action="/admin/jobs/flag/{{ job.id }}/" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn-flag {% if job.flagged %}unflag{% endif %}">{% if job.flagged %}Unflag{% else %}Flag{% endif %}</button>
+        </form>
+        <form method="POST" action="/admin/jobs/delete/{{ job.id }}/" style="margin:0;" onsubmit="return confirm('Delete this job posting permanently?')">
+            {% csrf_token %}
+            <button type="submit" class="btn-delete">Delete</button>
+        </form>
+    </div>
 
     <div class="job-hero">
         {% if job.image %}
@@ -256,13 +319,12 @@
         {% endif %}
 
         <div class="job-hero-body">
-            {% if job.flagged %}<div class="flag-strip">Flagged by Admin</div>{% endif %}
             <div class="job-company">{{ job.company_name }}</div>
             <div class="job-title">{{ job.title }}</div>
 
             <div class="job-meta">
                 {% if job.experience_required %}
-                <span class="meta-badge">🕐 {{ job.experience_required }}</span>
+                <span class="meta-badge">{{ job.experience_required }}</span>
                 {% endif %}
                 {% if job.salary %}
                 <span class="meta-badge salary">₹ {{ job.salary }}</span>
@@ -289,9 +351,7 @@
         <div class="poster-row">
             <div class="poster-avatar">{{ job.posted_by_name|slice:":1"|upper }}</div>
             <div>
-                <div class="poster-name">
-                    <a href="/users/{{ job.posted_by }}/" style="color:var(--primary);text-decoration:none;">{{ job.posted_by_name }}</a>
-                </div>
+                <div class="poster-name">{{ job.posted_by_name }}</div>
                 <div class="poster-date">Posted on {{ job.posted_at_str }}</div>
             </div>
         </div>
@@ -310,12 +370,6 @@
         <div class="section-label">About {{ job.company_name }}</div>
         <p class="section-text">{{ job.company_description }}</p>
         <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
-    </div>
-    {% endif %}
-
-    {% if user.id == job.posted_by %}
-    <div style="margin-top:24px;display:flex;gap:10px;">
-        <a href="/jobs/edit/{{ job.id }}/" style="padding:10px 22px;background:var(--primary);color:white;border-radius:9px;text-decoration:none;font-size:14px;font-weight:600;">Edit Job</a>
     </div>
     {% endif %}
 </div>

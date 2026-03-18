@@ -209,28 +209,6 @@
         overflow-wrap: break-word;
     }
 
-    .job-desc.expanded {
-        max-height: none;
-        overflow: visible;
-    }
-
-    .show-more-btn {
-        background: none;
-        border: none;
-        color: var(--primary-mid);
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        padding: 4px 0 0;
-        font-family: 'DM Sans', sans-serif;
-        display: block;
-        text-align: left;
-    }
-
-    .show-more-btn:hover {
-        text-decoration: underline;
-    }
-
     .job-footer {
         padding: 12px 20px;
         border-top: 1px solid #f0f4f1;
@@ -281,6 +259,20 @@
         margin-bottom: 24px;
     }
 
+    .flag-strip {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 5px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -312,6 +304,7 @@
                 <div class="job-img-placeholder">💼</div>
                 {% endif %}
                 <div class="job-body">
+                    {% if job.flagged %}<div class="flag-strip">Flagged by Admin</div>{% endif %}
                     <div class="job-company">{{ job.company_name }}</div>
                     <div class="job-title">{{ job.title }}</div>
                     <div class="job-meta">
@@ -338,7 +331,6 @@
                     {% endif %}
                     {% if job.description %}
                     <p class="job-desc">{{ job.description }}</p>
-                    <button class="show-more-btn" onclick="toggleShowMore(this, event)">Show more</button>
                     {% endif %}
                 </div>
                 <div class="job-footer">
@@ -366,24 +358,4 @@
     </div>
 </div>
 
-<script>
-    function toggleShowMore(btn, event) {
-        if (event) { event.preventDefault(); event.stopPropagation(); }
-        var el = btn.previousElementSibling;
-        if (el.classList.contains('expanded')) {
-            el.classList.remove('expanded');
-            btn.textContent = 'Show more';
-        } else {
-            el.classList.add('expanded');
-            btn.textContent = 'Show less';
-        }
-    }
-
-    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
-        var el = btn.previousElementSibling;
-        if (el.scrollHeight <= el.clientHeight + 2) {
-            btn.style.display = 'none';
-        }
-    });
-</script>
 {% endblock %}

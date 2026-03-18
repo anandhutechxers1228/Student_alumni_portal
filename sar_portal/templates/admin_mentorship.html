@@ -1,0 +1,335 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Mentorship — SAR Admin{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+    }
+
+    .counter-text {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 24px;
+    }
+
+    .counter-text strong {
+        color: var(--primary);
+    }
+
+    .questions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .question-row {
+        background: white;
+        border: 1px solid #E0E9E1;
+        border-bottom: none;
+        padding: 20px 24px;
+        transition: background 0.15s;
+        overflow: hidden;
+    }
+
+    .questions-list .question-row:first-child {
+        border-radius: 16px 16px 0 0;
+    }
+
+    .questions-list .question-row:last-child {
+        border-radius: 0 0 16px 16px;
+        border-bottom: 1px solid #E0E9E1;
+    }
+
+    .questions-list .question-row:only-child {
+        border-radius: 16px;
+        border-bottom: 1px solid #E0E9E1;
+    }
+
+    .question-row.is-flagged {
+        border-color: #f5c6c2;
+        background: #fffafa;
+    }
+
+    .flagged-strip {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        border-radius: 6px;
+        padding: 5px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--danger);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .q-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 10px;
+    }
+
+    .q-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .q-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        overflow: hidden;
+    }
+
+    .q-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        color: white;
+        font-family: 'DM Serif Display', serif;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .q-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .q-author {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--primary-mid);
+        white-space: nowrap;
+    }
+
+    .q-date {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+    }
+
+    .q-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 17px;
+        color: var(--primary);
+        margin-bottom: 6px;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .q-body {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 8px;
+        max-height: calc(13px * 1.6 * 2);
+        overflow: hidden;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .q-footer {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .q-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-view {
+        padding: 7px 14px;
+        background: #f0f7f3;
+        color: var(--primary);
+        border: 1px solid #d0e8d8;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-view:hover {
+        background: #e0f0e8;
+    }
+
+    .btn-flag {
+        padding: 7px 14px;
+        background: var(--accent-light);
+        color: #8a6d15;
+        border: 1px solid rgba(201,168,76,0.3);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-flag:hover {
+        background: #f0e0a0;
+    }
+
+    .btn-flag.unflag {
+        background: #fdf0ee;
+        color: var(--danger);
+        border-color: #f5c6c2;
+    }
+
+    .btn-flag.unflag:hover {
+        background: #fce0de;
+    }
+
+    .btn-delete {
+        padding: 7px 14px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-delete:hover {
+        background: #fce0de;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+    }
+
+    .empty-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-sub {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+        .page {
+            padding: 20px;
+        }
+        .q-top {
+            flex-direction: column;
+        }
+        .card-actions {
+            width: 100%;
+        }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="page-header">
+        <div class="page-title">Mentorship Questions</div>
+    </div>
+    <p class="counter-text"><strong>{{ questions|length }}</strong> question{{ questions|length|pluralize }}</p>
+
+    {% if questions %}
+    <div class="questions-list">
+        {% for q in questions %}
+        <div class="question-row {% if q.flagged %}is-flagged{% endif %}">
+            {% if q.flagged %}<div class="flagged-strip">Flagged by Admin</div>{% endif %}
+            <div class="q-top">
+                <div class="q-main">
+                    <div class="q-meta">
+                        <div class="q-avatar">
+                            {% if q.posted_by_pic %}<img src="/media/{{ q.posted_by_pic }}" alt="">{% else %}{{ q.posted_by_name|slice:":1"|upper }}{% endif %}
+                        </div>
+                        <span class="q-author">{{ q.posted_by_name }}</span>
+                        <span class="q-date">· {{ q.posted_at_str }}</span>
+                    </div>
+                    <div class="q-title">{{ q.title }}</div>
+                    {% if q.body %}
+                    <p class="q-body">{{ q.body }}</p>
+                    {% endif %}
+                    <div class="q-footer">
+                        <span class="q-stat">▲ {{ q.up_count }}</span>
+                        <span class="q-stat">▼ {{ q.down_count }}</span>
+                        <span class="q-stat">💬 {{ q.reply_count }} repl{% if q.reply_count == 1 %}y{% else %}ies{% endif %}</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="/admin/mentorship/{{ q.id }}/" class="btn-view">View Replies</a>
+                    <form method="POST" action="/admin/mentorship/flag/question/{{ q.id }}/" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-flag {% if q.flagged %}unflag{% endif %}">{% if q.flagged %}Unflag{% else %}Flag{% endif %}</button>
+                    </form>
+                    <form method="POST" action="/admin/mentorship/delete/question/{{ q.id }}/" style="margin:0;" onsubmit="return confirm('Delete this question and all its replies permanently?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-delete">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-title">No Questions Found</div>
+        <p class="empty-sub">No mentorship questions yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

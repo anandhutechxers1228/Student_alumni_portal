@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin — SAR Portal{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #1B4332;
+            --primary-mid: #2D6A4F;
+            --primary-light: #40916C;
+            --accent: #C9A84C;
+            --accent-light: #F9F1D8;
+            --bg: #F5F7F5;
+            --white: #FFFFFF;
+            --text: #1A2E1F;
+            --muted: #6B7B6E;
+            --danger: #B5302A;
+            --success: #2D6A4F;
+            --border: #DDE5DD;
+            --nav-h: 68px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: var(--primary);
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 16px rgba(27, 67, 50, 0.18);
+        }
+
+        .nav-brand {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            color: var(--white);
+            text-decoration: none;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            margin-right: 32px;
+            flex-shrink: 0;
+        }
+
+        .nav-brand span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.72);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 7px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-logout {
+            padding: 7px 16px;
+            background: rgba(181,48,42,0.15);
+            color: #f5a09d;
+            border: 1px solid rgba(181,48,42,0.3);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .nav-logout:hover {
+            background: rgba(181,48,42,0.28);
+        }
+
+        .main-content {
+            min-height: calc(100vh - var(--nav-h));
+        }
+
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 0 20px;
+            }
+            .nav-link {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+                flex-wrap: wrap;
+                height: auto;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                gap: 8px;
+            }
+            .nav-links {
+                order: 3;
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            .nav-brand {
+                margin-right: 0;
+                font-size: 18px;
+            }
+        }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/admin/dashboard/" class="nav-brand">SAR <span>Admin</span></a>
+    <div class="nav-links">
+        <a href="/admin/dashboard/" class="nav-link {% if request.path == '/admin/dashboard/' %}active{% endif %}">Dashboard</a>
+        <a href="/admin/users/" class="nav-link {% if request.path == '/admin/users/' %}active{% endif %}">Users</a>
+        <a href="/admin/jobs/" class="nav-link {% if request.path == '/admin/jobs/' %}active{% endif %}">Jobs</a>
+        <a href="/admin/internships/" class="nav-link {% if request.path == '/admin/internships/' %}active{% endif %}">Internships</a>
+        <a href="/admin/mentorship/" class="nav-link {% if '/admin/mentorship' in request.path %}active{% endif %}">Mentorship</a>
+    </div>
+    <div class="nav-right">
+        <a href="/admin/logout/" class="nav-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

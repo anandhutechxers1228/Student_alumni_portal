@@ -357,6 +357,20 @@
         transform: translateY(-1px);
     }
 
+    .flag-strip {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 5px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -375,6 +389,7 @@
         {% for q in questions %}
         <a href="/mentorship/{{ q.id }}/" class="question-row">
             <div class="q-meta-top">
+                {% if q.flagged %}<div class="flag-strip" style="width:100%;margin-bottom:6px;">Flagged by Admin</div>{% endif %}
                 <div class="q-avatar">
                     {% if q.posted_by_pic %}<img src="/media/{{ q.posted_by_pic }}" alt="">{% else %}{{ q.posted_by_name|slice:":1"|upper }}{% endif %}
                 </div>

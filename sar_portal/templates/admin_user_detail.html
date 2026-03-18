@@ -1,0 +1,406 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}{{ profile_user.name }} — SAR Admin{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--primary-mid);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .hero-card {
+        background: linear-gradient(130deg, #1B4332, #2D6A4F);
+        border-radius: 20px;
+        padding: 36px;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-card::after {
+        content: '';
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+        right: -40px;
+        top: -40px;
+        pointer-events: none;
+    }
+
+    .hero-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--primary);
+        font-family: 'DM Serif Display', serif;
+        font-size: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid rgba(255,255,255,0.25);
+        flex-shrink: 0;
+        z-index: 2;
+        font-weight: 700;
+        overflow: hidden;
+    }
+
+    .hero-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-info {
+        flex: 1;
+        z-index: 2;
+        min-width: 0;
+    }
+
+    .hero-name {
+        font-family: 'DM Serif Display', serif;
+        font-size: 26px;
+        color: white;
+        margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .hero-sub {
+        font-size: 13px;
+        color: rgba(255,255,255,0.65);
+        margin-bottom: 10px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .hero-tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .hero-tag {
+        background: rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.85);
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .hero-tag.gold {
+        background: rgba(201,168,76,0.2);
+        color: #F9E4A0;
+        border-color: rgba(201,168,76,0.35);
+    }
+
+    .section-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        padding: 24px 28px;
+        margin-bottom: 16px;
+    }
+
+    .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--muted);
+        margin-bottom: 14px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f0f4f1;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .meta-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+    }
+
+    .meta-val {
+        font-size: 14px;
+        color: var(--text);
+        font-weight: 500;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .pills-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .pill {
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary);
+        border: 1px solid #d0e8d8;
+        font-weight: 500;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+
+    .list-item {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.7;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f4f1;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .list-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .list-item:first-child {
+        padding-top: 0;
+    }
+
+    .list-item-title {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 2px;
+    }
+
+    .list-item-sub {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .desc-text {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.8;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(14px * 1.8 * 3);
+        overflow: hidden;
+    }
+
+    .desc-text.expanded {
+        max-height: none;
+        overflow: visible;
+        white-space: pre-wrap;
+    }
+
+    .show-more-btn {
+        background: none;
+        border: none;
+        color: var(--primary-mid);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 0 0;
+        font-family: 'DM Sans', sans-serif;
+        display: block;
+        text-align: left;
+    }
+
+    .show-more-btn:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .page {
+            padding: 20px;
+        }
+        .hero-card {
+            flex-direction: column;
+        }
+        .meta-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/admin/users/" class="back-link">← Back to Users</a>
+
+    <div class="hero-card">
+        <div class="hero-avatar">
+            {% if profile_user.profile_pic %}
+            <img src="/media/{{ profile_user.profile_pic }}" alt="{{ profile_user.name }}">
+            {% else %}
+            {{ profile_user.name|slice:":1"|upper }}
+            {% endif %}
+        </div>
+        <div class="hero-info">
+            <div class="hero-name">{{ profile_user.name }}</div>
+            <div class="hero-sub">{{ profile_user.email }}</div>
+            <div class="hero-tags">
+                <span class="hero-tag {% if profile_user.status == 'alumni' %}gold{% endif %}">{{ profile_user.status|capfirst }}</span>
+                {% if profile_user.stream %}<span class="hero-tag">{{ profile_user.stream }}</span>{% endif %}
+                {% if profile_user.admission_year %}<span class="hero-tag">Batch {{ profile_user.admission_year }}</span>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-label">Basic Info</div>
+        <div class="meta-grid">
+            <div class="meta-item">
+                <div class="meta-label">Phone</div>
+                <div class="meta-val">{{ profile_user.phone|default:"—" }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Gender</div>
+                <div class="meta-val">{{ profile_user.gender|default:"—" }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Batch Year</div>
+                <div class="meta-val">{{ profile_user.admission_year|default:"—" }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Stream</div>
+                <div class="meta-val">{{ profile_user.stream|default:"—" }}</div>
+            </div>
+            {% if profile_user.status == 'student' %}
+            <div class="meta-item">
+                <div class="meta-label">Current Year</div>
+                <div class="meta-val">{{ profile_user.current_year|default:"—" }}</div>
+            </div>
+            {% endif %}
+            {% if profile_user.status == 'alumni' %}
+            <div class="meta-item">
+                <div class="meta-label">Current Company</div>
+                <div class="meta-val">{{ profile_user.current_company_name|default:"—" }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Current Status</div>
+                <div class="meta-val">{{ profile_user.current_status|default:"—" }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if profile_user.skills %}
+    <div class="section-card">
+        <div class="section-label">Skills</div>
+        <div class="pills-wrap">
+            {% for s in profile_user.skills %}<span class="pill">{{ s }}</span>{% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if profile_user.status == 'student' and profile_user.achievements %}
+    <div class="section-card">
+        <div class="section-label">Achievements</div>
+        {% for a in profile_user.achievements %}
+        <div class="list-item">
+            <div class="list-item-title">{{ a.title }}</div>
+            {% if a.year %}<div class="list-item-sub">{{ a.year }}</div>{% endif %}
+            {% if a.description %}
+            <p class="desc-text" style="margin-top:4px;">{{ a.description }}</p>
+            <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if profile_user.status == 'student' and profile_user.startup %}
+    <div class="section-card">
+        <div class="section-label">Startup</div>
+        <div class="list-item">
+            <div class="list-item-title">{{ profile_user.startup.name }}</div>
+            {% if profile_user.startup.started_year %}<div class="list-item-sub">Since {{ profile_user.startup.started_year }}</div>{% endif %}
+            {% if profile_user.startup.description %}
+            <p class="desc-text" style="margin-top:4px;">{{ profile_user.startup.description }}</p>
+            <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if profile_user.status == 'alumni' and profile_user.experience %}
+    <div class="section-card">
+        <div class="section-label">Experience</div>
+        {% for e in profile_user.experience %}
+        <div class="list-item">
+            <div class="list-item-title">{{ e.role }} — {{ e.company }}</div>
+            <div class="list-item-sub">{{ e.from_year }}{% if e.to_year %} – {{ e.to_year }}{% else %} – Present{% endif %}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if profile_user.status == 'alumni' and profile_user.previously_owned %}
+    <div class="section-card">
+        <div class="section-label">Previously Owned Startups</div>
+        {% for s in profile_user.previously_owned %}
+        <div class="list-item">
+            <div class="list-item-title">{{ s.name }}</div>
+            {% if s.started_year %}<div class="list-item-sub">Since {{ s.started_year }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleShowMore(btn) {
+        var el = btn.previousElementSibling;
+        if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            btn.textContent = 'Show more';
+        } else {
+            el.classList.add('expanded');
+            btn.textContent = 'Show less';
+        }
+    }
+
+    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
+        var el = btn.previousElementSibling;
+        if (el.scrollHeight <= el.clientHeight + 2) {
+            btn.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

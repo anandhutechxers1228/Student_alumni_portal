@@ -1,0 +1,386 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Internships — SAR Admin{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+    }
+
+    .counter-text {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 24px;
+    }
+
+    .counter-text strong {
+        color: var(--primary);
+    }
+
+    .profiles-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        overflow: hidden;
+    }
+
+    .profile-card.is-flagged {
+        border-color: #f5c6c2;
+    }
+
+    .flagged-strip {
+        background: #fdf0ee;
+        border-bottom: 1px solid #f5c6c2;
+        padding: 8px 24px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--danger);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .card-hero {
+        background: linear-gradient(130deg, #1B4332, #2D6A4F);
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .card-hero.flagged-hero {
+        background: linear-gradient(130deg, #5c1a18, #8c2e2a);
+    }
+
+    .hero-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .hero-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        border: 3px solid rgba(255,255,255,0.25);
+        flex-shrink: 0;
+        font-weight: 700;
+    }
+
+    .hero-text {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .hero-name {
+        font-family: 'DM Serif Display', serif;
+        font-size: 18px;
+        color: white;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .hero-sub {
+        font-size: 12px;
+        color: rgba(255,255,255,0.55);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-top: 2px;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-view {
+        padding: 8px 16px;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-view:hover {
+        background: rgba(255,255,255,0.25);
+    }
+
+    .btn-flag {
+        padding: 8px 16px;
+        background: rgba(201,168,76,0.18);
+        color: #F9E4A0;
+        border: 1px solid rgba(201,168,76,0.35);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-flag:hover {
+        background: rgba(201,168,76,0.28);
+    }
+
+    .btn-flag.unflag {
+        background: rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.75);
+        border-color: rgba(255,255,255,0.2);
+    }
+
+    .btn-flag.unflag:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .btn-delete {
+        padding: 8px 16px;
+        background: rgba(181,48,42,0.2);
+        color: #f5a09d;
+        border: 1px solid rgba(181,48,42,0.35);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-delete:hover {
+        background: rgba(181,48,42,0.32);
+    }
+
+    .card-body {
+        padding: 16px 24px;
+    }
+
+    .section {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f4f1;
+    }
+
+    .section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+    .pills-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .pill {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary);
+        border: 1px solid #d0e8d8;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 160px;
+    }
+
+    .pill.lang {
+        background: #f5f0ff;
+        color: #5b3fa0;
+        border-color: #d8ccf5;
+    }
+
+    .pill.location {
+        background: #eef4ff;
+        color: #2d5fb0;
+        border-color: #c5d8f5;
+    }
+
+    .loc-text {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.7;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(13px * 1.7 * 3);
+        overflow: hidden;
+    }
+
+    .desc-text {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.7;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(13px * 1.7 * 2);
+        overflow: hidden;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+    }
+
+    .empty-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-sub {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+        .page {
+            padding: 20px;
+        }
+        .card-hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .card-actions {
+            width: 100%;
+        }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="page-header">
+        <div class="page-title">Internship Profiles</div>
+    </div>
+    <p class="counter-text"><strong>{{ profiles|length }}</strong> profile{{ profiles|length|pluralize }}</p>
+
+    {% if profiles %}
+    <div class="profiles-list">
+        {% for p in profiles %}
+        <div class="profile-card {% if p.flagged %}is-flagged{% endif %}">
+            {% if p.flagged %}
+            <div class="flagged-strip">Flagged by Admin</div>
+            {% endif %}
+            <div class="card-hero {% if p.flagged %}flagged-hero{% endif %}">
+                <div class="hero-left">
+                    <div class="hero-avatar">{{ p.name|slice:":1"|upper }}</div>
+                    <div class="hero-text">
+                        <div class="hero-name">{{ p.name }}</div>
+                        <div class="hero-sub">{{ p.stream }} · {{ p.current_year }} · {{ p.created_at_str }}</div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="/admin/internships/{{ p.id }}/" class="btn-view">View</a>
+                    <form method="POST" action="/admin/internships/flag/{{ p.id }}/" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-flag {% if p.flagged %}unflag{% endif %}">{% if p.flagged %}Unflag{% else %}Flag{% endif %}</button>
+                    </form>
+                    <form method="POST" action="/admin/internships/delete/{{ p.id }}/" style="margin:0;" onsubmit="return confirm('Delete this internship profile permanently?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-delete">Delete</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if p.current_location %}
+                <div class="section">
+                    <div class="section-title">Location</div>
+                    <p class="loc-text">{{ p.current_location }}</p>
+                    {% if p.relocatable_locations %}
+                    <div style="margin-top:8px;">
+                        <div class="section-title" style="margin-bottom:4px;">Open to Relocate</div>
+                        <div class="pills-wrap">{% for loc in p.relocatable_locations %}<span class="pill location">{{ loc }}</span>{% endfor %}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if p.skills %}
+                <div class="section">
+                    <div class="section-title">Skills</div>
+                    <div class="pills-wrap">{% for s in p.skills %}<span class="pill">{{ s }}</span>{% endfor %}</div>
+                </div>
+                {% endif %}
+                {% if p.languages %}
+                <div class="section">
+                    <div class="section-title">Languages</div>
+                    <div class="pills-wrap">{% for l in p.languages %}<span class="pill lang">{{ l }}</span>{% endfor %}</div>
+                </div>
+                {% endif %}
+                {% if p.description %}
+                <div class="section">
+                    <div class="section-title">Why I Need This Internship</div>
+                    <p class="desc-text">{{ p.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-title">No Profiles Found</div>
+        <p class="empty-sub">No internship profiles posted yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

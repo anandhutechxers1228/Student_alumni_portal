@@ -1,0 +1,541 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}{{ question.title }} — SAR Admin{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--primary-mid);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .flagged-banner {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        color: var(--danger);
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .question-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+        padding: 28px;
+        margin-bottom: 20px;
+    }
+
+    .question-card.is-flagged {
+        border-color: #f5c6c2;
+    }
+
+    .q-author-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .q-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        color: white;
+        font-family: 'DM Serif Display', serif;
+        font-size: 17px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .q-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .q-author-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .q-author-date {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .q-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 24px;
+        color: var(--primary);
+        margin-bottom: 10px;
+        line-height: 1.3;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .q-body {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.8;
+        margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(14px * 1.8 * 3);
+        overflow: hidden;
+    }
+
+    .q-body.expanded {
+        max-height: none;
+        overflow: visible;
+        white-space: pre-wrap;
+    }
+
+    .show-more-btn {
+        background: none;
+        border: none;
+        color: var(--primary-mid);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 0 12px;
+        font-family: 'DM Sans', sans-serif;
+        display: block;
+    }
+
+    .show-more-btn:hover {
+        text-decoration: underline;
+    }
+
+    .q-stats-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding-top: 14px;
+        border-top: 1px solid #f0f4f1;
+    }
+
+    .q-stat {
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .admin-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-flag {
+        padding: 7px 14px;
+        background: var(--accent-light);
+        color: #8a6d15;
+        border: 1px solid rgba(201,168,76,0.3);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-flag:hover {
+        background: #f0e0a0;
+    }
+
+    .btn-flag.unflag {
+        background: #fdf0ee;
+        color: var(--danger);
+        border-color: #f5c6c2;
+    }
+
+    .btn-flag.unflag:hover {
+        background: #fce0de;
+    }
+
+    .btn-delete {
+        padding: 7px 14px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-delete:hover {
+        background: #fce0de;
+    }
+
+    .replies-header {
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        color: var(--primary);
+        margin-bottom: 14px;
+    }
+
+    .reply-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #E0E9E1;
+        padding: 18px 22px;
+        margin-bottom: 10px;
+    }
+
+    .reply-card.is-flagged {
+        border-color: #f5c6c2;
+        background: #fffafa;
+    }
+
+    .reply-flagged-strip {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        border-radius: 5px;
+        padding: 4px 10px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--danger);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .reply-author-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .reply-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-mid));
+        color: white;
+        font-family: 'DM Serif Display', serif;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .reply-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .reply-author-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .reply-date {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .reply-body {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.7;
+        margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(13px * 1.7 * 3);
+        overflow: hidden;
+    }
+
+    .reply-body.expanded {
+        max-height: none;
+        overflow: visible;
+        white-space: pre-wrap;
+    }
+
+    .reply-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding-top: 10px;
+        border-top: 1px solid #f0f4f1;
+        margin-top: 8px;
+    }
+
+    .reply-stat {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .reply-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+    }
+
+    .subreplies {
+        margin-top: 10px;
+        margin-left: 20px;
+        border-left: 3px solid #d0e8d8;
+        padding-left: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .subreply-card {
+        background: #fafcfa;
+        border-radius: 12px;
+        border: 1px solid #eef4ef;
+        padding: 14px 18px;
+    }
+
+    .subreply-card.is-flagged {
+        border-color: #f5c6c2;
+        background: #fffafa;
+    }
+
+    .subreply-author-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .subreply-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--primary);
+        font-family: 'DM Serif Display', serif;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+        font-weight: 700;
+    }
+
+    .subreply-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .subreply-author-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .subreply-date {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .subreply-body {
+        font-size: 12px;
+        color: var(--text);
+        line-height: 1.7;
+        margin-bottom: 4px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-height: calc(12px * 1.7 * 3);
+        overflow: hidden;
+    }
+
+    .subreply-body.expanded {
+        max-height: none;
+        overflow: visible;
+        white-space: pre-wrap;
+    }
+
+    @media (max-width: 768px) {
+        .page {
+            padding: 20px;
+        }
+        .question-card {
+            padding: 20px;
+        }
+        .q-stats-row {
+            flex-wrap: wrap;
+        }
+        .admin-actions {
+            margin-left: 0;
+            width: 100%;
+        }
+        .reply-actions {
+            margin-left: 0;
+            width: 100%;
+        }
+        .subreplies {
+            margin-left: 10px;
+        }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <a href="/admin/mentorship/" class="back-link">← Back to Mentorship</a>
+
+    {% if question.flagged %}<div class="flagged-banner">Flagged by Admin</div>{% endif %}
+
+    <div class="question-card {% if question.flagged %}is-flagged{% endif %}">
+        <div class="q-author-row">
+            <div class="q-avatar">
+                {% if question.posted_by_pic %}<img src="/media/{{ question.posted_by_pic }}" alt="">{% else %}{{ question.posted_by_name|slice:":1"|upper }}{% endif %}
+            </div>
+            <div>
+                <div class="q-author-name">{{ question.posted_by_name }}</div>
+                <div class="q-author-date">{{ question.posted_at_str }}</div>
+            </div>
+        </div>
+        <div class="q-title">{{ question.title }}</div>
+        {% if question.body %}
+        <p class="q-body">{{ question.body }}</p>
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
+        {% endif %}
+        <div class="q-stats-row">
+            <span class="q-stat">▲ {{ question.up_count }}</span>
+            <span class="q-stat">▼ {{ question.down_count }}</span>
+            <div class="admin-actions">
+                <form method="POST" action="/admin/mentorship/flag/question/{{ question.id }}/" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-flag {% if question.flagged %}unflag{% endif %}">{% if question.flagged %}Unflag Question{% else %}Flag Question{% endif %}</button>
+                </form>
+                <form method="POST" action="/admin/mentorship/delete/question/{{ question.id }}/" style="margin:0;" onsubmit="return confirm('Delete this question and all replies permanently?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete">Delete Question</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if top_replies %}
+    <div class="replies-header">{{ top_replies|length }} Repl{% if top_replies|length == 1 %}y{% else %}ies{% endif %}</div>
+
+    {% for reply in top_replies %}
+    <div class="reply-card {% if reply.flagged %}is-flagged{% endif %}">
+        {% if reply.flagged %}<div class="reply-flagged-strip">Flagged by Admin</div>{% endif %}
+        <div class="reply-author-row">
+            <div class="reply-avatar">
+                {% if reply.posted_by_pic %}<img src="/media/{{ reply.posted_by_pic }}" alt="">{% else %}{{ reply.posted_by_name|slice:":1"|upper }}{% endif %}
+            </div>
+            <div>
+                <div class="reply-author-name">{{ reply.posted_by_name }}</div>
+                <div class="reply-date">{{ reply.posted_at_str }}</div>
+            </div>
+        </div>
+        <p class="reply-body">{{ reply.content }}</p>
+        <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
+        <div class="reply-footer">
+            <span class="reply-stat">▲ {{ reply.up_count }}</span>
+            <span class="reply-stat">▼ {{ reply.down_count }}</span>
+            <div class="reply-actions">
+                <form method="POST" action="/admin/mentorship/flag/reply/{{ reply.id }}/" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-flag {% if reply.flagged %}unflag{% endif %}">{% if reply.flagged %}Unflag{% else %}Flag{% endif %}</button>
+                </form>
+                <form method="POST" action="/admin/mentorship/delete/reply/{{ reply.id }}/" style="margin:0;" onsubmit="return confirm('Delete this reply and its sub-replies permanently?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete">Delete</button>
+                </form>
+            </div>
+        </div>
+
+        {% if reply.children %}
+        <div class="subreplies">
+            {% for sub in reply.children %}
+            <div class="subreply-card {% if sub.flagged %}is-flagged{% endif %}">
+                {% if sub.flagged %}<div class="reply-flagged-strip">Flagged by Admin</div>{% endif %}
+                <div class="subreply-author-row">
+                    <div class="subreply-avatar">
+                        {% if sub.posted_by_pic %}<img src="/media/{{ sub.posted_by_pic }}" alt="">{% else %}{{ sub.posted_by_name|slice:":1"|upper }}{% endif %}
+                    </div>
+                    <div>
+                        <div class="subreply-author-name">{{ sub.posted_by_name }}</div>
+                        <div class="subreply-date">{{ sub.posted_at_str }}</div>
+                    </div>
+                </div>
+                <p class="subreply-body">{{ sub.content }}</p>
+                <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
+                <div class="reply-footer">
+                    <span class="reply-stat">▲ {{ sub.up_count }}</span>
+                    <span class="reply-stat">▼ {{ sub.down_count }}</span>
+                    <div class="reply-actions">
+                        <form method="POST" action="/admin/mentorship/flag/reply/{{ sub.id }}/" style="margin:0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-flag {% if sub.flagged %}unflag{% endif %}">{% if sub.flagged %}Unflag{% else %}Flag{% endif %}</button>
+                        </form>
+                        <form method="POST" action="/admin/mentorship/delete/reply/{{ sub.id }}/" style="margin:0;" onsubmit="return confirm('Delete this reply permanently?')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<script>
+    function toggleShowMore(btn) {
+        var el = btn.previousElementSibling;
+        if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            btn.textContent = 'Show more';
+        } else {
+            el.classList.add('expanded');
+            btn.textContent = 'Show less';
+        }
+    }
+
+    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
+        var el = btn.previousElementSibling;
+        if (el.scrollHeight <= el.clientHeight + 2) {
+            btn.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

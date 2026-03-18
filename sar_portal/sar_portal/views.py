@@ -885,3 +885,308 @@ def chat_unread_api(request):
     rooms = list(db.sar_chat_rooms.find({'participants': user['id']}, {f'unread.{user["id"]}': 1}))
     total = sum(r.get('unread', {}).get(user['id'], 0) for r in rooms)
     return JsonResponse({'count': total})
+
+
+def admin_login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('admin_id'):
+            return redirect('/admin/')
+        return view_func(request, *args, **kwargs)
+    wrapper.__name__ = view_func.__name__
+    return wrapper
+
+
+def admin_login_view(request):
+    db = get_db()
+    admin_exists = db.sar_admins.count_documents({}) > 0
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        if not admin_exists:
+            doc = {
+                'username': username,
+                'password': make_password(password),
+                'created_at': datetime.utcnow(),
+            }
+            result = db.sar_admins.insert_one(doc)
+            request.session['admin_id'] = str(result.inserted_id)
+            return redirect('/admin/dashboard/')
+        admin = db.sar_admins.find_one({'username': username})
+        if admin and check_password(password, admin['password']):
+            request.session['admin_id'] = str(admin['_id'])
+            return redirect('/admin/dashboard/')
+        error = 'Invalid username or password.'
+    return render(request, 'admin_login.html', {'admin_exists': admin_exists, 'error': error})
+
+
+def admin_logout_view(request):
+    request.session.pop('admin_id', None)
+    return redirect('/admin/')
+
+
+@admin_login_required
+def admin_dashboard_view(request):
+    db = get_db()
+    user_count = db.sar_users.count_documents({})
+    job_count = db.sar_jobs.count_documents({})
+    internship_count = db.sar_internship_profiles.count_documents({})
+    question_count = db.sar_questions.count_documents({})
+    flagged_jobs = db.sar_jobs.count_documents({'flagged': True})
+    flagged_internships = db.sar_internship_profiles.count_documents({'flagged': True})
+    flagged_questions = db.sar_questions.count_documents({'flagged': True})
+    flagged_replies = db.sar_replies.count_documents({'flagged': True})
+    return render(request, 'admin_dashboard.html', {
+        'user_count': user_count,
+        'job_count': job_count,
+        'internship_count': internship_count,
+        'question_count': question_count,
+        'flagged_jobs': flagged_jobs,
+        'flagged_internships': flagged_internships,
+        'flagged_questions': flagged_questions,
+        'flagged_replies': flagged_replies,
+    })
+
+
+@admin_login_required
+def admin_users_view(request):
+    db = get_db()
+    users = list(db.sar_users.find({}).sort('_id', -1))
+    for u in users:
+        u['id'] = str(u['_id'])
+    return render(request, 'admin_users.html', {'users': users})
+
+
+@admin_login_required
+def admin_jobs_view(request):
+    db = get_db()
+    jobs = list(db.sar_jobs.find({}).sort('posted_at', -1))
+    for j in jobs:
+        j['id'] = str(j['_id'])
+        if 'posted_at' in j and j['posted_at']:
+            j['posted_at_str'] = j['posted_at'].strftime('%b %d, %Y')
+        else:
+            j['posted_at_str'] = ''
+    return render(request, 'admin_jobs.html', {'jobs': jobs})
+
+
+@admin_login_required
+def admin_job_delete_view(request, job_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            db.sar_jobs.delete_one({'_id': ObjectId(job_id)})
+        except Exception:
+            pass
+    return redirect('/admin/jobs/')
+
+
+@admin_login_required
+def admin_job_flag_view(request, job_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            job = db.sar_jobs.find_one({'_id': ObjectId(job_id)})
+            if job:
+                db.sar_jobs.update_one({'_id': ObjectId(job_id)}, {'$set': {'flagged': not job.get('flagged', False)}})
+        except Exception:
+            pass
+    return redirect('/admin/jobs/')
+
+
+@admin_login_required
+def admin_internships_view(request):
+    db = get_db()
+    profiles = list(db.sar_internship_profiles.find({}).sort('created_at', -1))
+    for p in profiles:
+        p['id'] = str(p['_id'])
+        if 'created_at' in p and p['created_at']:
+            p['created_at_str'] = p['created_at'].strftime('%b %d, %Y')
+        else:
+            p['created_at_str'] = ''
+    return render(request, 'admin_internships.html', {'profiles': profiles})
+
+
+@admin_login_required
+def admin_internship_delete_view(request, internship_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            db.sar_internship_profiles.delete_one({'_id': ObjectId(internship_id)})
+        except Exception:
+            pass
+    return redirect('/admin/internships/')
+
+
+@admin_login_required
+def admin_internship_flag_view(request, internship_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            p = db.sar_internship_profiles.find_one({'_id': ObjectId(internship_id)})
+            if p:
+                db.sar_internship_profiles.update_one({'_id': ObjectId(internship_id)}, {'$set': {'flagged': not p.get('flagged', False)}})
+        except Exception:
+            pass
+    return redirect('/admin/internships/')
+
+
+@admin_login_required
+def admin_mentorship_view(request):
+    db = get_db()
+    questions = list(db.sar_questions.find({}).sort('posted_at', -1))
+    for q in questions:
+        q['id'] = str(q['_id'])
+        q['reply_count'] = db.sar_replies.count_documents({'question_id': q['id']})
+        q['up_count'] = len(q.get('upvotes', []))
+        q['down_count'] = len(q.get('downvotes', []))
+        if 'posted_at' in q:
+            q['posted_at_str'] = q['posted_at'].strftime('%b %d, %Y')
+        else:
+            q['posted_at_str'] = ''
+    return render(request, 'admin_mentorship.html', {'questions': questions})
+
+
+@admin_login_required
+def admin_mentorship_question_view(request, question_id):
+    db = get_db()
+    try:
+        question = db.sar_questions.find_one({'_id': ObjectId(question_id)})
+    except Exception:
+        return redirect('/admin/mentorship/')
+    if not question:
+        return redirect('/admin/mentorship/')
+    question['id'] = str(question['_id'])
+    question['up_count'] = len(question.get('upvotes', []))
+    question['down_count'] = len(question.get('downvotes', []))
+    if 'posted_at' in question:
+        question['posted_at_str'] = question['posted_at'].strftime('%b %d, %Y at %H:%M')
+    else:
+        question['posted_at_str'] = ''
+    all_replies = list(db.sar_replies.find({'question_id': question_id}).sort('posted_at', 1))
+    for r in all_replies:
+        r['id'] = str(r['_id'])
+        r['up_count'] = len(r.get('upvotes', []))
+        r['down_count'] = len(r.get('downvotes', []))
+        if 'posted_at' in r:
+            r['posted_at_str'] = r['posted_at'].strftime('%b %d, %Y at %H:%M')
+        else:
+            r['posted_at_str'] = ''
+    top_replies = [r for r in all_replies if not r.get('parent_reply_id')]
+    reply_children = {}
+    for r in all_replies:
+        if r.get('parent_reply_id'):
+            pid = r['parent_reply_id']
+            if pid not in reply_children:
+                reply_children[pid] = []
+            reply_children[pid].append(r)
+    for r in top_replies:
+        r['children'] = reply_children.get(r['id'], [])
+    return render(request, 'admin_mentorship_question.html', {'question': question, 'top_replies': top_replies})
+
+
+@admin_login_required
+def admin_question_delete_view(request, question_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            db.sar_questions.delete_one({'_id': ObjectId(question_id)})
+            db.sar_replies.delete_many({'question_id': question_id})
+        except Exception:
+            pass
+    return redirect('/admin/mentorship/')
+
+
+@admin_login_required
+def admin_question_flag_view(request, question_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            q = db.sar_questions.find_one({'_id': ObjectId(question_id)})
+            if q:
+                db.sar_questions.update_one({'_id': ObjectId(question_id)}, {'$set': {'flagged': not q.get('flagged', False)}})
+        except Exception:
+            pass
+    return redirect(f'/admin/mentorship/{question_id}/')
+
+
+@admin_login_required
+def admin_reply_delete_view(request, reply_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            r = db.sar_replies.find_one({'_id': ObjectId(reply_id)})
+            if r:
+                question_id = r.get('question_id', '')
+                db.sar_replies.delete_one({'_id': ObjectId(reply_id)})
+                db.sar_replies.delete_many({'parent_reply_id': reply_id})
+                return redirect(f'/admin/mentorship/{question_id}/')
+        except Exception:
+            pass
+    return redirect('/admin/mentorship/')
+
+
+@admin_login_required
+def admin_reply_flag_view(request, reply_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            r = db.sar_replies.find_one({'_id': ObjectId(reply_id)})
+            if r:
+                question_id = r.get('question_id', '')
+                db.sar_replies.update_one({'_id': ObjectId(reply_id)}, {'$set': {'flagged': not r.get('flagged', False)}})
+                return redirect(f'/admin/mentorship/{question_id}/')
+        except Exception:
+            pass
+    return redirect('/admin/mentorship/')
+
+
+@admin_login_required
+def admin_job_detail_view(request, job_id):
+    db = get_db()
+    try:
+        job = db.sar_jobs.find_one({'_id': ObjectId(job_id)})
+    except Exception:
+        return redirect('/admin/jobs/')
+    if not job:
+        return redirect('/admin/jobs/')
+    job['id'] = str(job['_id'])
+    if 'posted_at' in job and job['posted_at']:
+        job['posted_at_str'] = job['posted_at'].strftime('%b %d, %Y')
+    else:
+        job['posted_at_str'] = ''
+    return render(request, 'admin_job_detail.html', {'job': job})
+
+
+@admin_login_required
+def admin_internship_detail_view(request, internship_id):
+    db = get_db()
+    try:
+        profile = db.sar_internship_profiles.find_one({'_id': ObjectId(internship_id)})
+    except Exception:
+        return redirect('/admin/internships/')
+    if not profile:
+        return redirect('/admin/internships/')
+    profile['id'] = str(profile['_id'])
+    if 'created_at' in profile and profile['created_at']:
+        profile['created_at_str'] = profile['created_at'].strftime('%b %d, %Y')
+    else:
+        profile['created_at_str'] = ''
+    if 'updated_at' in profile and profile['updated_at']:
+        profile['updated_at_str'] = profile['updated_at'].strftime('%b %d, %Y')
+    else:
+        profile['updated_at_str'] = ''
+    return render(request, 'admin_internship_detail.html', {'profile': profile})
+
+
+@admin_login_required
+def admin_user_detail_view(request, user_id):
+    db = get_db()
+    try:
+        profile_user = db.sar_users.find_one({'_id': ObjectId(user_id)})
+    except Exception:
+        return redirect('/admin/users/')
+    if not profile_user:
+        return redirect('/admin/users/')
+    profile_user['id'] = str(profile_user['_id'])
+    return render(request, 'admin_user_detail.html', {'profile_user': profile_user})
