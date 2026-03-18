@@ -171,6 +171,11 @@
         color: #8a6d15;
     }
 
+    .meta-badge.closed {
+        background: #fff3f3;
+        color: var(--danger);
+    }
+
     .pills-wrap {
         display: flex;
         flex-wrap: wrap;
@@ -202,6 +207,7 @@
         flex-direction: column;
         gap: 8px;
         flex-shrink: 0;
+        align-items: flex-end;
     }
 
     .btn-edit {
@@ -225,6 +231,62 @@
         transform: translateY(-1px);
     }
 
+    .btn-applicants {
+        padding: 7px 14px;
+        background: #f0f7f3;
+        color: var(--primary-mid);
+        border: 1px solid #d0e8d8;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        text-align: center;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-applicants:hover {
+        background: #e0f0e8;
+    }
+
+    .btn-close-small {
+        padding: 6px 12px;
+        background: white;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+
+    .btn-close-small:hover {
+        background: #fdf0ee;
+    }
+
+    .btn-reopen-small {
+        padding: 6px 12px;
+        background: white;
+        color: var(--success);
+        border: 1px solid #c8e6d4;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+
+    .btn-reopen-small:hover {
+        background: #f0f7f3;
+    }
+
     .job-date {
         font-size: 11px;
         color: var(--muted);
@@ -238,6 +300,20 @@
         background: white;
         border-radius: 20px;
         border: 1px solid #E0E9E1;
+    }
+
+    .flag-strip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 10px 20px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border-bottom: 1px solid #f5c6c2;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .empty-icon {
@@ -274,6 +350,7 @@
         }
         .job-actions {
             flex-direction: row;
+            align-items: center;
         }
     }
 {% endblock %}
@@ -290,6 +367,7 @@
     <div class="jobs-list">
         {% for job in jobs %}
         <div class="job-card">
+            {% if job.flagged %}<div class="flag-strip">🚩 Flagged by Admin</div>{% endif %}
             <div class="job-img-side">
                 {% if job.image %}
                 <img src="/media/{{ job.image }}" alt="{{ job.title }}">
@@ -301,8 +379,11 @@
                 <div class="job-top">
                     <div class="job-main">
                         <div class="job-company">{{ job.company_name }}</div>
-                        <div class="job-title">{{ job.title }}</div>
+                        <div class="job-title">
+                            <a href="/jobs/{{ job.id }}/" style="text-decoration:none;color:inherit;">{{ job.title }}</a>
+                        </div>
                         <div class="job-meta">
+                            {% if job.closed %}<span class="meta-badge closed">Closed</span>{% endif %}
                             {% if job.experience_required %}
                             <span class="meta-badge">{{ job.experience_required }}</span>
                             {% endif %}
@@ -327,6 +408,15 @@
                     </div>
                     <div class="job-actions">
                         <a href="/jobs/edit/{{ job.id }}/" class="btn-edit">Edit</a>
+                        <a href="/jobs/applicants/{{ job.id }}/" class="btn-applicants">👥 {{ job.applicant_count }} Applicant{{ job.applicant_count|pluralize }}</a>
+                        <form method="POST" action="/jobs/close/{{ job.id }}/" style="margin:0;">
+                            {% csrf_token %}
+                            {% if job.closed %}
+                            <button type="submit" class="btn-reopen-small">▶ Reopen</button>
+                            {% else %}
+                            <button type="submit" class="btn-close-small">✕ Close</button>
+                            {% endif %}
+                        </form>
                         <div class="job-date">{{ job.posted_at_str }}</div>
                     </div>
                 </div>

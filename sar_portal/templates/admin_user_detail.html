@@ -280,6 +280,16 @@
                 {% if profile_user.admission_year %}<span class="hero-tag">Batch {{ profile_user.admission_year }}</span>{% endif %}
             </div>
         </div>
+        <div style="z-index:2;flex-shrink:0;">
+            <form method="POST" action="/admin/users/flag/{{ profile_user.id }}/" style="margin:0;">
+                {% csrf_token %}
+                {% if profile_user.flagged %}
+                <button type="submit" style="padding:9px 20px;background:rgba(181,48,42,0.2);color:#f5a09d;border:1px solid rgba(181,48,42,0.4);border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">✕ Unflag User</button>
+                {% else %}
+                <button type="submit" style="padding:9px 20px;background:rgba(181,48,42,0.12);color:#f5a09d;border:1px solid rgba(181,48,42,0.25);border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">🚩 Flag User</button>
+                {% endif %}
+            </form>
+        </div>
     </div>
 
     <div class="section-card">

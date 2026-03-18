@@ -321,6 +321,20 @@
         border: 1px solid #E0E9E1;
     }
 
+    .flag-strip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 10px 28px;
+        background: #fdf0ee;
+        color: var(--danger);
+        border-bottom: 1px solid #f5c6c2;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
     .empty-icon {
         font-size: 56px;
         margin-bottom: 16px;
@@ -371,6 +385,7 @@
     <div class="profiles-list">
         {% for p in profiles %}
         <div class="profile-card">
+            {% if p.flagged %}<div class="flag-strip">🚩 Flagged by Admin</div>{% endif %}
             <div class="card-hero">
                 <div class="hero-left">
                     <div class="hero-avatar">{{ p.name|slice:":1"|upper }}</div>

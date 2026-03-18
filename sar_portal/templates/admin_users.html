@@ -204,6 +204,7 @@
                     <th>Stream</th>
                     <th>Batch Year</th>
                     <th>Gender</th>
+                    <th>Flag</th>
                     <th></th>
                 </tr>
             </thead>
@@ -223,6 +224,16 @@
                     <td class="text-muted">{{ u.stream }}</td>
                     <td class="text-muted">{{ u.admission_year }}</td>
                     <td class="text-muted">{{ u.gender }}</td>
+                    <td>
+                        <form method="POST" action="/admin/users/flag/{{ u.id }}/" style="margin:0;">
+                            {% csrf_token %}
+                            {% if u.flagged %}
+                            <button type="submit" style="padding:5px 12px;background:#fdf0ee;color:var(--danger);border:1px solid #f5c6c2;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">Unflag</button>
+                            {% else %}
+                            <button type="submit" style="padding:5px 12px;background:#f5f7f5;color:var(--muted);border:1px solid #DDE5DD;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">Flag</button>
+                            {% endif %}
+                        </form>
+                    </td>
                     <td><a href="/admin/users/{{ u.id }}/" class="btn-view-user">View</a></td>
                 </tr>
                 {% endfor %}

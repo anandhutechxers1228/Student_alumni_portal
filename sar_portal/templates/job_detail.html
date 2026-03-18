@@ -103,6 +103,12 @@
         border-color: rgba(201,168,76,0.3);
     }
 
+    .meta-badge.closed {
+        background: #fff3f3;
+        color: var(--danger);
+        border-color: #f5c6c2;
+    }
+
     .pills-wrap {
         display: flex;
         flex-wrap: wrap;
@@ -231,6 +237,120 @@
         letter-spacing: 0.4px;
     }
 
+    .btn-apply {
+        padding: 12px 32px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-apply:hover:not(:disabled) {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    .btn-apply.applied {
+        background: #2D6A4F;
+        cursor: default;
+    }
+
+    .btn-apply.applied:hover {
+        transform: none;
+    }
+
+    .btn-apply:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-close {
+        padding: 10px 24px;
+        background: white;
+        color: var(--danger);
+        border: 1.5px solid var(--danger);
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-close:hover {
+        background: #fdf0ee;
+    }
+
+    .btn-reopen {
+        padding: 10px 24px;
+        background: white;
+        color: var(--success);
+        border: 1.5px solid var(--success);
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-reopen:hover {
+        background: #f0f7f3;
+    }
+
+    .btn-edit-link {
+        padding: 10px 22px;
+        background: var(--primary);
+        color: white;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-edit-link:hover {
+        background: var(--primary-mid);
+    }
+
+    .btn-applicants {
+        padding: 10px 22px;
+        background: var(--accent-light);
+        color: #8a6d15;
+        border: 1px solid rgba(201,168,76,0.3);
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-applicants:hover {
+        background: #f0e4bb;
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -257,6 +377,7 @@
 
         <div class="job-hero-body">
             {% if job.flagged %}<div class="flag-strip">Flagged by Admin</div>{% endif %}
+            {% if job.closed %}<div class="flag-strip" style="background:#fff3f3;color:var(--danger);border-color:#f5c6c2;">Applications Closed</div>{% endif %}
             <div class="job-company">{{ job.company_name }}</div>
             <div class="job-title">{{ job.title }}</div>
 
@@ -266,6 +387,9 @@
                 {% endif %}
                 {% if job.salary %}
                 <span class="meta-badge salary">₹ {{ job.salary }}</span>
+                {% endif %}
+                {% if job.applicant_count %}
+                <span class="meta-badge">👥 {{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}</span>
                 {% endif %}
             </div>
 
@@ -313,11 +437,31 @@
     </div>
     {% endif %}
 
-    {% if user.id == job.posted_by %}
-    <div style="margin-top:24px;display:flex;gap:10px;">
-        <a href="/jobs/edit/{{ job.id }}/" style="padding:10px 22px;background:var(--primary);color:white;border-radius:9px;text-decoration:none;font-size:14px;font-weight:600;">Edit Job</a>
+    <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        {% if user.id == job.posted_by %}
+        <a href="/jobs/edit/{{ job.id }}/" class="btn-edit-link">Edit Job</a>
+        <a href="/jobs/applicants/{{ job.id }}/" class="btn-applicants">👥 View Applicants ({{ job.applicant_count }})</a>
+        <form method="POST" action="/jobs/close/{{ job.id }}/" style="margin:0;">
+            {% csrf_token %}
+            {% if job.closed %}
+            <button type="submit" class="btn-reopen">▶ Reopen Applications</button>
+            {% else %}
+            <button type="submit" class="btn-close">✕ Close Applications</button>
+            {% endif %}
+        </form>
+        {% else %}
+        <form method="POST" action="/jobs/apply/{{ job.id }}/" style="margin:0;">
+            {% csrf_token %}
+            {% if job.closed %}
+            <button type="button" class="btn-apply" disabled>Applications Closed</button>
+            {% elif job.has_applied %}
+            <button type="submit" class="btn-apply applied">✓ Applied</button>
+            {% else %}
+            <button type="submit" class="btn-apply">Apply Now</button>
+            {% endif %}
+        </form>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
 <script>

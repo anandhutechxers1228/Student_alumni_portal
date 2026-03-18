@@ -347,6 +347,20 @@
         color: var(--muted);
     }
 
+    .flag-banner {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        border-radius: 12px;
+        padding: 14px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--danger);
+        font-weight: 600;
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -367,6 +381,10 @@
 {% block content %}
 <div class="page">
     <a href="javascript:history.back()" class="back-link">← Back</a>
+
+    {% if profile_user.flagged %}
+    <div class="flag-banner">🚩 This account has been flagged by an administrator.</div>
+    {% endif %}
 
     <div class="profile-hero">
         <div class="avatar-img">

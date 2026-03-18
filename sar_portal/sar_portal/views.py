@@ -199,6 +199,16 @@ def profile_view(request):
             new_pw = request.POST.get('new_password', '')
             if check_password(old_pw, user['password']):
                 db.sar_users.update_one({'_id': uid}, {'$set': {'password': make_password(new_pw)}})
+                db.sar_notifications.insert_one({
+                    'user_id': user['id'],
+                    'type': 'password_changed',
+                    'title': 'Password Changed',
+                    'message': 'Your account password was changed successfully.',
+                    'link': '/profile/',
+                    'reference_id': '',
+                    'read': False,
+                    'created_at': datetime.utcnow(),
+                })
                 success = 'Password changed successfully.'
             else:
                 error = 'Current password is incorrect.'
@@ -267,12 +277,15 @@ def job_portal_view(request):
         jobs = list(db.sar_jobs.find({'posted_by': {'$ne': user['id']}}).sort('posted_at', -1))
     else:
         jobs = list(db.sar_jobs.find({}).sort('posted_at', -1))
+    user_applied = set(a['job_id'] for a in db.sar_job_applications.find({'applicant_id': user['id']}, {'job_id': 1}))
     for j in jobs:
         j['id'] = str(j['_id'])
         if 'posted_at' in j and j['posted_at']:
             j['posted_at_str'] = j['posted_at'].strftime('%b %d, %Y')
         else:
             j['posted_at_str'] = ''
+        j['has_applied'] = j['id'] in user_applied
+        j['closed'] = j.get('closed', False)
     return render(request, 'job_portal.html', {'user': user, 'jobs': jobs})
 
 
@@ -291,7 +304,114 @@ def job_detail_view(request, job_id):
         job['posted_at_str'] = job['posted_at'].strftime('%b %d, %Y')
     else:
         job['posted_at_str'] = ''
+    job['closed'] = job.get('closed', False)
+    job['applicant_count'] = db.sar_job_applications.count_documents({'job_id': job['id']})
+    if user['id'] != job.get('posted_by'):
+        existing_app = db.sar_job_applications.find_one({'job_id': job['id'], 'applicant_id': user['id']})
+        job['has_applied'] = existing_app is not None
+    else:
+        job['has_applied'] = False
     return render(request, 'job_detail.html', {'user': user, 'job': job})
+
+
+@login_required
+def job_apply_view(request, job_id):
+    if request.method != 'POST':
+        return redirect('/jobs/')
+    user = get_current_user(request)
+    db = get_db()
+    try:
+        job = db.sar_jobs.find_one({'_id': ObjectId(job_id)})
+    except Exception:
+        return redirect('/jobs/')
+    if not job:
+        return redirect('/jobs/')
+    job_id_str = str(job['_id'])
+    if job.get('posted_by') == user['id'] or job.get('closed'):
+        return redirect(f'/jobs/{job_id_str}/')
+    existing = db.sar_job_applications.find_one({'job_id': job_id_str, 'applicant_id': user['id']})
+    if existing:
+        db.sar_job_applications.delete_one({'_id': existing['_id']})
+    else:
+        now = datetime.utcnow()
+        db.sar_job_applications.insert_one({
+            'job_id': job_id_str,
+            'job_title': job.get('title', ''),
+            'applicant_id': user['id'],
+            'applicant_name': user['name'],
+            'applicant_pic': user.get('profile_pic', ''),
+            'applied_at': now,
+        })
+        db.sar_notifications.insert_one({
+            'user_id': job.get('posted_by', ''),
+            'type': 'job_application',
+            'title': 'New Job Application',
+            'message': f"{user['name']} applied to your job: {job.get('title', '')}",
+            'link': f'/jobs/applicants/{job_id_str}/',
+            'job_title': job.get('title', ''),
+            'reference_id': job_id_str,
+            'read': False,
+            'created_at': now,
+        })
+    return redirect(f'/jobs/{job_id_str}/')
+
+
+@login_required
+def job_applied_view(request):
+    user = get_current_user(request)
+    db = get_db()
+    applications = list(db.sar_job_applications.find({'applicant_id': user['id']}).sort('applied_at', -1))
+    jobs = []
+    for app in applications:
+        try:
+            job = db.sar_jobs.find_one({'_id': ObjectId(app['job_id'])})
+        except Exception:
+            continue
+        if not job:
+            continue
+        job['id'] = str(job['_id'])
+        if 'posted_at' in job and job['posted_at']:
+            job['posted_at_str'] = job['posted_at'].strftime('%b %d, %Y')
+        else:
+            job['posted_at_str'] = ''
+        job['applied_at_str'] = app['applied_at'].strftime('%b %d, %Y') if app.get('applied_at') else ''
+        job['closed'] = job.get('closed', False)
+        jobs.append(job)
+    return render(request, 'job_applied.html', {'user': user, 'jobs': jobs})
+
+
+@login_required
+def job_applicants_view(request, job_id):
+    user = get_current_user(request)
+    db = get_db()
+    try:
+        job = db.sar_jobs.find_one({'_id': ObjectId(job_id), 'posted_by': user['id']})
+    except Exception:
+        return redirect('/jobs/')
+    if not job:
+        return redirect('/jobs/')
+    job['id'] = str(job['_id'])
+    applications = list(db.sar_job_applications.find({'job_id': job['id']}).sort('applied_at', -1))
+    for app in applications:
+        app['id'] = str(app['_id'])
+        app['applied_at_str'] = app['applied_at'].strftime('%b %d, %Y') if app.get('applied_at') else ''
+    return render(request, 'job_applicants.html', {'user': user, 'job': job, 'applications': applications})
+
+
+@login_required
+def job_toggle_close_view(request, job_id):
+    if request.method != 'POST':
+        return redirect('/jobs/')
+    user = get_current_user(request)
+    db = get_db()
+    try:
+        job = db.sar_jobs.find_one({'_id': ObjectId(job_id), 'posted_by': user['id']})
+    except Exception:
+        return redirect('/jobs/')
+    if not job:
+        return redirect('/jobs/')
+    db.sar_jobs.update_one({'_id': ObjectId(job_id)}, {'$set': {'closed': not job.get('closed', False)}})
+    return redirect(f'/jobs/{job_id}/')
 
 
 @login_required
@@ -324,6 +444,7 @@ def job_add_view(request):
             'posted_by': user['id'],
             'posted_by_name': user['name'],
             'posted_at': datetime.utcnow(),
+            'closed': False,
         }
 
         if 'job_image' in request.FILES:
@@ -337,7 +458,22 @@ def job_add_view(request):
                     f.write(chunk)
             job_doc['image'] = f'job_images/{filename}'
 
-        db.sar_jobs.insert_one(job_doc)
+        inserted = db.sar_jobs.insert_one(job_doc)
+        job_id_str = str(inserted.inserted_id)
+        now = datetime.utcnow()
+        all_users = list(db.sar_users.find({'_id': {'$ne': ObjectId(user['id'])}}, {'_id': 1}))
+        notif_docs = [{
+            'user_id': str(u['_id']),
+            'type': 'new_job',
+            'title': 'New Job Posted',
+            'message': f"A new job '{job_doc['title']}' has been posted by {user['name']}",
+            'link': f'/jobs/{job_id_str}/',
+            'reference_id': job_id_str,
+            'read': False,
+            'created_at': now,
+        } for u in all_users]
+        if notif_docs:
+            db.sar_notifications.insert_many(notif_docs)
         return redirect('/jobs/mine/')
     return render(request, 'job_add.html', {'user': user, 'error': error})
 
@@ -355,6 +491,8 @@ def job_mine_view(request):
             j['posted_at_str'] = j['posted_at'].strftime('%b %d, %Y')
         else:
             j['posted_at_str'] = ''
+        j['closed'] = j.get('closed', False)
+        j['applicant_count'] = db.sar_job_applications.count_documents({'job_id': j['id']})
     return render(request, 'job_mine.html', {'user': user, 'jobs': jobs})
 
 
@@ -428,6 +566,11 @@ def internship_view(request):
             p['created_at_str'] = p['created_at'].strftime('%b %d, %Y')
         else:
             p['created_at_str'] = ''
+        try:
+            poster = db.sar_users.find_one({'_id': ObjectId(p['student_id'])}, {'name': 1, 'profile_pic': 1})
+            p['poster_pic'] = poster.get('profile_pic', '') if poster else ''
+        except Exception:
+            p['poster_pic'] = ''
     return render(request, 'internship.html', {'user': user, 'profiles': profiles})
 
 
@@ -450,7 +593,27 @@ def internship_detail_view(request, internship_id):
         profile['updated_at_str'] = profile['updated_at'].strftime('%b %d, %Y')
     else:
         profile['updated_at_str'] = ''
-    return render(request, 'internship_detail.html', {'user': user, 'profile': profile})
+    try:
+        poster = db.sar_users.find_one({'_id': ObjectId(profile['student_id'])}, {'name': 1, 'profile_pic': 1})
+        if poster:
+            profile['poster_name'] = poster.get('name', profile.get('student_name', ''))
+            profile['poster_pic'] = poster.get('profile_pic', '')
+            profile['poster_id'] = str(poster['_id'])
+        else:
+            profile['poster_name'] = profile.get('student_name', '')
+            profile['poster_pic'] = ''
+            profile['poster_id'] = profile.get('student_id', '')
+    except Exception:
+        profile['poster_name'] = profile.get('student_name', '')
+        profile['poster_pic'] = ''
+        profile['poster_id'] = profile.get('student_id', '')
+    has_interested = False
+    if user.get('status') == 'alumni' and user['id'] != profile.get('student_id'):
+        has_interested = db.sar_internship_interests.find_one({
+            'internship_id': profile['id'],
+            'alumni_id': user['id'],
+        }) is not None
+    return render(request, 'internship_detail.html', {'user': user, 'profile': profile, 'has_interested': has_interested})
 
 
 @login_required
@@ -493,7 +656,22 @@ def internship_add_view(request):
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow(),
         }
-        db.sar_internship_profiles.insert_one(profile_doc)
+        inserted = db.sar_internship_profiles.insert_one(profile_doc)
+        internship_id_str = str(inserted.inserted_id)
+        now = datetime.utcnow()
+        alumni_users = list(db.sar_users.find({'status': 'alumni', '_id': {'$ne': ObjectId(user['id'])}}, {'_id': 1}))
+        notif_docs = [{
+            'user_id': str(u['_id']),
+            'type': 'new_internship',
+            'title': 'New Internship Profile',
+            'message': f"A new internship profile '{profile_doc['name']}' has been posted by {user['name']}",
+            'link': f'/internships/{internship_id_str}/',
+            'reference_id': internship_id_str,
+            'read': False,
+            'created_at': now,
+        } for u in alumni_users]
+        if notif_docs:
+            db.sar_notifications.insert_many(notif_docs)
         return redirect('/internships/mine/')
 
     return render(request, 'internship_add.html', {'user': user, 'existing': None, 'error': error, 'count': count})
@@ -578,6 +756,141 @@ def internship_mine_view(request):
 
 
 @login_required
+def internship_interest_view(request, internship_id):
+    if request.method != 'POST':
+        return redirect('/internships/')
+    user = get_current_user(request)
+    if user.get('status') != 'alumni':
+        return redirect('/internships/')
+    db = get_db()
+    try:
+        profile = db.sar_internship_profiles.find_one({'_id': ObjectId(internship_id)})
+    except Exception:
+        return redirect('/internships/')
+    if not profile or profile.get('student_id') == user['id']:
+        return redirect('/internships/')
+    existing_interest = db.sar_internship_interests.find_one({
+        'internship_id': internship_id,
+        'alumni_id': user['id'],
+    })
+    if existing_interest:
+        return redirect(f'/internships/{internship_id}/')
+    poster_id = profile.get('student_id', '')
+    room_id = _get_room_id(user['id'], poster_id)
+    now_utc = datetime.utcnow()
+    role_part = f" — {profile.get('role_title')}" if profile.get('role_title') else ''
+    msg_content = f"Hi! I'm interested in your internship profile: {profile.get('name', '')}{role_part}"
+    msg_doc = {
+        'room_id': room_id,
+        'sender_id': user['id'],
+        'sender_name': user.get('name', ''),
+        'content': msg_content,
+        'sent_at': now_utc,
+        'reactions': {},
+        'read': False,
+        'link': f'/internships/{internship_id}/',
+    }
+    db.sar_chat_messages.insert_one(msg_doc)
+    db.sar_chat_rooms.update_one(
+        {'room_id': room_id},
+        {
+            '$set': {
+                'last_message': msg_content[:120],
+                'last_message_at': now_utc,
+                'last_sender_id': user['id'],
+            },
+            '$inc': {f'unread.{poster_id}': 1},
+            '$setOnInsert': {
+                'room_id': room_id,
+                'participants': sorted([user['id'], poster_id]),
+            }
+        },
+        upsert=True
+    )
+    db.sar_internship_interests.insert_one({
+        'internship_id': internship_id,
+        'alumni_id': user['id'],
+        'alumni_name': user.get('name', ''),
+        'sent_at': now_utc,
+    })
+    db.sar_notifications.insert_one({
+        'user_id': poster_id,
+        'type': 'internship_interest',
+        'title': 'Alumni Interest',
+        'message': f"{user.get('name', '')} is interested in your internship profile: {profile.get('name', '')}",
+        'link': f'/internships/{internship_id}/',
+        'reference_id': internship_id,
+        'read': False,
+        'created_at': now_utc,
+    })
+    return redirect(f'/chat/{poster_id}/')
+
+
+@login_required
+def notifications_view(request):
+    user = get_current_user(request)
+    db = get_db()
+    notifications_raw = list(db.sar_notifications.find({'user_id': user['id']}).sort('created_at', -1).limit(200))
+    dm_seen = set()
+    job_app_by_ref = {}
+    interest_by_ref = {}
+    other_notifications = []
+    for n in notifications_raw:
+        n['id'] = str(n['_id'])
+        if n.get('created_at'):
+            try:
+                ca = n['created_at']
+                if ca.tzinfo is None:
+                    ca = ca.replace(tzinfo=timezone.utc)
+                n['time_str'] = ca.astimezone(IST).strftime('%b %d, %Y %I:%M %p')
+            except Exception:
+                n['time_str'] = ''
+        else:
+            n['time_str'] = ''
+        t = n.get('type', '')
+        if t == 'dm':
+            ref = n.get('reference_id', '')
+            if ref not in dm_seen:
+                dm_seen.add(ref)
+                other_notifications.append(n)
+        elif t == 'job_application':
+            ref = n.get('reference_id', '')
+            if ref not in job_app_by_ref:
+                job_app_by_ref[ref] = {'count': 0, 'notif': n}
+            job_app_by_ref[ref]['count'] += 1
+        elif t == 'internship_interest':
+            ref = n.get('reference_id', '')
+            if ref not in interest_by_ref:
+                interest_by_ref[ref] = {'count': 0, 'notif': n}
+            interest_by_ref[ref]['count'] += 1
+        else:
+            other_notifications.append(n)
+    for ref, data in job_app_by_ref.items():
+        n = data['notif']
+        count = data['count']
+        if count > 3:
+            n['message'] = f"{count} people applied to your job: {n.get('job_title', '')}"
+        other_notifications.append(n)
+    for ref, data in interest_by_ref.items():
+        n = data['notif']
+        count = data['count']
+        if count > 3:
+            n['message'] = f"{count} alumni are interested in your internship profile"
+        other_notifications.append(n)
+    other_notifications.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
+    db.sar_notifications.update_many({'user_id': user['id'], 'read': False}, {'$set': {'read': True}})
+    return render(request, 'notifications.html', {'user': user, 'notifications': other_notifications})
+
+
+@login_required
+def notifications_api_view(request):
+    user = get_current_user(request)
+    db = get_db()
+    count = db.sar_notifications.count_documents({'user_id': user['id'], 'read': False})
+    return JsonResponse({'count': count})
+
+
+@login_required
 def mentorship_view(request):
     user = get_current_user(request)
     db = get_db()
@@ -650,6 +963,18 @@ def mentorship_question_view(request, question_id):
                     'upvotes': [],
                     'downvotes': [],
                 })
+                question_poster_id = question.get('posted_by', '')
+                if question_poster_id and question_poster_id != user['id']:
+                    db.sar_notifications.insert_one({
+                        'user_id': question_poster_id,
+                        'type': 'mentor_reply',
+                        'title': 'New Reply',
+                        'message': f"{user['name']} replied to your question: {question.get('title', '')}",
+                        'link': f'/mentorship/{question_id}/',
+                        'reference_id': question_id,
+                        'read': False,
+                        'created_at': datetime.utcnow(),
+                    })
         elif action == 'delete_question' and question['is_author']:
             db.sar_questions.delete_one({'_id': ObjectId(question_id)})
             db.sar_replies.delete_many({'question_id': question_id})
@@ -771,6 +1096,7 @@ def _serialize_message(msg, current_user_id):
         'my_reactions': [k for k, v in reactions.items() if current_user_id in v],
         'is_mine': msg.get('sender_id') == current_user_id,
         'read': msg.get('read', False),
+        'link': msg.get('link', ''),
     }
 
 
@@ -836,6 +1162,11 @@ def chat_room_view(request, other_user_id):
             }
         },
         upsert=True
+    )
+
+    db.sar_notifications.update_many(
+        {'user_id': user['id'], 'type': 'dm', 'reference_id': room_id, 'read': False},
+        {'$set': {'read': True}}
     )
 
     messages_cursor = db.sar_chat_messages.find({'room_id': room_id}).sort('sent_at', -1).limit(50)
@@ -936,6 +1267,7 @@ def admin_dashboard_view(request):
     flagged_internships = db.sar_internship_profiles.count_documents({'flagged': True})
     flagged_questions = db.sar_questions.count_documents({'flagged': True})
     flagged_replies = db.sar_replies.count_documents({'flagged': True})
+    flagged_users = db.sar_users.count_documents({'flagged': True})
     return render(request, 'admin_dashboard.html', {
         'user_count': user_count,
         'job_count': job_count,
@@ -945,6 +1277,7 @@ def admin_dashboard_view(request):
         'flagged_internships': flagged_internships,
         'flagged_questions': flagged_questions,
         'flagged_replies': flagged_replies,
+        'flagged_users': flagged_users,
     })
 
 
@@ -955,6 +1288,31 @@ def admin_users_view(request):
     for u in users:
         u['id'] = str(u['_id'])
     return render(request, 'admin_users.html', {'users': users})
+
+
+@admin_login_required
+def admin_user_flag_view(request, user_id):
+    if request.method == 'POST':
+        db = get_db()
+        try:
+            u = db.sar_users.find_one({'_id': ObjectId(user_id)})
+            if u:
+                new_flagged = not u.get('flagged', False)
+                db.sar_users.update_one({'_id': ObjectId(user_id)}, {'$set': {'flagged': new_flagged}})
+                if new_flagged:
+                    db.sar_notifications.insert_one({
+                        'user_id': user_id,
+                        'type': 'account_flagged',
+                        'title': 'Account Flagged',
+                        'message': 'Your account has been flagged by the admin. Please review your profile.',
+                        'link': '/profile/',
+                        'reference_id': '',
+                        'read': False,
+                        'created_at': datetime.utcnow(),
+                    })
+        except Exception:
+            pass
+    return redirect(f'/admin/users/{user_id}/')
 
 
 @admin_login_required
@@ -988,7 +1346,19 @@ def admin_job_flag_view(request, job_id):
         try:
             job = db.sar_jobs.find_one({'_id': ObjectId(job_id)})
             if job:
-                db.sar_jobs.update_one({'_id': ObjectId(job_id)}, {'$set': {'flagged': not job.get('flagged', False)}})
+                new_flagged = not job.get('flagged', False)
+                db.sar_jobs.update_one({'_id': ObjectId(job_id)}, {'$set': {'flagged': new_flagged}})
+                if new_flagged:
+                    db.sar_notifications.insert_one({
+                        'user_id': job.get('posted_by', ''),
+                        'type': 'content_flagged',
+                        'title': 'Job Flagged',
+                        'message': f"Your job posting '{job.get('title', '')}' has been flagged by the admin.",
+                        'link': f'/jobs/{job_id}/',
+                        'reference_id': job_id,
+                        'read': False,
+                        'created_at': datetime.utcnow(),
+                    })
         except Exception:
             pass
     return redirect('/admin/jobs/')
@@ -1025,7 +1395,19 @@ def admin_internship_flag_view(request, internship_id):
         try:
             p = db.sar_internship_profiles.find_one({'_id': ObjectId(internship_id)})
             if p:
-                db.sar_internship_profiles.update_one({'_id': ObjectId(internship_id)}, {'$set': {'flagged': not p.get('flagged', False)}})
+                new_flagged = not p.get('flagged', False)
+                db.sar_internship_profiles.update_one({'_id': ObjectId(internship_id)}, {'$set': {'flagged': new_flagged}})
+                if new_flagged:
+                    db.sar_notifications.insert_one({
+                        'user_id': p.get('student_id', ''),
+                        'type': 'content_flagged',
+                        'title': 'Internship Profile Flagged',
+                        'message': f"Your internship profile '{p.get('name', '')}' has been flagged by the admin.",
+                        'link': f'/internships/{internship_id}/',
+                        'reference_id': internship_id,
+                        'read': False,
+                        'created_at': datetime.utcnow(),
+                    })
         except Exception:
             pass
     return redirect('/admin/internships/')
@@ -1104,7 +1486,19 @@ def admin_question_flag_view(request, question_id):
         try:
             q = db.sar_questions.find_one({'_id': ObjectId(question_id)})
             if q:
-                db.sar_questions.update_one({'_id': ObjectId(question_id)}, {'$set': {'flagged': not q.get('flagged', False)}})
+                new_flagged = not q.get('flagged', False)
+                db.sar_questions.update_one({'_id': ObjectId(question_id)}, {'$set': {'flagged': new_flagged}})
+                if new_flagged:
+                    db.sar_notifications.insert_one({
+                        'user_id': q.get('posted_by', ''),
+                        'type': 'content_flagged',
+                        'title': 'Question Flagged',
+                        'message': f"Your mentorship question '{q.get('title', '')}' has been flagged by the admin.",
+                        'link': f'/mentorship/{question_id}/',
+                        'reference_id': question_id,
+                        'read': False,
+                        'created_at': datetime.utcnow(),
+                    })
         except Exception:
             pass
     return redirect(f'/admin/mentorship/{question_id}/')
@@ -1134,7 +1528,19 @@ def admin_reply_flag_view(request, reply_id):
             r = db.sar_replies.find_one({'_id': ObjectId(reply_id)})
             if r:
                 question_id = r.get('question_id', '')
-                db.sar_replies.update_one({'_id': ObjectId(reply_id)}, {'$set': {'flagged': not r.get('flagged', False)}})
+                new_flagged = not r.get('flagged', False)
+                db.sar_replies.update_one({'_id': ObjectId(reply_id)}, {'$set': {'flagged': new_flagged}})
+                if new_flagged:
+                    db.sar_notifications.insert_one({
+                        'user_id': r.get('posted_by', ''),
+                        'type': 'content_flagged',
+                        'title': 'Reply Flagged',
+                        'message': 'Your reply in mentorship has been flagged by the admin.',
+                        'link': f'/mentorship/{question_id}/',
+                        'reference_id': question_id,
+                        'read': False,
+                        'created_at': datetime.utcnow(),
+                    })
                 return redirect(f'/admin/mentorship/{question_id}/')
         except Exception:
             pass

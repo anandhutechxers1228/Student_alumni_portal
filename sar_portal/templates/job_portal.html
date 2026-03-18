@@ -171,6 +171,16 @@
         color: #8a6d15;
     }
 
+    .meta-badge.applied {
+        background: #e8f5ee;
+        color: #1B6B3A;
+    }
+
+    .meta-badge.closed {
+        background: #fff3f3;
+        color: var(--danger);
+    }
+
     .pills-wrap {
         display: flex;
         flex-wrap: wrap;
@@ -291,6 +301,10 @@
             <a href="/jobs/add/" class="btn-primary">+ Post a Job</a>
             <a href="/jobs/mine/" class="btn-outline">My Posted Jobs</a>
         </div>
+        {% else %}
+        <div class="header-actions">
+            <a href="/jobs/applied/" class="btn-outline">Jobs I Applied To</a>
+        </div>
         {% endif %}
     </div>
 
@@ -308,6 +322,8 @@
                     <div class="job-company">{{ job.company_name }}</div>
                     <div class="job-title">{{ job.title }}</div>
                     <div class="job-meta">
+                        {% if job.closed %}<span class="meta-badge closed">Closed</span>{% endif %}
+                        {% if job.has_applied %}<span class="meta-badge applied">✓ Applied</span>{% endif %}
                         {% if job.experience_required %}
                         <span class="meta-badge">🕐 {{ job.experience_required }}</span>
                         {% endif %}

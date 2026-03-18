@@ -249,6 +249,50 @@
             color: var(--muted);
         }
 
+        .nav-notif-wrap {
+            position: relative;
+        }
+
+        .nav-notif-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-notif-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #e53e3e;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
         .nav-avatar {
             width: 38px;
             height: 38px;
@@ -431,6 +475,12 @@
                 </div>
             </div>
         </div>
+        <div class="nav-notif-wrap">
+            <a href="/notifications/" class="nav-notif-btn" title="Notifications">
+                🔔
+                <span class="notif-badge" id="notifBadge"></span>
+            </a>
+        </div>
         <div class="nav-dropdown" id="navDropdown">
             <a href="/profile/" class="nav-avatar">
                 {% if user.profile_pic %}
@@ -457,6 +507,7 @@
     <a href="/internships/" class="nav-link">Internships</a>
     <a href="/mentorship/" class="nav-link">Mentorship</a>
     <a href="/chat/" class="nav-link">Chat</a>
+    <a href="/notifications/" class="nav-link">Notifications</a>
     <a href="/profile/" class="nav-link">Profile</a>
     <a href="/logout/" class="nav-link" style="color:#f9a8a8;">Logout</a>
 </div>
@@ -521,7 +572,7 @@
                         var avatar = u.profile_pic
                             ? '<img src="/media/' + u.profile_pic + '" alt="">'
                             : '<span>' + u.name.charAt(0).toUpperCase() + '</span>';
-                        return '<a href="/users/' + u.id + '/" class="search-result-item">' +
+                        return '<a href="/users/' + u.id + '/\" class="search-result-item">' +
                             '<div class="search-avatar-sm">' + avatar + '</div>' +
                             '<div class="search-result-info">' +
                             '<div class="search-result-name">' + u.name + '</div>' +
@@ -552,6 +603,24 @@
     }
     updateChatBadge();
     setInterval(updateChatBadge, 30000);
+
+    function updateNotifBadge() {
+        fetch('/notifications/api/unread/')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var badge = document.getElementById('notifBadge');
+                if (!badge) return;
+                if (d.count > 0) {
+                    badge.textContent = d.count > 99 ? '99+' : d.count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(function() {});
+    }
+    updateNotifBadge();
+    setInterval(updateNotifBadge, 30000);
 </script>
 
 {% block extra_js %}{% endblock %}

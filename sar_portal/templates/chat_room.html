@@ -357,6 +357,26 @@
         }
     }
 
+    .msg-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--primary-mid);
+        text-decoration: none;
+        margin-top: 5px;
+        padding: 4px 10px;
+        background: #f0f7f3;
+        border: 1px solid #d0e8d8;
+        border-radius: 20px;
+        transition: background 0.15s;
+    }
+
+    .msg-link:hover {
+        background: #d8f0e4;
+    }
+
     @media (max-width: 480px) {
         .chat-header {
             padding: 10px 12px;
@@ -463,6 +483,9 @@ function renderMessage(msg, showAvatar) {
     html += renderEmojiPicker(msg.id, isMine);
     html += escHtml(msg.content);
     html += '</div>';
+    if (msg.link) {
+        html += '<a class="msg-link" href="' + escHtml(msg.link) + '">View Profile →</a>';
+    }
     html += renderReactions(msg.reactions, msg.my_reactions, msg.id);
     html += '<div class="msg-time">' + escHtml(msg.sent_at) + '</div>';
     html += '</div>';

@@ -87,7 +87,8 @@
         transition: all 0.2s;
         text-decoration: none;
         color: inherit;
-        display: block;
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
     }
 
@@ -206,26 +207,57 @@
         overflow: hidden;
         word-break: break-word;
         overflow-wrap: break-word;
+        flex: 1;
     }
 
     .card-footer {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 10px;
         margin-top: 14px;
         padding-top: 12px;
         border-top: 1px solid #f0f4f1;
     }
 
-    .card-year {
-        font-size: 11px;
-        color: var(--muted);
+    .card-footer-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'DM Serif Display', serif;
+        font-size: 12px;
+        color: white;
+        flex-shrink: 0;
+        overflow: hidden;
     }
 
-    .card-batch {
+    .card-footer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-footer-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .card-poster {
+        font-size: 12px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .card-date {
         font-size: 11px;
-        color: var(--primary-mid);
-        font-weight: 600;
+        color: var(--muted);
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .section-tag {
@@ -248,18 +280,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    .alumni-badge {
-        display: inline-block;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 10px;
-        background: var(--accent-light);
-        color: #8a6d15;
-        border: 1px solid rgba(201,168,76,0.3);
-        margin-left: 6px;
     }
 
     .empty-state {
@@ -326,13 +346,11 @@
         {% if profiles %}
             {% for p in profiles %}
             <a href="/internships/{{ p.id }}/" class="profile-card">
+                {% if p.flagged %}<div class="flag-strip" style="width:100%;margin-bottom:8px;">Flagged by Admin</div>{% endif %}
                 <div class="card-header">
-                    {% if p.flagged %}<div class="flag-strip" style="width:100%;margin-bottom:8px;">Flagged by Admin</div>{% endif %}
                     <div class="card-avatar">{{ p.name|slice:":1"|upper }}</div>
                     <div class="card-name-wrap">
-                        <div class="card-name">
-                            {{ p.name }}{% if p.user_status == 'alumni' %}<span class="alumni-badge">Alumni</span>{% endif %}
-                        </div>
+                        <div class="card-name">{{ p.name }}</div>
                         <div class="card-stream">{{ p.stream }}</div>
                     </div>
                 </div>
@@ -371,8 +389,13 @@
                 {% endif %}
 
                 <div class="card-footer">
-                    <span class="card-year">{{ p.current_year }}</span>
-                    <span class="card-batch">Batch {{ p.admission_year }}</span>
+                    <div class="card-footer-avatar">
+                        {% if p.poster_pic %}<img src="/media/{{ p.poster_pic }}" alt="">{% else %}{{ p.student_name|slice:":1"|upper }}{% endif %}
+                    </div>
+                    <div class="card-footer-info">
+                        <div class="card-poster">{{ p.student_name }}</div>
+                    </div>
+                    <div class="card-date">{{ p.created_at_str }}</div>
                 </div>
             </a>
             {% endfor %}

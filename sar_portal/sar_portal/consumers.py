@@ -156,6 +156,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if unread_inc:
             update_doc['$inc'] = unread_inc
         db.sar_chat_rooms.update_one({'room_id': self.room_id}, update_doc, upsert=True)
+        for recipient_id in other_parts:
+            existing = db.sar_notifications.find_one({
+                'user_id': recipient_id,
+                'type': 'dm',
+                'reference_id': self.room_id,
+                'read': False,
+            })
+            if not existing:
+                db.sar_notifications.insert_one({
+                    'user_id': recipient_id,
+                    'type': 'dm',
+                    'title': 'New Message',
+                    'message': f"{user.get('name', '')} sent you a message: {content[:80]}",
+                    'link': f'/chat/{self.user_id}/',
+                    'reference_id': self.room_id,
+                    'read': False,
+                    'created_at': now_utc,
+                })
         return {
             'id': str(result.inserted_id),
             'sender_id': self.user_id,

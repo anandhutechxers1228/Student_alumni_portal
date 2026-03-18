@@ -221,6 +221,49 @@
         font-weight: 500;
     }
 
+    .poster-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 28px;
+        border-top: 1px solid #f0f4f1;
+    }
+
+    .poster-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--primary);
+        font-family: 'DM Serif Display', serif;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .poster-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .poster-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary);
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .poster-date {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
     .flag-strip {
         display: inline-block;
         font-size: 11px;
@@ -233,6 +276,33 @@
         margin-bottom: 16px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
+    }
+
+    .btn-interested {
+        padding: 11px 28px;
+        background: var(--accent);
+        color: var(--primary);
+        border: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-interested:hover:not(:disabled) {
+        background: #d4b055;
+        transform: translateY(-1px);
+    }
+
+    .btn-interested:disabled {
+        opacity: 0.7;
+        cursor: default;
+        background: #e8d89a;
     }
 
     @media (max-width: 768px) {
@@ -298,6 +368,20 @@
     </div>
     {% endif %}
 
+    <div class="section-card" style="padding:0;overflow:hidden;">
+        <div class="poster-row">
+            <div class="poster-avatar">
+                {% if profile.poster_pic %}<img src="/media/{{ profile.poster_pic }}" alt="">{% else %}{{ profile.poster_name|slice:":1"|upper }}{% endif %}
+            </div>
+            <div style="flex:1;">
+                <div class="poster-name">
+                    <a href="/users/{{ profile.poster_id }}/" style="color:var(--primary);text-decoration:none;">{{ profile.poster_name }}</a>
+                </div>
+                <div class="poster-date">Posted on {{ profile.created_at_str }}</div>
+            </div>
+        </div>
+    </div>
+
     <div class="section-card">
         <div class="section-label">Profile Details</div>
         <div class="meta-row">
@@ -306,11 +390,18 @@
         </div>
     </div>
 
-    {% if user.id == profile.student_id %}
-    <div style="margin-top:4px;display:flex;gap:10px;">
+    <div style="margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;">
+        {% if user.id == profile.student_id %}
         <a href="/internships/edit/{{ profile.id }}/" style="padding:10px 22px;background:var(--primary);color:white;border-radius:9px;text-decoration:none;font-size:14px;font-weight:600;">Edit Profile</a>
+        {% elif user.status == 'alumni' %}
+        <form method="POST" action="/internships/interest/{{ profile.id }}/" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn-interested" {% if has_interested %}disabled{% endif %}>
+                {% if has_interested %}✓ Interest Sent{% else %}🤝 Express Interest{% endif %}
+            </button>
+        </form>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
 <script>

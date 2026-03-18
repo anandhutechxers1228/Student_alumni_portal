@@ -823,6 +823,20 @@
         margin: 4px 0 16px;
     }
 
+    .flag-banner {
+        background: #fdf0ee;
+        border: 1px solid #f5c6c2;
+        border-radius: 12px;
+        padding: 14px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--danger);
+        font-weight: 600;
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
@@ -861,6 +875,9 @@
 
     {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if user.flagged %}
+    <div class="flag-banner">🚩 Your account has been flagged by an administrator. Please review your profile or contact support.</div>
+    {% endif %}
 
     <div class="profile-hero">
         <div class="avatar-wrap" onclick="document.getElementById('editModal').classList.add('open')">
