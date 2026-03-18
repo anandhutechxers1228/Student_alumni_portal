@@ -170,6 +170,7 @@ def profile_view(request):
                 'stream': request.POST.get('stream', ''),
                 'status': status,
                 'gender': request.POST.get('gender', ''),
+                'location': request.POST.get('location', '').strip(),
             }
             if status == 'student':
                 update_data['current_year'] = request.POST.get('current_year', '')
@@ -286,7 +287,7 @@ def job_portal_view(request):
             j['posted_at_str'] = ''
         j['has_applied'] = j['id'] in user_applied
         j['closed'] = j.get('closed', False)
-    return render(request, 'job_portal.html', {'user': user, 'jobs': jobs})
+    return render(request, 'job_portal.html', {'user': user, 'jobs': jobs, 'recommended_jobs': _get_job_recommendations(user, db, jobs)})
 
 
 @login_required
@@ -571,7 +572,7 @@ def internship_view(request):
             p['poster_pic'] = poster.get('profile_pic', '') if poster else ''
         except Exception:
             p['poster_pic'] = ''
-    return render(request, 'internship.html', {'user': user, 'profiles': profiles})
+    return render(request, 'internship.html', {'user': user, 'profiles': profiles, 'recommended_profiles': _get_internship_recommendations(user, db, profiles)})
 
 
 @login_required
@@ -817,7 +818,7 @@ def internship_interest_view(request, internship_id):
         'type': 'internship_interest',
         'title': 'Alumni Interest',
         'message': f"{user.get('name', '')} is interested in your internship profile: {profile.get('name', '')}",
-        'link': f'/chat/{user["id"]}/',
+        'link': f'/internships/{internship_id}/',
         'reference_id': internship_id,
         'read': False,
         'created_at': now_utc,
@@ -833,9 +834,6 @@ def notifications_view(request):
     dm_seen = set()
     job_app_by_ref = {}
     interest_by_ref = {}
-    new_job_list = []
-    new_internship_list = []
-    mentor_reply_by_ref = {}
     other_notifications = []
     for n in notifications_raw:
         n['id'] = str(n['_id'])
@@ -858,62 +856,27 @@ def notifications_view(request):
         elif t == 'job_application':
             ref = n.get('reference_id', '')
             if ref not in job_app_by_ref:
-                job_app_by_ref[ref] = []
-            job_app_by_ref[ref].append(n)
+                job_app_by_ref[ref] = {'count': 0, 'notif': n}
+            job_app_by_ref[ref]['count'] += 1
         elif t == 'internship_interest':
             ref = n.get('reference_id', '')
             if ref not in interest_by_ref:
-                interest_by_ref[ref] = []
-            interest_by_ref[ref].append(n)
-        elif t == 'new_job':
-            new_job_list.append(n)
-        elif t == 'new_internship':
-            new_internship_list.append(n)
-        elif t == 'mentor_reply':
-            ref = n.get('reference_id', '')
-            if ref not in mentor_reply_by_ref:
-                mentor_reply_by_ref[ref] = []
-            mentor_reply_by_ref[ref].append(n)
+                interest_by_ref[ref] = {'count': 0, 'notif': n}
+            interest_by_ref[ref]['count'] += 1
         else:
             other_notifications.append(n)
-    for ref, notifs in job_app_by_ref.items():
-        if len(notifs) <= 3:
-            other_notifications.extend(notifs)
-        else:
-            n = notifs[0]
-            n['message'] = f"{len(notifs)} people applied to your job: {n.get('job_title', '')}"
-            other_notifications.append(n)
-    for ref, notifs in interest_by_ref.items():
-        if len(notifs) <= 3:
-            other_notifications.extend(notifs)
-        else:
-            n = notifs[0]
-            n['message'] = f"{len(notifs)} alumni are interested in your internship profile"
-            n['link'] = '/chat/'
-            other_notifications.append(n)
-    if len(new_job_list) <= 3:
-        other_notifications.extend(new_job_list)
-    elif new_job_list:
-        n = new_job_list[0]
-        n['title'] = 'New Jobs Posted'
-        n['message'] = f"{len(new_job_list)} new jobs have been posted"
-        n['link'] = '/jobs/'
+    for ref, data in job_app_by_ref.items():
+        n = data['notif']
+        count = data['count']
+        if count > 3:
+            n['message'] = f"{count} people applied to your job: {n.get('job_title', '')}"
         other_notifications.append(n)
-    if len(new_internship_list) <= 3:
-        other_notifications.extend(new_internship_list)
-    elif new_internship_list:
-        n = new_internship_list[0]
-        n['title'] = 'New Internship Profiles'
-        n['message'] = f"{len(new_internship_list)} new internship profiles have been posted"
-        n['link'] = '/internships/'
+    for ref, data in interest_by_ref.items():
+        n = data['notif']
+        count = data['count']
+        if count > 3:
+            n['message'] = f"{count} alumni are interested in your internship profile"
         other_notifications.append(n)
-    for ref, notifs in mentor_reply_by_ref.items():
-        if len(notifs) <= 3:
-            other_notifications.extend(notifs)
-        else:
-            n = notifs[0]
-            n['message'] = f"{len(notifs)} people replied to your question"
-            other_notifications.append(n)
     other_notifications.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
     db.sar_notifications.update_many({'user_id': user['id'], 'read': False}, {'$set': {'read': True}})
     return render(request, 'notifications.html', {'user': user, 'notifications': other_notifications})
@@ -1252,6 +1215,28 @@ def chat_unread_api(request):
     rooms = list(db.sar_chat_rooms.find({'participants': user['id']}, {f'unread.{user["id"]}': 1}))
     total = sum(r.get('unread', {}).get(user['id'], 0) for r in rooms)
     return JsonResponse({'count': total})
+
+
+def _get_job_recommendations(user, db, all_jobs):
+    try:
+        from .recommender import build_user_text, build_job_text, rank_by_similarity
+        user_text = build_user_text(user)
+        job_texts = [build_job_text(j) for j in all_jobs]
+        ranked = rank_by_similarity(user_text, all_jobs, job_texts)[:3]
+        return [(j, round(s * 100, 1)) for j, s in ranked]
+    except Exception:
+        return []
+
+
+def _get_internship_recommendations(user, db, all_profiles):
+    try:
+        from .recommender import build_user_text, build_internship_text, rank_by_similarity
+        user_text = build_user_text(user)
+        profile_texts = [build_internship_text(p) for p in all_profiles]
+        ranked = rank_by_similarity(user_text, all_profiles, profile_texts)[:3]
+        return [(p, round(s * 100, 1)) for p, s in ranked]
+    except Exception:
+        return []
 
 
 def admin_login_required(view_func):

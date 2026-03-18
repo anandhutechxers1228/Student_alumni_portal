@@ -916,6 +916,7 @@
                 <div class="info-row"><div class="info-label">Email Address</div><div class="info-value">{{ user.email }}</div></div>
                 <div class="info-row"><div class="info-label">Phone Number</div><div class="info-value">{{ user.phone|default:"—" }}</div></div>
                 <div class="info-row"><div class="info-label">Gender</div><div class="info-value">{{ user.gender|default:"—" }}</div></div>
+                <div class="info-row"><div class="info-label">Location</div><div class="info-value">{{ user.location|default:"—" }}</div></div>
             </div>
         </div>
 
@@ -1035,6 +1036,7 @@
                     <div class="form-group"><label>Full Name</label><input type="text" name="name" value="{{ user.name }}" required></div>
                     <div class="form-group"><label>Phone</label><input type="text" name="phone" value="{{ user.phone }}"></div>
                 </div>
+                <div class="form-group"><label>Location</label><input type="text" name="location" value="{{ user.location|default:'' }}" placeholder="e.g. Kochi, Kerala"></div>
                 <div class="form-row">
                     <div class="form-group"><label>Admission Year</label><input type="number" name="admission_year" value="{{ user.admission_year }}" min="1990" max="2030"></div>
                     <div class="form-group">

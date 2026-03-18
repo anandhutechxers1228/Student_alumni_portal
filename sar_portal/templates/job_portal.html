@@ -283,11 +283,109 @@
         letter-spacing: 0.4px;
     }
 
+    .rec-section {
+        margin-bottom: 36px;
+    }
+
+    .rec-section-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        color: var(--primary);
+        margin-bottom: 14px;
+    }
+
+    .rec-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    .rec-card {
+        background: white;
+        border-radius: 14px;
+        border: 2px solid var(--primary-mid);
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.2s;
+    }
+
+    .rec-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(27,67,50,0.12);
+    }
+
+    .rec-match-bar {
+        height: 4px;
+        background: #e8f0e9;
+    }
+
+    .rec-match-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-mid), var(--primary-light));
+    }
+
+    .rec-card-body {
+        padding: 16px 18px;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .rec-card-img {
+        width: 100%;
+        height: 110px;
+        object-fit: cover;
+    }
+
+    .rec-card-placeholder {
+        width: 100%;
+        height: 110px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+    }
+
+    .rec-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        color: var(--primary-mid);
+        text-transform: uppercase;
+        margin-bottom: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .rec-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 16px;
+        color: var(--primary);
+        margin-bottom: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .rec-score {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--primary-mid);
+    }
+
     @media (max-width: 768px) {
         .page {
             padding: 20px;
         }
         .jobs-grid {
+            grid-template-columns: 1fr;
+        }
+        .rec-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -307,6 +405,29 @@
         </div>
         {% endif %}
     </div>
+
+    {% if recommended_jobs %}
+    <div class="rec-section">
+        <div class="rec-section-title">✨ Recommended for You</div>
+        <div class="rec-grid">
+            {% for job, score in recommended_jobs %}
+            <a href="/jobs/{{ job.id }}/" class="rec-card">
+                {% if job.image %}
+                <img class="rec-card-img" src="/media/{{ job.image }}" alt="{{ job.title }}">
+                {% else %}
+                <div class="rec-card-placeholder">💼</div>
+                {% endif %}
+                <div class="rec-match-bar"><div class="rec-match-fill" style="width:{{ score|floatformat:0 }}%"></div></div>
+                <div class="rec-card-body">
+                    <div class="rec-label">{{ job.company_name }}</div>
+                    <div class="rec-title">{{ job.title }}</div>
+                    <div class="rec-score">{{ score|floatformat:0 }}% match</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     <div class="jobs-grid">
         {% if jobs %}

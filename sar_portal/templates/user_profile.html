@@ -443,6 +443,12 @@
                     <div class="info-value">{{ profile_user.gender }}</div>
                 </div>
                 {% endif %}
+                {% if profile_user.location %}
+                <div class="info-row">
+                    <div class="info-label">Location</div>
+                    <div class="info-value">{{ profile_user.location }}</div>
+                </div>
+                {% endif %}
             </div>
         </div>
 
