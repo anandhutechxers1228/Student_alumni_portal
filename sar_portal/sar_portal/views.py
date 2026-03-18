@@ -788,7 +788,6 @@ def internship_interest_view(request, internship_id):
         'sent_at': now_utc,
         'reactions': {},
         'read': False,
-        'link': f'/internships/{internship_id}/',
     }
     db.sar_chat_messages.insert_one(msg_doc)
     db.sar_chat_rooms.update_one(
@@ -818,7 +817,7 @@ def internship_interest_view(request, internship_id):
         'type': 'internship_interest',
         'title': 'Alumni Interest',
         'message': f"{user.get('name', '')} is interested in your internship profile: {profile.get('name', '')}",
-        'link': f'/internships/{internship_id}/',
+        'link': f'/chat/{user["id"]}/',
         'reference_id': internship_id,
         'read': False,
         'created_at': now_utc,
@@ -834,6 +833,9 @@ def notifications_view(request):
     dm_seen = set()
     job_app_by_ref = {}
     interest_by_ref = {}
+    new_job_list = []
+    new_internship_list = []
+    mentor_reply_by_ref = {}
     other_notifications = []
     for n in notifications_raw:
         n['id'] = str(n['_id'])
@@ -856,27 +858,62 @@ def notifications_view(request):
         elif t == 'job_application':
             ref = n.get('reference_id', '')
             if ref not in job_app_by_ref:
-                job_app_by_ref[ref] = {'count': 0, 'notif': n}
-            job_app_by_ref[ref]['count'] += 1
+                job_app_by_ref[ref] = []
+            job_app_by_ref[ref].append(n)
         elif t == 'internship_interest':
             ref = n.get('reference_id', '')
             if ref not in interest_by_ref:
-                interest_by_ref[ref] = {'count': 0, 'notif': n}
-            interest_by_ref[ref]['count'] += 1
+                interest_by_ref[ref] = []
+            interest_by_ref[ref].append(n)
+        elif t == 'new_job':
+            new_job_list.append(n)
+        elif t == 'new_internship':
+            new_internship_list.append(n)
+        elif t == 'mentor_reply':
+            ref = n.get('reference_id', '')
+            if ref not in mentor_reply_by_ref:
+                mentor_reply_by_ref[ref] = []
+            mentor_reply_by_ref[ref].append(n)
         else:
             other_notifications.append(n)
-    for ref, data in job_app_by_ref.items():
-        n = data['notif']
-        count = data['count']
-        if count > 3:
-            n['message'] = f"{count} people applied to your job: {n.get('job_title', '')}"
+    for ref, notifs in job_app_by_ref.items():
+        if len(notifs) <= 3:
+            other_notifications.extend(notifs)
+        else:
+            n = notifs[0]
+            n['message'] = f"{len(notifs)} people applied to your job: {n.get('job_title', '')}"
+            other_notifications.append(n)
+    for ref, notifs in interest_by_ref.items():
+        if len(notifs) <= 3:
+            other_notifications.extend(notifs)
+        else:
+            n = notifs[0]
+            n['message'] = f"{len(notifs)} alumni are interested in your internship profile"
+            n['link'] = '/chat/'
+            other_notifications.append(n)
+    if len(new_job_list) <= 3:
+        other_notifications.extend(new_job_list)
+    elif new_job_list:
+        n = new_job_list[0]
+        n['title'] = 'New Jobs Posted'
+        n['message'] = f"{len(new_job_list)} new jobs have been posted"
+        n['link'] = '/jobs/'
         other_notifications.append(n)
-    for ref, data in interest_by_ref.items():
-        n = data['notif']
-        count = data['count']
-        if count > 3:
-            n['message'] = f"{count} alumni are interested in your internship profile"
+    if len(new_internship_list) <= 3:
+        other_notifications.extend(new_internship_list)
+    elif new_internship_list:
+        n = new_internship_list[0]
+        n['title'] = 'New Internship Profiles'
+        n['message'] = f"{len(new_internship_list)} new internship profiles have been posted"
+        n['link'] = '/internships/'
         other_notifications.append(n)
+    for ref, notifs in mentor_reply_by_ref.items():
+        if len(notifs) <= 3:
+            other_notifications.extend(notifs)
+        else:
+            n = notifs[0]
+            n['message'] = f"{len(notifs)} people replied to your question"
+            other_notifications.append(n)
     other_notifications.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
     db.sar_notifications.update_many({'user_id': user['id'], 'read': False}, {'$set': {'read': True}})
     return render(request, 'notifications.html', {'user': user, 'notifications': other_notifications})
@@ -1096,7 +1133,6 @@ def _serialize_message(msg, current_user_id):
         'my_reactions': [k for k, v in reactions.items() if current_user_id in v],
         'is_mine': msg.get('sender_id') == current_user_id,
         'read': msg.get('read', False),
-        'link': msg.get('link', ''),
     }
 
 
