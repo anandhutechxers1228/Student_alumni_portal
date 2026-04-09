@@ -15,6 +15,8 @@ application = ProtocolTypeRouter({
     'websocket': SessionMiddlewareStack(
         URLRouter([
             re_path(r'^ws/chat/(?P<room_id>[^/]+)/$', consumers.ChatConsumer.as_asgi()),
+            re_path(r'^ws/support/(?P<user_id>[^/]+)/$', consumers.SupportConsumer.as_asgi()),
+            re_path(r'^ws/broadcasts/$', consumers.BroadcastConsumer.as_asgi()),
         ])
     ),
 })

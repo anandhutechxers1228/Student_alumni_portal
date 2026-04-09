@@ -7,7 +7,6 @@ from datetime import datetime, timezone, timedelta
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
-
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
@@ -207,3 +206,85 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {'$set': {'reactions': reactions}}
         )
         return {k: len(v) for k, v in reactions.items()}
+
+class SupportConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user_id = self.scope['url_route']['kwargs']['user_id']
+        self.room_group = f'support_{self.user_id}'
+        await self.channel_layer.group_add(self.room_group, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(self.room_group, self.channel_name)
+
+    async def support_message(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'message',
+            'message': event['message'],
+        }))
+
+class BroadcastConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.room_group = 'broadcasts'
+        self.user_id = await self.get_user_id_from_session()
+        if not self.user_id:
+            await self.close()
+            return
+        await self.channel_layer.group_add(self.room_group, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(self.room_group, self.channel_name)
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+        except Exception:
+            return
+        if data.get('type') == 'reaction':
+            msg_id = data.get('msg_id')
+            emoji = data.get('emoji')
+            if not msg_id or not emoji:
+                return
+            user_name = await self.get_user_name()
+            result = await self.toggle_broadcast_reaction(msg_id, emoji, user_name)
+            await self.channel_layer.group_send(self.room_group, {
+                'type': 'broadcast_reaction',
+                'msg_id': msg_id,
+                'reactions': result,
+            })
+
+    async def broadcast_reaction(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'reaction',
+            'msg_id': event['msg_id'],
+            'reactions': event['reactions'],
+        }))
+
+    @database_sync_to_async
+    def get_user_id_from_session(self):
+        session = self.scope.get('session')
+        return session.get('user_id') if session else None
+
+    @database_sync_to_async
+    def get_user_name(self):
+        db = get_db()
+        user = db.sar_users.find_one({'_id': ObjectId(self.user_id)})
+        return user.get('name', '') if user else ''
+
+    @database_sync_to_async
+    def toggle_broadcast_reaction(self, msg_id, emoji, user_name):
+        db = get_db()
+        bc = db.sar_broadcasts.find_one({'_id': ObjectId(msg_id)})
+        if not bc:
+            return {}
+        reactions = bc.get('reactions', {})
+        if reactions.get(self.user_id, {}).get('emoji') == emoji:
+            del reactions[self.user_id]
+        else:
+            reactions[self.user_id] = {'emoji': emoji, 'name': user_name}
+        db.sar_broadcasts.update_one({'_id': ObjectId(msg_id)}, {'$set': {'reactions': reactions}})
+        counts = {}
+        for uid, r in reactions.items():
+            counts[r['emoji']] = counts.get(r['emoji'], 0) + 1
+        return counts

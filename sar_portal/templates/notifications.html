@@ -68,6 +68,8 @@
     .notif-icon.internship { background: #eef4ff; }
     .notif-icon.flag { background: #fdf0ee; }
     .notif-icon.apply { background: #e8f5ee; }
+    .notif-icon.support { background: #f0f4ff; color: #2d5fb0; }
+    .notif-icon.broadcast { background: #fff4e5; color: #b07d2d; }
 
     .notif-body {
         flex: 1;
@@ -143,7 +145,7 @@
     <div class="notif-list">
         {% for n in notifications %}
         <a href="{{ n.link }}" class="notif-item">
-            <div class="notif-icon {% if n.type == 'dm' %}dm{% elif n.type == 'mentor_reply' %}reply{% elif n.type == 'password_changed' %}password{% elif n.type == 'new_job' %}job{% elif n.type == 'new_internship' %}internship{% elif n.type == 'content_flagged' or n.type == 'account_flagged' %}flag{% elif n.type == 'job_application' or n.type == 'internship_interest' %}apply{% endif %}">
+            <div class="notif-icon {% if n.type == 'dm' %}dm{% elif n.type == 'mentor_reply' %}reply{% elif n.type == 'password_changed' %}password{% elif n.type == 'new_job' %}job{% elif n.type == 'new_internship' %}internship{% elif n.type == 'content_flagged' or n.type == 'account_flagged' %}flag{% elif n.type == 'job_application' or n.type == 'internship_interest' %}apply{% elif n.type == 'support_reply' %}support{% elif n.type == 'broadcast' %}broadcast{% endif %}">
                 {% if n.type == 'dm' %}💬
                 {% elif n.type == 'mentor_reply' %}💡
                 {% elif n.type == 'password_changed' %}🔑
@@ -152,6 +154,8 @@
                 {% elif n.type == 'content_flagged' or n.type == 'account_flagged' %}🚩
                 {% elif n.type == 'job_application' %}✅
                 {% elif n.type == 'internship_interest' %}🤝
+                {% elif n.type == 'support_reply' %}🎧
+                {% elif n.type == 'broadcast' %}📢
                 {% else %}🔔{% endif %}
             </div>
             <div class="notif-body">

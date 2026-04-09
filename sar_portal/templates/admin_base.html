@@ -82,6 +82,7 @@
             transition: all 0.2s;
             white-space: nowrap;
             flex-shrink: 0;
+            position: relative;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -91,6 +92,24 @@
 
         .nav-link.active {
             color: var(--accent);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: #e53e3e;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            line-height: 1;
         }
 
         .nav-right {
@@ -166,6 +185,8 @@
         <a href="/admin/jobs/" class="nav-link {% if request.path == '/admin/jobs/' %}active{% endif %}">Jobs</a>
         <a href="/admin/internships/" class="nav-link {% if request.path == '/admin/internships/' %}active{% endif %}">Internships</a>
         <a href="/admin/mentorship/" class="nav-link {% if '/admin/mentorship' in request.path %}active{% endif %}">Mentorship</a>
+        <a href="/admin/broadcast/" class="nav-link {% if request.path == '/admin/broadcast/' %}active{% endif %}">Broadcasts</a>
+        <a href="/admin/support/" class="nav-link {% if '/admin/support' in request.path %}active{% endif %}">Support<span class="chat-badge" id="adminSupportBadge"></span></a>
     </div>
     <div class="nav-right">
         <a href="/admin/logout/" class="nav-logout">Logout</a>
@@ -175,6 +196,26 @@
 <div class="main-content">
     {% block content %}{% endblock %}
 </div>
+
+<script>
+    function updateAdminSupportBadge() {
+        fetch('/admin/api/unread_support/')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var badge = document.getElementById('adminSupportBadge');
+                if (!badge) return;
+                if (d.count > 0) {
+                    badge.textContent = d.count > 99 ? '99+' : d.count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(function() {});
+    }
+    updateAdminSupportBadge();
+    setInterval(updateAdminSupportBadge, 30000);
+</script>
 
 {% block extra_js %}{% endblock %}
 </body>

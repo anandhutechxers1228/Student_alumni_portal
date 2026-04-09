@@ -9,6 +9,8 @@ import uuid
 import traceback
 from datetime import datetime, timezone, timedelta
 import json
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 from .recommender import build_user_text, build_job_text, calculate_similarity, rank_by_similarity
 
 STREAMS = [
@@ -17,6 +19,8 @@ STREAMS = [
     'Electrical',
     'Instrumentation',
 ]
+
+EMOJIS = ['👍', '❤️', '😂', '😡', '👏']
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -260,6 +264,73 @@ def profile_view(request):
         'streams': STREAMS,
     })
 
+@login_required
+def support_view(request):
+    user = get_current_user(request)
+    db = get_db()
+    db.sar_support.update_many({'user_id': user['id'], 'sender': 'admin', 'read_by_user': False}, {'$set': {'read_by_user': True}})
+    messages = list(db.sar_support.find({'user_id': user['id']}).sort('sent_at', 1))
+    for m in messages:
+        m['id'] = str(m['_id'])
+        if m.get('sent_at'):
+            ca = m['sent_at']
+            if ca.tzinfo is None:
+                ca = ca.replace(tzinfo=timezone.utc)
+            m['sent_at_str'] = ca.astimezone(IST).strftime('%b %d, %Y %I:%M %p')
+        else:
+            m['sent_at_str'] = ''
+    return render(request, 'support.html', {'user': user, 'messages': messages})
+
+@login_required
+def support_send_api_view(request):
+    if request.method == 'POST':
+        user = get_current_user(request)
+        db = get_db()
+        content = request.POST.get('content', '').strip()
+        images = request.FILES.getlist('images')
+        image_paths = []
+        if images:
+            save_dir = os.path.join(settings.MEDIA_ROOT, 'support_images')
+            os.makedirs(save_dir, exist_ok=True)
+            for img in images[:10]:
+                ext = os.path.splitext(img.name)[1].lower()
+                filename = f"{uuid.uuid4().hex}{ext}"
+                filepath = os.path.join(save_dir, filename)
+                with open(filepath, 'wb+') as f:
+                    for chunk in img.chunks():
+                        f.write(chunk)
+                image_paths.append(f'support_images/{filename}')
+        if content or image_paths:
+            now_utc = datetime.utcnow()
+            db.sar_support.insert_one({
+                'user_id': user['id'],
+                'sender': 'user',
+                'content': content,
+                'images': image_paths,
+                'sent_at': now_utc,
+                'read_by_admin': False,
+                'read_by_user': True
+            })
+            try:
+                now_ist = datetime.now(IST)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f"support_{user['id']}",
+                    {
+                        'type': 'support_message',
+                        'message': {
+                            'sender': 'user',
+                            'content': content,
+                            'images': image_paths,
+                            'sent_at_str': now_ist.strftime('%b %d, %Y %I:%M %p')
+                        }
+                    }
+                )
+            except Exception:
+                pass
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'})
+
 def _cleanup_old_jobs(db):
     cutoff = datetime.utcnow() - timedelta(days=45)
     old_jobs = list(db.sar_jobs.find({'closed': True, 'posted_at': {'$lt': cutoff}}, {'_id': 1}))
@@ -279,9 +350,7 @@ def _get_job_recommendations(user, db, all_jobs):
             if score_pct > 50.0:
                 valid_recs.append((j, score_pct))
         return valid_recs[:3]
-    except Exception as e:
-        print("RECOMMENDATION ERROR IN _GET_JOB_RECOMMENDATIONS:")
-        traceback.print_exc()
+    except Exception:
         return []
 
 @login_required
@@ -367,10 +436,7 @@ def job_apply_view(request, job_id):
             poster_text = build_user_text(poster) if poster else ""
             target_text = job_text + " | Poster Profile: " + poster_text
             score = calculate_similarity(applicant_text, target_text)
-            print("APPLICATION SCORE CALCULATED:", score)
-        except Exception as e:
-            print("SCORE CALCULATION ERROR IN JOB_APPLY_VIEW:")
-            traceback.print_exc()
+        except Exception:
             score = 0.0
 
         db.sar_job_applications.insert_one({
@@ -930,6 +996,25 @@ def chat_view(request):
     db = get_db()
     rooms = list(db.sar_chat_rooms.find({'participants': user['id']}).sort('last_message_at', -1))
     conversations = []
+    
+    bc_latest = list(db.sar_broadcasts.find().sort('sent_at', -1).limit(1))
+    if bc_latest:
+        b = bc_latest[0]
+        ca = b['sent_at']
+        if ca and ca.tzinfo is None:
+            ca = ca.replace(tzinfo=timezone.utc)
+        conversations.append({
+            'room_id': 'broadcasts',
+            'other_id': 'broadcasts',
+            'other_name': 'Official Broadcasts',
+            'other_pic': '',
+            'other_stream': 'Admin',
+            'other_status': 'System',
+            'last_message': b.get('content', '')[:120],
+            'last_at': ca.astimezone(IST).strftime('%b %d, %Y %H:%M') if ca else '',
+            'unread': 0,
+        })
+        
     for room in rooms:
         other_id = next((p for p in room.get('participants', []) if p != user['id']), None)
         if not other_id:
@@ -953,7 +1038,7 @@ def chat_view(request):
             'last_at': last_at.strftime('%b %d, %Y %H:%M') if last_at else '',
             'unread': unread,
         })
-    total_unread = sum(c['unread'] for c in conversations)
+    total_unread = sum(c['unread'] for c in conversations if c['room_id'] != 'broadcasts')
     return render(request, 'chat.html', {'user': user, 'conversations': conversations, 'total_unread': total_unread})
 
 @login_required
@@ -1037,6 +1122,38 @@ def chat_unread_api(request):
     rooms = list(db.sar_chat_rooms.find({'participants': user['id']}, {f'unread.{user["id"]}': 1}))
     total = sum(r.get('unread', {}).get(user['id'], 0) for r in rooms)
     return JsonResponse({'count': total})
+
+@login_required
+def broadcast_chat_view(request):
+    user = get_current_user(request)
+    db = get_db()
+    broadcasts = list(db.sar_broadcasts.find().sort('sent_at', 1))
+    
+    messages_json = []
+    for b in broadcasts:
+        bid = str(b['_id'])
+        if b.get('sent_at'):
+            ca = b['sent_at']
+            if ca.tzinfo is None:
+                ca = ca.replace(tzinfo=timezone.utc)
+            sent_at_str = ca.astimezone(IST).strftime('%b %d, %Y %I:%M %p')
+        else:
+            sent_at_str = ''
+            
+        my_reaction = b.get('reactions', {}).get(user['id'], {}).get('emoji')
+        counts = {}
+        for uid, r in b.get('reactions', {}).items():
+            counts[r['emoji']] = counts.get(r['emoji'], 0) + 1
+            
+        messages_json.append({
+            'id': bid,
+            'content': b.get('content', ''),
+            'sent_at': sent_at_str,
+            'reactions': counts,
+            'my_reaction': my_reaction,
+        })
+            
+    return render(request, 'broadcast_chat.html', {'user': user, 'messages_json': json.dumps(messages_json)})
 
 def admin_login_required(view_func):
     def wrapper(request, *args, **kwargs):
@@ -1348,3 +1465,179 @@ def admin_user_detail_view(request, user_id):
         return redirect('/admin/users/')
     profile_user['id'] = str(profile_user['_id'])
     return render(request, 'admin_user_detail.html', {'profile_user': profile_user})
+
+@admin_login_required
+def admin_support_unread_api(request):
+    db = get_db()
+    count = db.sar_support.count_documents({'sender': 'user', 'read_by_admin': False})
+    return JsonResponse({'count': count})
+
+@admin_login_required
+def admin_support_list_view(request):
+    db = get_db()
+    pipeline = [
+        {"$sort": {"sent_at": -1}},
+        {"$group": {
+            "_id": "$user_id",
+            "last_message": {"$first": "$content"},
+            "last_at": {"$first": "$sent_at"},
+            "unread": {"$sum": {"$cond": [{"$and": [{"$eq": ["$sender", "user"]}, {"$eq": ["$read_by_admin", False]}]}, 1, 0]}}
+        }}
+    ]
+    users_agg = list(db.sar_support.aggregate(pipeline))
+    conversations = []
+    for u in users_agg:
+        user_doc = db.sar_users.find_one({'_id': ObjectId(u['_id'])})
+        if user_doc:
+            ca = u['last_at']
+            if ca and ca.tzinfo is None:
+                ca = ca.replace(tzinfo=timezone.utc)
+            time_str = ca.astimezone(IST).strftime('%b %d, %Y %I:%M %p') if ca else ''
+            conversations.append({
+                'user_id': str(user_doc['_id']),
+                'user_name': user_doc.get('name', ''),
+                'user_pic': user_doc.get('profile_pic', ''),
+                'last_message': u.get('last_message', ''),
+                'last_at': time_str,
+                'unread': u.get('unread', 0)
+            })
+    conversations.sort(key=lambda x: (x['unread'] > 0, x['last_at']), reverse=True)
+    return render(request, 'admin_support_list.html', {'conversations': conversations})
+
+@admin_login_required
+def admin_support_room_view(request, user_id):
+    db = get_db()
+    user_doc = db.sar_users.find_one({'_id': ObjectId(user_id)})
+    if not user_doc:
+        return redirect('/admin/support/')
+    user_doc['id'] = str(user_doc['_id'])
+        
+    db.sar_support.update_many({'user_id': user_id, 'sender': 'user', 'read_by_admin': False}, {'$set': {'read_by_admin': True}})
+    
+    messages = list(db.sar_support.find({'user_id': user_id}).sort('sent_at', 1))
+    for m in messages:
+        m['id'] = str(m['_id'])
+        if m.get('sent_at'):
+            ca = m['sent_at']
+            if ca.tzinfo is None:
+                ca = ca.replace(tzinfo=timezone.utc)
+            m['sent_at_str'] = ca.astimezone(IST).strftime('%b %d, %Y %I:%M %p')
+            
+    return render(request, 'admin_support_room.html', {'profile_user': user_doc, 'messages': messages})
+
+@admin_login_required
+def admin_support_send_api_view(request, user_id):
+    if request.method == 'POST':
+        db = get_db()
+        content = request.POST.get('content', '').strip()
+        images = request.FILES.getlist('images')
+        image_paths = []
+        if images:
+            save_dir = os.path.join(settings.MEDIA_ROOT, 'support_images')
+            os.makedirs(save_dir, exist_ok=True)
+            for img in images[:10]:
+                ext = os.path.splitext(img.name)[1].lower()
+                filename = f"{uuid.uuid4().hex}{ext}"
+                filepath = os.path.join(save_dir, filename)
+                with open(filepath, 'wb+') as f:
+                    for chunk in img.chunks():
+                        f.write(chunk)
+                image_paths.append(f'support_images/{filename}')
+
+        if content or image_paths:
+            now_utc = datetime.utcnow()
+            db.sar_support.insert_one({
+                'user_id': user_id,
+                'sender': 'admin',
+                'content': content,
+                'images': image_paths,
+                'sent_at': now_utc,
+                'read_by_user': False,
+                'read_by_admin': True
+            })
+            db.sar_notifications.insert_one({
+                'user_id': user_id,
+                'type': 'support_reply',
+                'title': 'Support Reply',
+                'message': 'Admin has replied to your support ticket.',
+                'link': '/support/',
+                'reference_id': '',
+                'read': False,
+                'created_at': now_utc,
+            })
+            try:
+                now_ist = datetime.now(IST)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f"support_{user_id}",
+                    {
+                        'type': 'support_message',
+                        'message': {
+                            'sender': 'admin',
+                            'content': content,
+                            'images': image_paths,
+                            'sent_at_str': now_ist.strftime('%b %d, %Y %I:%M %p')
+                        }
+                    }
+                )
+            except Exception:
+                pass
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'})
+
+@admin_login_required
+def admin_broadcast_view(request):
+    db = get_db()
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        if content:
+            now = datetime.utcnow()
+            bc_id = db.sar_broadcasts.insert_one({
+                'content': content,
+                'sent_at': now,
+                'reactions': {}
+            }).inserted_id
+            
+            all_users = list(db.sar_users.find({}, {'_id': 1}))
+            notifs = [{
+                'user_id': str(u['_id']),
+                'type': 'broadcast',
+                'title': 'Official Broadcast',
+                'message': content[:80],
+                'link': '/chat/broadcasts/',
+                'reference_id': str(bc_id),
+                'read': False,
+                'created_at': now,
+            } for u in all_users]
+            if notifs:
+                db.sar_notifications.insert_many(notifs)
+        return redirect('/admin/broadcast/')
+        
+    broadcasts = list(db.sar_broadcasts.find().sort('sent_at', -1))
+    for b in broadcasts:
+        b['id'] = str(b['_id'])
+        if b.get('sent_at'):
+            ca = b['sent_at']
+            if ca.tzinfo is None:
+                ca = ca.replace(tzinfo=timezone.utc)
+            b['sent_at_str'] = ca.astimezone(IST).strftime('%b %d, %Y %I:%M %p')
+        else:
+            b['sent_at_str'] = ''
+        
+        summary = {}
+        for user_id, react in b.get('reactions', {}).items():
+            emoji = react.get('emoji')
+            name = react.get('name')
+            if emoji not in summary:
+                summary[emoji] = []
+            summary[emoji].append(name)
+            
+        b['admin_emoji_data'] = []
+        for em in EMOJIS:
+            if em in summary:
+                b['admin_emoji_data'].append({
+                    'emoji': em,
+                    'users': summary[em]
+                })
+            
+    return render(request, 'admin_broadcast.html', {'broadcasts': broadcasts})

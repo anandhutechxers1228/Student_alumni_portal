@@ -1,0 +1,216 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Broadcasts — SAR Admin{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 28px;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+    }
+
+    .broadcast-form {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        padding: 24px;
+        margin-bottom: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .broadcast-form textarea {
+        width: 100%;
+        padding: 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        resize: vertical;
+        outline: none;
+    }
+
+    .broadcast-form textarea:focus {
+        border-color: var(--primary-mid);
+    }
+
+    .btn-primary {
+        padding: 12px 28px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        align-self: flex-end;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    .broadcasts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .bc-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        padding: 24px;
+    }
+
+    .bc-content {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text);
+        margin-bottom: 12px;
+        white-space: pre-wrap;
+    }
+
+    .bc-date {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f0f4f1;
+    }
+
+    .bc-reactions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .react-group {
+        font-size: 13px;
+        color: var(--text);
+        position: relative;
+    }
+
+    .react-dropdown-btn {
+        background: #f0f7f3;
+        border: 1px solid #d0e8d8;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--primary-mid);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .react-dropdown-btn:hover {
+        background: #e0f0e8;
+    }
+
+    .react-dropdown-list {
+        display: none;
+        margin-top: 6px;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #E0E9E1;
+        border-radius: 8px;
+        min-width: 140px;
+    }
+
+    .react-dropdown-list.open {
+        display: block;
+    }
+
+    .react-user-item {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 4px 0;
+        border-bottom: 1px solid #f0f4f1;
+    }
+
+    .react-user-item:last-child {
+        border-bottom: none;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 40px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #E0E9E1;
+    }
+
+    .empty-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        color: var(--primary);
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="page-header">
+        <div class="page-title">Broadcast Message</div>
+    </div>
+
+    <form method="POST" class="broadcast-form" onsubmit="return confirm('Broadcast this message to all users?')">
+        {% csrf_token %}
+        <textarea name="content" rows="4" placeholder="Write a message to broadcast to all registered users..." required></textarea>
+        <button type="submit" class="btn-primary">Send Broadcast</button>
+    </form>
+
+    <div class="page-header" style="margin-top:40px; margin-bottom:20px;">
+        <div class="page-title" style="font-size:22px;">Past Broadcasts & Reactions</div>
+    </div>
+
+    {% if broadcasts %}
+    <div class="broadcasts-list">
+        {% for b in broadcasts %}
+        <div class="bc-card">
+            <div class="bc-content">{{ b.content }}</div>
+            <div class="bc-date">Sent on {{ b.sent_at_str }}</div>
+            <div class="bc-reactions">
+                {% for ed in b.admin_emoji_data %}
+                {% if ed.users %}
+                <div class="react-group">
+                    <button type="button" class="react-dropdown-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+                        {{ ed.emoji }} {{ ed.users|length }} ▾
+                    </button>
+                    <div class="react-dropdown-list">
+                        {% for u in ed.users %}
+                        <div class="react-user-item">{{ u }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-title">No Past Broadcasts</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
