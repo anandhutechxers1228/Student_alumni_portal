@@ -5,7 +5,7 @@
 {% block extra_css %}
     .page {
         padding: 36px 48px;
-        max-width: 1000px;
+        max-width: 1100px;
         margin: 0 auto;
     }
 
@@ -34,32 +34,26 @@
         color: var(--primary);
     }
 
-    .profiles-list {
+    .jobs-list {
         display: flex;
         flex-direction: column;
         gap: 14px;
     }
 
-    .profile-card {
+    .job-card {
         background: white;
         border-radius: 16px;
         border: 1px solid #E0E9E1;
         overflow: hidden;
+        transition: all 0.2s;
     }
 
-    .profile-card.is-flagged {
+    .job-card.is-flagged {
         border-color: #f5c6c2;
     }
 
-    .flagged-strip {
-        background: #fdf0ee;
-        border-bottom: 1px solid #f5c6c2;
-        padding: 8px 24px;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--danger);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .job-card:hover {
+        box-shadow: 0 4px 20px rgba(27,67,50,0.08);
     }
 
     .card-hero {
@@ -83,20 +77,25 @@
         flex: 1;
     }
 
-    .hero-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: var(--accent);
-        color: var(--primary);
+    .hero-img {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .hero-img-placeholder {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.12);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'DM Serif Display', serif;
         font-size: 22px;
-        border: 3px solid rgba(255,255,255,0.25);
         flex-shrink: 0;
-        font-weight: 700;
     }
 
     .hero-text {
@@ -104,9 +103,21 @@
         flex: 1;
     }
 
-    .hero-name {
+    .hero-company {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .hero-title {
         font-family: 'DM Serif Display', serif;
-        font-size: 18px;
+        font-size: 19px;
         color: white;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -116,10 +127,10 @@
     .hero-sub {
         font-size: 12px;
         color: rgba(255,255,255,0.55);
+        margin-top: 2px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        margin-top: 2px;
     }
 
     .card-actions {
@@ -199,25 +210,32 @@
         padding: 16px 24px;
     }
 
-    .section {
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f0f4f1;
+    .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
     }
 
-    .section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary-mid);
+        font-weight: 500;
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .section-title {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        color: var(--muted);
-        margin-bottom: 6px;
+    .meta-badge.salary {
+        background: var(--accent-light);
+        color: #8a6d15;
     }
 
     .pills-wrap {
@@ -240,36 +258,32 @@
         max-width: 160px;
     }
 
-    .pill.lang {
-        background: #f5f0ff;
-        color: #5b3fa0;
-        border-color: #d8ccf5;
-    }
-
     .pill.location {
         background: #eef4ff;
         color: #2d5fb0;
         border-color: #c5d8f5;
     }
 
-    .loc-text {
-        font-size: 13px;
-        color: var(--text);
-        line-height: 1.7;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        max-height: calc(13px * 1.7 * 3);
-        overflow: hidden;
+    .flagged-strip {
+        background: #fdf0ee;
+        border-bottom: 1px solid #f5c6c2;
+        padding: 8px 24px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--danger);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .desc-text {
         font-size: 13px;
-        color: var(--text);
-        line-height: 1.7;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-top: 8px;
+        max-height: calc(13px * 1.6 * 2);
+        overflow: hidden;
         word-break: break-word;
         overflow-wrap: break-word;
-        max-height: calc(13px * 1.7 * 2);
-        overflow: hidden;
     }
 
     .empty-state {
@@ -309,67 +323,59 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
-        <div class="page-title">Internship Profiles</div>
+        <div class="page-title">Internships</div>
     </div>
-    <p class="counter-text"><strong>{{ profiles|length }}</strong> profile{{ profiles|length|pluralize }}</p>
+    <p class="counter-text"><strong>{{ jobs|length }}</strong> internship posting{{ jobs|length|pluralize }}</p>
 
-    {% if profiles %}
-    <div class="profiles-list">
-        {% for p in profiles %}
-        <div class="profile-card {% if p.flagged %}is-flagged{% endif %}">
-            {% if p.flagged %}
+    {% if jobs %}
+    <div class="jobs-list">
+        {% for job in jobs %}
+        <div class="job-card {% if job.flagged %}is-flagged{% endif %}">
+            {% if job.flagged %}
             <div class="flagged-strip">Flagged by Admin</div>
             {% endif %}
-            <div class="card-hero {% if p.flagged %}flagged-hero{% endif %}">
+            <div class="card-hero {% if job.flagged %}flagged-hero{% endif %}">
                 <div class="hero-left">
-                    <div class="hero-avatar">{{ p.name|slice:":1"|upper }}</div>
+                    {% if job.image %}
+                    <img class="hero-img" src="/media/{{ job.image }}" alt="">
+                    {% else %}
+                    <div class="hero-img-placeholder">💼</div>
+                    {% endif %}
                     <div class="hero-text">
-                        <div class="hero-name">{{ p.name }}</div>
-                        <div class="hero-sub">{{ p.stream }} · {{ p.current_year }} · {{ p.created_at_str }}</div>
+                        <div class="hero-company">{{ job.company_name }}</div>
+                        <div class="hero-title">{{ job.title }}</div>
+                        <div class="hero-sub">Posted by {{ job.posted_by_name }} · {{ job.posted_at_str }}</div>
                     </div>
                 </div>
                 <div class="card-actions">
-                    <a href="/admin/internships/{{ p.id }}/" class="btn-view">View</a>
-                    <form method="POST" action="/admin/internships/flag/{{ p.id }}/" style="margin:0;">
+                    <a href="/admin/internships/{{ job.id }}/" class="btn-view">View</a>
+                    <form method="POST" action="/admin/internships/flag/{{ job.id }}/" style="margin:0;">
                         {% csrf_token %}
-                        <button type="submit" class="btn-flag {% if p.flagged %}unflag{% endif %}">{% if p.flagged %}Unflag{% else %}Flag{% endif %}</button>
+                        <button type="submit" class="btn-flag {% if job.flagged %}unflag{% endif %}">{% if job.flagged %}Unflag{% else %}Flag{% endif %}</button>
                     </form>
-                    <form method="POST" action="/admin/internships/delete/{{ p.id }}/" style="margin:0;" onsubmit="return confirm('Delete this internship profile permanently?')">
+                    <form method="POST" action="/admin/internships/delete/{{ job.id }}/" style="margin:0;" onsubmit="return confirm('Delete this internship posting permanently?')">
                         {% csrf_token %}
                         <button type="submit" class="btn-delete">Delete</button>
                     </form>
                 </div>
             </div>
             <div class="card-body">
-                {% if p.current_location %}
-                <div class="section">
-                    <div class="section-title">Location</div>
-                    <p class="loc-text">{{ p.current_location }}</p>
-                    {% if p.relocatable_locations %}
-                    <div style="margin-top:8px;">
-                        <div class="section-title" style="margin-bottom:4px;">Open to Relocate</div>
-                        <div class="pills-wrap">{% for loc in p.relocatable_locations %}<span class="pill location">{{ loc }}</span>{% endfor %}</div>
-                    </div>
-                    {% endif %}
+                <div class="meta-row">
+                    {% if job.experience_required %}<span class="meta-badge">{{ job.experience_required }} yrs exp</span>{% endif %}
+                    {% if job.salary %}<span class="meta-badge salary">{{ job.salary }}</span>{% endif %}
+                </div>
+                {% if job.locations %}
+                <div class="pills-wrap" style="margin-bottom:6px;">
+                    {% for loc in job.locations %}<span class="pill location">{{ loc }}</span>{% endfor %}
                 </div>
                 {% endif %}
-                {% if p.skills %}
-                <div class="section">
-                    <div class="section-title">Skills</div>
-                    <div class="pills-wrap">{% for s in p.skills %}<span class="pill">{{ s }}</span>{% endfor %}</div>
+                {% if job.eligibility %}
+                <div class="pills-wrap">
+                    {% for s in job.eligibility %}<span class="pill">{{ s }}</span>{% endfor %}
                 </div>
                 {% endif %}
-                {% if p.languages %}
-                <div class="section">
-                    <div class="section-title">Languages</div>
-                    <div class="pills-wrap">{% for l in p.languages %}<span class="pill lang">{{ l }}</span>{% endfor %}</div>
-                </div>
-                {% endif %}
-                {% if p.description %}
-                <div class="section">
-                    <div class="section-title">Why I Need This Internship</div>
-                    <p class="desc-text">{{ p.description }}</p>
-                </div>
+                {% if job.description %}
+                <p class="desc-text">{{ job.description }}</p>
                 {% endif %}
             </div>
         </div>
@@ -377,8 +383,8 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-title">No Profiles Found</div>
-        <p class="empty-sub">No internship profiles posted yet.</p>
+        <div class="empty-title">No Internships Found</div>
+        <p class="empty-sub">No internship postings yet.</p>
     </div>
     {% endif %}
 </div>

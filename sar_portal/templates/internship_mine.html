@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}My Internships — SAR Portal{% endblock %}
+{% block title %}My Posted Internships — SAR Portal{% endblock %}
 
 {% block extra_css %}
     .page {
         padding: 36px 48px;
-        max-width: 900px;
+        max-width: 1000px;
         margin: 0 auto;
     }
 
@@ -28,7 +28,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 8px;
+        margin-bottom: 28px;
         flex-wrap: wrap;
         gap: 12px;
     }
@@ -36,16 +36,6 @@
     .page-title {
         font-family: 'DM Serif Display', serif;
         font-size: 28px;
-        color: var(--primary);
-    }
-
-    .counter-text {
-        font-size: 13px;
-        color: var(--muted);
-        margin-bottom: 24px;
-    }
-
-    .counter-text strong {
         color: var(--primary);
     }
 
@@ -64,6 +54,8 @@
         align-items: center;
         gap: 6px;
         transition: all 0.2s;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .btn-primary:hover {
@@ -71,153 +63,117 @@
         transform: translateY(-1px);
     }
 
-    .btn-primary:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .profiles-list {
+    .jobs-list {
         display: flex;
         flex-direction: column;
         gap: 16px;
     }
 
-    .profile-card {
+    .job-card {
         background: white;
         border-radius: 16px;
         border: 1px solid #E0E9E1;
+        display: flex;
+        gap: 0;
         overflow: hidden;
+        transition: all 0.2s;
     }
 
-    .card-hero {
-        background: linear-gradient(130deg, #1B4332, #2D6A4F);
-        padding: 24px 28px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
+    .job-card:hover {
+        box-shadow: 0 6px 24px rgba(27,67,50,0.09);
     }
 
-    .hero-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        min-width: 0;
-        flex: 1;
-    }
-
-    .hero-avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: var(--accent);
-        color: var(--primary);
+    .job-img-side {
+        width: 120px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'DM Serif Display', serif;
-        font-size: 24px;
-        border: 3px solid rgba(255,255,255,0.25);
-        flex-shrink: 0;
+        font-size: 36px;
     }
 
-    .hero-text {
-        min-width: 0;
+    .job-img-side img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .job-body {
         flex: 1;
+        padding: 20px 24px;
+        min-width: 0;
+        overflow: hidden;
     }
 
-    .hero-name {
-        font-family: 'DM Serif Display', serif;
-        font-size: 20px;
-        color: white;
+    .job-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .job-main {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .job-company {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary-mid);
         margin-bottom: 3px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        max-width: 100%;
     }
 
-    .hero-sub {
-        font-size: 12px;
-        color: rgba(255,255,255,0.65);
+    .job-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 20px;
+        color: var(--primary);
+        margin-bottom: 10px;
+        line-height: 1.3;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .card-actions {
+    .job-meta {
         display: flex;
-        gap: 10px;
-        flex-shrink: 0;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
     }
 
-    .btn-edit {
-        padding: 8px 18px;
-        background: var(--accent);
-        color: var(--primary);
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        font-family: 'DM Sans', sans-serif;
+    .meta-badge {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        transition: all 0.2s;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary-mid);
+        font-weight: 500;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .btn-edit:hover {
-        background: #d4b055;
+    .meta-badge.salary {
+        background: var(--accent-light);
+        color: #8a6d15;
     }
 
-    .btn-delete {
-        padding: 8px 18px;
-        background: rgba(181,48,42,0.15);
-        color: #f5a09d;
-        border: 1px solid rgba(181,48,42,0.3);
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: 'DM Sans', sans-serif;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: all 0.2s;
-        white-space: nowrap;
-    }
-
-    .btn-delete:hover {
-        background: rgba(181,48,42,0.25);
-    }
-
-    .card-body {
-        padding: 20px 28px;
-    }
-
-    .section {
-        margin-bottom: 16px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f0f4f1;
-    }
-
-    .section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .section-title {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        color: var(--muted);
-        margin-bottom: 8px;
+    .meta-badge.closed {
+        background: #fff3f3;
+        color: var(--danger);
     }
 
     .pills-wrap {
@@ -234,15 +190,10 @@
         color: var(--primary);
         border: 1px solid #d0e8d8;
         font-weight: 500;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        max-width: 100%;
-    }
-
-    .pill.lang {
-        background: #f5f0ff;
-        color: #5b3fa0;
-        border-color: #d8ccf5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 160px;
     }
 
     .pill.location {
@@ -251,66 +202,96 @@
         border-color: #c5d8f5;
     }
 
-    .desc-text {
-        font-size: 13px;
-        color: var(--text);
-        line-height: 1.7;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        max-height: calc(13px * 1.7 * 3);
-        overflow: hidden;
+    .job-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-shrink: 0;
+        align-items: flex-end;
     }
 
-    .desc-text.expanded {
-        max-height: none;
-        overflow: visible;
-    }
-
-    .show-more-btn {
-        background: none;
+    .btn-edit {
+        padding: 8px 20px;
+        background: var(--accent);
+        color: var(--primary);
         border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: 'DM Sans', sans-serif;
+        text-align: center;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: #d4b055;
+        transform: translateY(-1px);
+    }
+
+    .btn-applicants {
+        padding: 7px 14px;
+        background: #f0f7f3;
         color: var(--primary-mid);
+        border: 1px solid #d0e8d8;
+        border-radius: 8px;
         font-size: 12px;
         font-weight: 600;
         cursor: pointer;
-        padding: 4px 0 0;
+        text-decoration: none;
         font-family: 'DM Sans', sans-serif;
-        display: block;
-        text-align: left;
-    }
-
-    .show-more-btn:hover {
-        text-decoration: underline;
-    }
-
-    .meta-row {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .meta-item {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .meta-label {
-        font-size: 10px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--muted);
-    }
-
-    .meta-val {
-        font-size: 13px;
-        color: var(--text);
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        text-align: center;
+        transition: all 0.2s;
         white-space: nowrap;
-        max-width: 400px;
+    }
+
+    .btn-applicants:hover {
+        background: #e0f0e8;
+    }
+
+    .btn-close-small {
+        padding: 6px 12px;
+        background: white;
+        color: var(--danger);
+        border: 1px solid #f5c6c2;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+
+    .btn-close-small:hover {
+        background: #fdf0ee;
+    }
+
+    .btn-reopen-small {
+        padding: 6px 12px;
+        background: white;
+        color: var(--success);
+        border: 1px solid #c8e6d4;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+
+    .btn-reopen-small:hover {
+        background: #f0f7f3;
+    }
+
+    .job-date {
+        font-size: 11px;
+        color: var(--muted);
+        text-align: right;
+        white-space: nowrap;
     }
 
     .empty-state {
@@ -327,7 +308,7 @@
         gap: 8px;
         font-size: 12px;
         font-weight: 700;
-        padding: 10px 28px;
+        padding: 10px 20px;
         background: #fdf0ee;
         color: var(--danger);
         border-bottom: 1px solid #f5c6c2;
@@ -357,12 +338,19 @@
         .page {
             padding: 20px;
         }
-        .card-hero {
+        .job-card {
             flex-direction: column;
-            align-items: flex-start;
         }
-        .card-actions {
+        .job-img-side {
             width: 100%;
+            height: 100px;
+        }
+        .job-top {
+            flex-direction: column;
+        }
+        .job-actions {
+            flex-direction: row;
+            align-items: center;
         }
     }
 {% endblock %}
@@ -370,111 +358,79 @@
 {% block content %}
 <div class="page">
     <a href="/internships/" class="back-link">← Back to Internship Portal</a>
-
     <div class="page-header">
-        <div class="page-title">My Internships</div>
-        {% if profiles|length < 5 %}
-        <a href="/internships/add/" class="btn-primary">+ Add New</a>
-        {% else %}
-        <button class="btn-primary" disabled>Limit Reached</button>
-        {% endif %}
+        <div class="page-title">My Posted Internships</div>
+        <a href="/jobs/add/?type=internship" class="btn-primary">+ Post a New Internship</a>
     </div>
-    <p class="counter-text"><strong>{{ profiles|length }}/5</strong> internship profiles posted</p>
 
-    {% if profiles %}
-    <div class="profiles-list">
-        {% for p in profiles %}
-        <div class="profile-card">
-            {% if p.flagged %}<div class="flag-strip">🚩 Flagged by Admin</div>{% endif %}
-            <div class="card-hero">
-                <div class="hero-left">
-                    <div class="hero-avatar">{{ p.name|slice:":1"|upper }}</div>
-                    <div class="hero-text">
-                        <div class="hero-name">{{ p.name }}</div>
-                        <div class="hero-sub">
-                            {% if p.role_title %}{{ p.role_title }} · {% endif %}
-                            {{ p.stream }} · {{ p.current_year }} · {{ p.created_at_str }}
-                        </div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/internships/edit/{{ p.id }}/" class="btn-edit">Edit</a>
-                    <form method="POST" action="/internships/delete/{{ p.id }}/" style="margin:0;" onsubmit="return confirm('Delete this profile?')">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-delete">Delete</button>
-                    </form>
-                </div>
+    {% if jobs %}
+    <div class="jobs-list">
+        {% for job in jobs %}
+        <div class="job-card">
+            {% if job.flagged %}<div class="flag-strip">🚩 Flagged by Admin</div>{% endif %}
+            <div class="job-img-side">
+                {% if job.image %}
+                <img src="/media/{{ job.image }}" alt="{{ job.title }}">
+                {% else %}
+                💼
+                {% endif %}
             </div>
-            <div class="card-body">
-                {% if p.current_location %}
-                <div class="section">
-                    <div class="section-title">Location</div>
-                    <div class="meta-row">
-                        <div class="meta-item">
-                            <div class="meta-label">Currently In</div>
-                            <div class="meta-val">{{ p.current_location }}</div>
+            <div class="job-body">
+                <div class="job-top">
+                    <div class="job-main">
+                        <div class="job-company">{{ job.company_name }}</div>
+                        <div class="job-title">
+                            <a href="/jobs/{{ job.id }}/" style="text-decoration:none;color:inherit;">{{ job.title }}</a>
                         </div>
-                    </div>
-                    {% if p.relocatable_locations %}
-                    <div style="margin-top:10px;">
-                        <div class="meta-label" style="margin-bottom:6px;">Open to Relocate</div>
+                        <div class="job-meta">
+                            {% if job.closed %}<span class="meta-badge closed">Closed</span>{% endif %}
+                            {% if job.experience_required %}
+                            <span class="meta-badge">{{ job.experience_required }}</span>
+                            {% endif %}
+                            {% if job.salary %}
+                            <span class="meta-badge salary">₹ {{ job.salary }}</span>
+                            {% endif %}
+                        </div>
+                        {% if job.locations %}
+                        <div class="pills-wrap" style="margin-bottom:6px;">
+                            {% for loc in job.locations %}
+                            <span class="pill location">{{ loc }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if job.eligibility %}
                         <div class="pills-wrap">
-                            {% for loc in p.relocatable_locations %}<span class="pill location">{{ loc }}</span>{% endfor %}
+                            {% for skill in job.eligibility %}
+                            <span class="pill">{{ skill }}</span>
+                            {% endfor %}
                         </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
+                    <div class="job-actions">
+                        <a href="/jobs/edit/{{ job.id }}/" class="btn-edit">Edit</a>
+                        <a href="/jobs/applicants/{{ job.id }}/" class="btn-applicants">👥 {{ job.applicant_count }} Applicant{{ job.applicant_count|pluralize }}</a>
+                        <form method="POST" action="/jobs/close/{{ job.id }}/" style="margin:0;">
+                            {% csrf_token %}
+                            {% if job.closed %}
+                            <button type="submit" class="btn-reopen-small">▶ Reopen</button>
+                            {% else %}
+                            <button type="submit" class="btn-close-small">✕ Close</button>
+                            {% endif %}
+                        </form>
+                        <div class="job-date">{{ job.posted_at_str }}</div>
+                    </div>
                 </div>
-                {% endif %}
-                {% if p.skills %}
-                <div class="section">
-                    <div class="section-title">Skills</div>
-                    <div class="pills-wrap">{% for s in p.skills %}<span class="pill">{{ s }}</span>{% endfor %}</div>
-                </div>
-                {% endif %}
-                {% if p.languages %}
-                <div class="section">
-                    <div class="section-title">Languages</div>
-                    <div class="pills-wrap">{% for l in p.languages %}<span class="pill lang">{{ l }}</span>{% endfor %}</div>
-                </div>
-                {% endif %}
-                {% if p.description %}
-                <div class="section">
-                    <div class="section-title">Why I Need This Internship</div>
-                    <p class="desc-text">{{ p.description }}</p>
-                    <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
-                </div>
-                {% endif %}
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-icon"></div>
-        <div class="empty-title">No Profiles Yet</div>
-        <p class="empty-sub">Post your internship profile so alumni can find you!</p>
-        <a href="/internships/add/" class="btn-primary">+ Post Internship</a>
+        <div class="empty-icon">💼</div>
+        <div class="empty-title">No Internships Posted Yet</div>
+        <p class="empty-sub">Post your first internship and help students find great opportunities.</p>
+        <a href="/jobs/add/?type=internship" class="btn-primary">+ Post Internship</a>
     </div>
     {% endif %}
 </div>
-
-<script>
-    function toggleShowMore(btn) {
-        var el = btn.previousElementSibling;
-        if (el.classList.contains('expanded')) {
-            el.classList.remove('expanded');
-            btn.textContent = 'Show more';
-        } else {
-            el.classList.add('expanded');
-            btn.textContent = 'Show less';
-        }
-    }
-
-    document.querySelectorAll('.show-more-btn').forEach(function(btn) {
-        var el = btn.previousElementSibling;
-        if (el.scrollHeight <= el.clientHeight + 2) {
-            btn.style.display = 'none';
-        }
-    });
-</script>
 {% endblock %}

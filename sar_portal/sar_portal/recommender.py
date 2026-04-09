@@ -3,13 +3,11 @@ import numpy as np
 
 _model = None
 
-
 def get_model():
     global _model
     if _model is None:
         _model = SentenceTransformer('all-MiniLM-L6-v2')
     return _model
-
 
 def build_user_text(user):
     parts = []
@@ -44,7 +42,6 @@ def build_user_text(user):
             parts.append('Startup: ' + user['startup']['name'])
     return ' | '.join(parts) if parts else 'student profile'
 
-
 def build_job_text(job):
     parts = []
     if job.get('title'):
@@ -63,28 +60,6 @@ def build_job_text(job):
         parts.append(job['company_description'][:200])
     return ' | '.join(parts) if parts else 'job posting'
 
-
-def build_internship_text(profile):
-    parts = []
-    if profile.get('name'):
-        parts.append(profile['name'])
-    if profile.get('role_title'):
-        parts.append('Role: ' + profile['role_title'])
-    if profile.get('stream'):
-        parts.append('Stream: ' + profile['stream'])
-    if profile.get('skills'):
-        parts.append('Skills: ' + ', '.join(profile['skills']))
-    if profile.get('current_location'):
-        parts.append('Location: ' + profile['current_location'])
-    if profile.get('relocatable_locations'):
-        parts.append('Open to relocate: ' + ', '.join(profile['relocatable_locations']))
-    if profile.get('languages'):
-        parts.append('Languages: ' + ', '.join(profile['languages']))
-    if profile.get('description'):
-        parts.append(profile['description'][:250])
-    return ' | '.join(parts) if parts else 'internship profile'
-
-
 def rank_by_similarity(user_text, items, item_texts):
     if not items or not item_texts:
         return []
@@ -94,3 +69,12 @@ def rank_by_similarity(user_text, items, item_texts):
     scores = (item_embs @ user_emb.T).flatten()
     ranked = sorted(zip(items, scores.tolist()), key=lambda x: x[1], reverse=True)
     return ranked
+
+def calculate_similarity(text1, text2):
+    if not text1 or not text2:
+        return 0.0
+    model = get_model()
+    emb1 = model.encode([text1], convert_to_numpy=True, normalize_embeddings=True)
+    emb2 = model.encode([text2], convert_to_numpy=True, normalize_embeddings=True)
+    score = (emb1 @ emb2.T).flatten()[0]
+    return float(score) * 100

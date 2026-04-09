@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Internships — SAR Portal{% endblock %}
+{% block title %}Internship Portal — SAR Portal{% endblock %}
 
 {% block extra_css %}
     .page {
@@ -73,94 +73,112 @@
         background: #f0f7f3;
     }
 
-    .profiles-grid {
+    .jobs-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 20px;
     }
 
-    .profile-card {
+    .job-card {
         background: white;
         border-radius: 16px;
         border: 1px solid #E0E9E1;
-        padding: 24px;
+        overflow: hidden;
         transition: all 0.2s;
-        text-decoration: none;
-        color: inherit;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
     }
 
-    .profile-card:hover {
+    .job-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 32px rgba(27,67,50,0.1);
-        border-color: var(--primary-mid);
     }
 
-    .card-header {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 16px;
-        min-width: 0;
+    .job-img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        display: block;
     }
 
-    .card-avatar {
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
+    .job-img-placeholder {
+        width: 100%;
+        height: 150px;
         background: linear-gradient(135deg, var(--primary), var(--primary-mid));
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'DM Serif Display', serif;
-        font-size: 22px;
-        color: white;
-        flex-shrink: 0;
-        overflow: hidden;
+        font-size: 44px;
     }
 
-    .card-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .card-name-wrap {
-        min-width: 0;
+    .job-body {
+        padding: 20px;
         flex: 1;
-    }
-
-    .card-name {
-        font-family: 'DM Serif Display', serif;
-        font-size: 18px;
-        color: var(--primary);
-        margin-bottom: 2px;
+        min-width: 0;
         overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 100%;
     }
 
-    .card-stream {
+    .job-company {
         font-size: 12px;
-        color: var(--muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary-mid);
+        margin-bottom: 4px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .location-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        color: var(--muted);
+    .job-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 19px;
+        color: var(--primary);
         margin-bottom: 12px;
+        line-height: 1.3;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #f0f7f3;
+        color: var(--primary-mid);
+        font-weight: 500;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .meta-badge.salary {
+        background: var(--accent-light);
+        color: #8a6d15;
+    }
+
+    .meta-badge.applied {
+        background: #e8f5ee;
+        color: #1B6B3A;
+    }
+
+    .meta-badge.closed {
+        background: #fff3f3;
+        color: var(--danger);
     }
 
     .pills-wrap {
@@ -181,13 +199,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        max-width: 160px;
-    }
-
-    .pill.lang {
-        background: #f5f0ff;
-        color: #5b3fa0;
-        border-color: #d8ccf5;
+        max-width: 140px;
     }
 
     .pill.location {
@@ -196,89 +208,37 @@
         border-color: #c5d8f5;
     }
 
-    .card-desc {
+    .job-desc {
         font-size: 13px;
         color: var(--muted);
         line-height: 1.6;
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid #f0f4f1;
+        margin-top: 8px;
         max-height: calc(13px * 1.6 * 3);
         overflow: hidden;
         word-break: break-word;
         overflow-wrap: break-word;
-        flex: 1;
     }
 
-    .card-footer {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 14px;
-        padding-top: 12px;
+    .job-footer {
+        padding: 12px 20px;
         border-top: 1px solid #f0f4f1;
-    }
-
-    .card-footer-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-family: 'DM Serif Display', serif;
-        font-size: 12px;
-        color: white;
-        flex-shrink: 0;
-        overflow: hidden;
+        justify-content: space-between;
     }
 
-    .card-footer-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .card-footer-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .card-poster {
+    .job-poster {
         font-size: 12px;
         color: var(--muted);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        max-width: 60%;
     }
 
-    .card-date {
+    .job-date {
         font-size: 11px;
         color: var(--muted);
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .section-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-        color: var(--muted);
-        margin-bottom: 6px;
-    }
-
-    .role-title {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--primary-mid);
-        margin-bottom: 10px;
-        overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
@@ -318,7 +278,7 @@
         background: #fdf0ee;
         color: var(--danger);
         border: 1px solid #f5c6c2;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
     }
@@ -374,26 +334,20 @@
         overflow: hidden;
     }
 
-    .rec-card-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
+    .rec-card-img {
+        width: 100%;
+        height: 110px;
+        object-fit: cover;
+    }
+
+    .rec-card-placeholder {
+        width: 100%;
+        height: 110px;
         background: linear-gradient(135deg, var(--primary), var(--primary-mid));
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'DM Serif Display', serif;
-        font-size: 18px;
-        color: white;
-        flex-shrink: 0;
-        overflow: hidden;
-        margin-bottom: 10px;
-    }
-
-    .rec-card-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        font-size: 32px;
     }
 
     .rec-label {
@@ -428,7 +382,7 @@
         .page {
             padding: 20px;
         }
-        .profiles-grid {
+        .jobs-grid {
             grid-template-columns: 1fr;
         }
         .rec-grid {
@@ -440,26 +394,34 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
+        <div class="page-title">Internships</div>
+        {% if user.status == 'alumni' %}
         <div class="header-actions">
-            <a href="/internships/add/" class="btn-primary">+ Post Internship</a>
-            <a href="/internships/mine/" class="btn-outline">My Internships</a>
+            <a href="/jobs/add/?type=internship" class="btn-primary">+ Post Internship</a>
+            <a href="/internships/mine/" class="btn-outline">My Posted Internships</a>
         </div>
+        {% else %}
+        <div class="header-actions">
+            <a href="/jobs/applied/" class="btn-outline">My Applications</a>
+        </div>
+        {% endif %}
     </div>
 
-    {% if recommended_profiles %}
+    {% if recommended_jobs %}
     <div class="rec-section">
         <div class="rec-section-title">✨ Recommended for You</div>
         <div class="rec-grid">
-            {% for profile, score in recommended_profiles %}
-            <a href="/internships/{{ profile.id }}/" class="rec-card">
+            {% for job, score in recommended_jobs %}
+            <a href="/jobs/{{ job.id }}/" class="rec-card">
+                {% if job.image %}
+                <img class="rec-card-img" src="/media/{{ job.image }}" alt="{{ job.title }}">
+                {% else %}
+                <div class="rec-card-placeholder">💼</div>
+                {% endif %}
                 <div class="rec-match-bar"><div class="rec-match-fill" style="width:{{ score|floatformat:0 }}%"></div></div>
                 <div class="rec-card-body">
-                    <div class="rec-card-avatar">
-                        {% if profile.poster_pic %}<img src="/media/{{ profile.poster_pic }}" alt="">{% else %}{{ profile.name|slice:":1"|upper }}{% endif %}
-                    </div>
-                    <div class="rec-label">{{ profile.stream }}</div>
-                    <div class="rec-title">{{ profile.name }}</div>
-                    {% if profile.role_title %}<div class="rec-label">{{ profile.role_title }}</div>{% endif %}
+                    <div class="rec-label">{{ job.company_name }}</div>
+                    <div class="rec-title">{{ job.title }}</div>
                     <div class="rec-score">{{ score|floatformat:0 }}% match</div>
                 </div>
             </a>
@@ -468,72 +430,69 @@
     </div>
     {% endif %}
 
-    <div class="profiles-grid">
-        {% if profiles %}
-            {% for p in profiles %}
-            <a href="/internships/{{ p.id }}/" class="profile-card">
-                {% if p.flagged %}<div class="flag-strip" style="width:100%;margin-bottom:8px;">Flagged by Admin</div>{% endif %}
-                <div class="card-header">
-                    <div class="card-avatar">{{ p.name|slice:":1"|upper }}</div>
-                    <div class="card-name-wrap">
-                        <div class="card-name">{{ p.name }}</div>
-                        <div class="card-stream">{{ p.stream }}</div>
+    <div class="jobs-grid">
+        {% if jobs %}
+            {% for job in jobs %}
+            <a href="/jobs/{{ job.id }}/" class="job-card">
+                {% if job.image %}
+                <img class="job-img" src="/media/{{ job.image }}" alt="{{ job.title }}">
+                {% else %}
+                <div class="job-img-placeholder">💼</div>
+                {% endif %}
+                <div class="job-body">
+                    {% if job.flagged %}<div class="flag-strip">Flagged by Admin</div>{% endif %}
+                    <div class="job-company">{{ job.company_name }}</div>
+                    <div class="job-title">{{ job.title }}</div>
+                    <div class="job-meta">
+                        {% if job.closed %}<span class="meta-badge closed">Closed</span>{% endif %}
+                        {% if job.has_applied %}<span class="meta-badge applied">✓ Applied</span>{% endif %}
+                        {% if job.experience_required %}
+                        <span class="meta-badge">🕐 {{ job.experience_required }}</span>
+                        {% endif %}
+                        {% if job.salary %}
+                        <span class="meta-badge salary">₹ {{ job.salary }}</span>
+                        {% endif %}
                     </div>
-                </div>
-
-                {% if p.role_title %}
-                <div class="role-title">{{ p.role_title }}</div>
-                {% endif %}
-
-                {% if p.current_location %}
-                <div class="location-row">Currently in {{ p.current_location }}</div>
-                {% endif %}
-
-                {% if p.relocatable_locations %}
-                <div class="section-tag">Open to relocate</div>
-                <div class="pills-wrap">
-                    {% for loc in p.relocatable_locations %}<span class="pill location">{{ loc }}</span>{% endfor %}
-                </div>
-                {% endif %}
-
-                {% if p.skills %}
-                <div class="section-tag">Skills</div>
-                <div class="pills-wrap">
-                    {% for skill in p.skills %}<span class="pill">{{ skill }}</span>{% endfor %}
-                </div>
-                {% endif %}
-
-                {% if p.languages %}
-                <div class="section-tag">Languages</div>
-                <div class="pills-wrap">
-                    {% for lang in p.languages %}<span class="pill lang">{{ lang }}</span>{% endfor %}
-                </div>
-                {% endif %}
-
-                {% if p.description %}
-                <p class="card-desc">{{ p.description }}</p>
-                {% endif %}
-
-                <div class="card-footer">
-                    <div class="card-footer-avatar">
-                        {% if p.poster_pic %}<img src="/media/{{ p.poster_pic }}" alt="">{% else %}{{ p.student_name|slice:":1"|upper }}{% endif %}
+                    {% if job.locations %}
+                    <div class="pills-wrap">
+                        {% for loc in job.locations %}
+                        <span class="pill location">{{ loc }}</span>
+                        {% endfor %}
                     </div>
-                    <div class="card-footer-info">
-                        <div class="card-poster">{{ p.student_name }}</div>
+                    {% endif %}
+                    {% if job.eligibility %}
+                    <div class="pills-wrap">
+                        {% for skill in job.eligibility %}
+                        <span class="pill">{{ skill }}</span>
+                        {% endfor %}
                     </div>
-                    <div class="card-date">{{ p.created_at_str }}</div>
+                    {% endif %}
+                    {% if job.description %}
+                    <p class="job-desc">{{ job.description }}</p>
+                    {% endif %}
+                </div>
+                <div class="job-footer">
+                    <span class="job-poster">Posted by {{ job.posted_by_name }}</span>
+                    <span class="job-date">{{ job.posted_at_str }}</span>
                 </div>
             </a>
             {% endfor %}
         {% else %}
         <div class="empty-state">
-            <div class="empty-icon"></div>
-            <div class="empty-title">No Profiles Yet</div>
-            <p class="empty-sub">Be the first to post an internship profile!</p>
-            <a href="/internships/add/" class="btn-primary">+ Post Internship</a>
+            <div class="empty-icon">💼</div>
+            <div class="empty-title">No Internships Yet</div>
+            <p class="empty-sub">
+                {% if user.status == 'alumni' %}
+                Be the first to post an internship for students!
+                {% else %}
+                Check back soon — alumni will post opportunities here.
+                {% endif %}
+            </p>
+            {% if user.status == 'alumni' %}
+            <a href="/jobs/add/?type=internship" class="btn-primary">+ Post Internship</a>
+            {% endif %}
         </div>
         {% endif %}
     </div>
 </div>
-
 {% endblock %}

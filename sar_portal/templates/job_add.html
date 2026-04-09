@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Post a Job — SAR Portal{% endblock %}
+{% block title %}Post a New Opportunity — SAR Portal{% endblock %}
 
 {% block extra_css %}
     .page {
@@ -322,8 +322,8 @@
 
 {% block content %}
 <div class="page">
-    <a href="/jobs/" class="back-link">← Back to Job Portal</a>
-    <div class="page-title">Post a New Job</div>
+    <a href="/jobs/" class="back-link">← Back</a>
+    <div class="page-title">Post a New Opportunity</div>
 
     <div class="form-card">
         {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
@@ -331,21 +331,33 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <div class="section-label">Job Details</div>
+            <div class="section-label">Details</div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Job Title</label>
-                    <input type="text" name="title" placeholder="e.g. Software Engineer" maxlength="150" required>
+                    <label>Posting Type</label>
+                    <div style="display:flex; gap:12px; margin-top:8px;">
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; font-weight:500; font-size:14px; color:var(--text); cursor:pointer;">
+                            <input type="radio" name="job_type" value="job" {% if default_type != 'internship' %}checked{% endif %} style="width:16px; height:16px; margin:0;"> Job
+                        </label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; font-weight:500; font-size:14px; color:var(--text); cursor:pointer;">
+                            <input type="radio" name="job_type" value="internship" {% if default_type == 'internship' %}checked{% endif %} style="width:16px; height:16px; margin:0;"> Internship
+                        </label>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Company Name</label>
-                    <input type="text" name="company_name" placeholder="e.g. Acme Corp" maxlength="150" required>
+                    <label>Title</label>
+                    <input type="text" name="title" placeholder="e.g. Software Engineer / Intern" maxlength="150" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Job Description <span class="opt-label">(optional)</span></label>
+                <label>Company Name</label>
+                <input type="text" name="company_name" placeholder="e.g. Acme Corp" maxlength="150" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description <span class="opt-label">(optional)</span></label>
                 <textarea name="description" rows="4" placeholder="Describe the role, responsibilities, and what you're looking for..."></textarea>
             </div>
 
@@ -360,11 +372,11 @@
                 <div class="form-group">
                     <label>Experience Required (Years)</label>
                     <input type="number" name="experience_required" placeholder="e.g. 2" min="0" max="50" step="1" required>
-                    <span class="field-hint">Enter number of years (0 for fresher)</span>
+                    <span class="field-hint">Enter number of years (0 for fresher/intern)</span>
                 </div>
                 <div class="form-group">
-                    <label>Salary</label>
-                    <input type="text" name="salary" placeholder="e.g. 6-8 LPA / 30,000/month" maxlength="100" required>
+                    <label>Compensation / Salary</label>
+                    <input type="text" name="salary" placeholder="e.g. 6-8 LPA / 30k per month / Unpaid" maxlength="100" required>
                 </div>
             </div>
 
@@ -392,18 +404,18 @@
                 <input type="hidden" id="eligibility-json" name="eligibility_json" value="[]">
             </div>
 
-            <div class="section-label">Job Poster / Image <span class="opt-label">(optional)</span></div>
+            <div class="section-label">Poster / Image <span class="opt-label">(optional)</span></div>
 
             <div class="img-upload-area" onclick="document.getElementById('jobImgInput').click()">
                 <img class="img-preview" id="imgPreview" src="#" alt="Preview">
                 <div class="upload-icon" id="uploadIcon">🖼️</div>
-                <div class="upload-label">Click to upload a job poster or company image<br><small>JPG, PNG, WEBP — max 5MB</small></div>
+                <div class="upload-label">Click to upload a poster or company image<br><small>JPG, PNG, WEBP — max 5MB</small></div>
                 <input type="file" name="job_image" id="jobImgInput" accept="image/*" onchange="previewImg(this)">
             </div>
 
             <div class="form-actions">
                 <a href="/jobs/" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-submit">Post Job →</button>
+                <button type="submit" class="btn-submit">Post →</button>
             </div>
         </form>
     </div>

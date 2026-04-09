@@ -52,9 +52,9 @@
 
     .applicant-item {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 14px;
-        padding: 16px 20px;
+        padding: 20px;
         text-decoration: none;
         color: inherit;
         transition: background 0.15s;
@@ -97,7 +97,7 @@
 
     .applicant-name {
         font-weight: 600;
-        font-size: 15px;
+        font-size: 16px;
         color: var(--primary);
         margin-bottom: 2px;
         overflow: hidden;
@@ -114,6 +114,7 @@
         font-size: 16px;
         color: var(--muted);
         flex-shrink: 0;
+        margin-top: 10px;
     }
 
     .count-badge {
@@ -156,7 +157,7 @@
 
 {% block content %}
 <div class="page">
-    <a href="/jobs/{{ job.id }}/" class="back-link">← Back to Job</a>
+    <a href="/jobs/{{ job.id }}/" class="back-link">← Back to Posting</a>
 
     <div class="page-header">
         <div class="page-title">
@@ -180,6 +181,12 @@
             <div class="applicant-body">
                 <div class="applicant-name">{{ app.applicant_name }}</div>
                 <div class="applicant-date">Applied on {{ app.applied_at_str }}</div>
+                {% if app.match_score is not None %}
+                <div style="font-size:12px; font-weight:700; color:var(--primary-mid); margin-top:6px;">{{ app.match_score }}% Match Profile</div>
+                {% endif %}
+                {% if app.cover_letter %}
+                <div style="font-size:13px; color:var(--text); margin-top:8px; background:#f0f7f3; padding:12px; border-radius:8px; border:1px solid #d0e8d8; white-space:pre-wrap;">{{ app.cover_letter }}</div>
+                {% endif %}
             </div>
             <div class="applicant-arrow">→</div>
         </a>
@@ -188,7 +195,7 @@
     {% else %}
     <div class="empty-state">
         <div class="empty-title">No Applicants Yet</div>
-        <p class="empty-sub">Share your job posting to get more applicants.</p>
+        <p class="empty-sub">Share your posting to get more applicants.</p>
     </div>
     {% endif %}
 </div>

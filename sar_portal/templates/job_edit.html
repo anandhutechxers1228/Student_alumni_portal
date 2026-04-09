@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Job — SAR Portal{% endblock %}
+{% block title %}Edit Opportunity — SAR Portal{% endblock %}
 
 {% block extra_css %}
     .page {
@@ -320,8 +320,8 @@
 
 {% block content %}
 <div class="page">
-    <a href="/jobs/mine/" class="back-link">← Back to My Jobs</a>
-    <div class="page-title">Edit Job</div>
+    <a href="javascript:history.back()" class="back-link">← Back</a>
+    <div class="page-title">Edit Opportunity</div>
 
     <div class="form-card">
         {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
@@ -329,21 +329,33 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <div class="section-label">Job Details</div>
+            <div class="section-label">Details</div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Job Title</label>
-                    <input type="text" name="title" value="{{ job.title }}" maxlength="150" required>
+                    <label>Posting Type</label>
+                    <div style="display:flex; gap:12px; margin-top:8px;">
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; font-weight:500; font-size:14px; color:var(--text); cursor:pointer;">
+                            <input type="radio" name="job_type" value="job" {% if job.type != 'internship' %}checked{% endif %} style="width:16px; height:16px; margin:0;"> Job
+                        </label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; font-weight:500; font-size:14px; color:var(--text); cursor:pointer;">
+                            <input type="radio" name="job_type" value="internship" {% if job.type == 'internship' %}checked{% endif %} style="width:16px; height:16px; margin:0;"> Internship
+                        </label>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Company Name</label>
-                    <input type="text" name="company_name" value="{{ job.company_name }}" maxlength="150" required>
+                    <label>Title</label>
+                    <input type="text" name="title" value="{{ job.title }}" maxlength="150" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Job Description <span class="opt-label">(optional)</span></label>
+                <label>Company Name</label>
+                <input type="text" name="company_name" value="{{ job.company_name }}" maxlength="150" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description <span class="opt-label">(optional)</span></label>
                 <textarea name="description" rows="4">{{ job.description }}</textarea>
             </div>
 
@@ -358,10 +370,10 @@
                 <div class="form-group">
                     <label>Experience Required (Years)</label>
                     <input type="number" name="experience_required" value="{{ job.experience_required }}" min="0" max="50" step="1" required>
-                    <span class="field-hint">Enter number of years (0 for fresher)</span>
+                    <span class="field-hint">Enter number of years (0 for fresher/intern)</span>
                 </div>
                 <div class="form-group">
-                    <label>Salary</label>
+                    <label>Compensation / Salary</label>
                     <input type="text" name="salary" value="{{ job.salary }}" maxlength="100" required>
                 </div>
             </div>
@@ -390,7 +402,7 @@
                 <input type="hidden" id="eligibility-json" name="eligibility_json" value="{{ job.eligibility_json }}">
             </div>
 
-            <div class="section-label">Job Poster / Image <span class="opt-label">(optional — leave blank to keep existing)</span></div>
+            <div class="section-label">Poster / Image <span class="opt-label">(optional — leave blank to keep existing)</span></div>
 
             <div class="img-upload-area" onclick="document.getElementById('jobImgInput').click()">
                 {% if job.image %}
@@ -405,7 +417,7 @@
             </div>
 
             <div class="form-actions">
-                <a href="/jobs/mine/" class="btn-cancel">Cancel</a>
+                <a href="javascript:history.back()" class="btn-cancel">Cancel</a>
                 <button type="submit" class="btn-submit">Save Changes →</button>
             </div>
         </form>

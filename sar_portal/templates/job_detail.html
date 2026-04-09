@@ -366,7 +366,7 @@
 
 {% block content %}
 <div class="page">
-    <a href="/jobs/" class="back-link">← Back to Job Portal</a>
+    <a href="javascript:history.back()" class="back-link">← Back</a>
 
     <div class="job-hero">
         {% if job.image %}
@@ -382,13 +382,14 @@
             <div class="job-title">{{ job.title }}</div>
 
             <div class="job-meta">
+                {% if job.type == 'internship' %}<span class="meta-badge" style="background:#eef4ff; color:#2d5fb0; border-color:#c5d8f5;">Internship</span>{% endif %}
                 {% if job.experience_required %}
-                <span class="meta-badge">🕐 {{ job.experience_required }}</span>
+                <span class="meta-badge">🕐 {{ job.experience_required }} yrs exp</span>
                 {% endif %}
                 {% if job.salary %}
                 <span class="meta-badge salary">₹ {{ job.salary }}</span>
                 {% endif %}
-                {% if job.applicant_count %}
+                {% if job.applicant_count is not None %}
                 <span class="meta-badge">👥 {{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}</span>
                 {% endif %}
             </div>
@@ -423,7 +424,7 @@
 
     {% if job.description %}
     <div class="section-card">
-        <div class="section-label">Job Description</div>
+        <div class="section-label">Description</div>
         <p class="section-text">{{ job.description }}</p>
         <button class="show-more-btn" onclick="toggleShowMore(this)">Show more</button>
     </div>
@@ -439,7 +440,7 @@
 
     <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
         {% if user.id == job.posted_by %}
-        <a href="/jobs/edit/{{ job.id }}/" class="btn-edit-link">Edit Job</a>
+        <a href="/jobs/edit/{{ job.id }}/" class="btn-edit-link">Edit</a>
         <a href="/jobs/applicants/{{ job.id }}/" class="btn-applicants">👥 View Applicants ({{ job.applicant_count }})</a>
         <form method="POST" action="/jobs/close/{{ job.id }}/" style="margin:0;">
             {% csrf_token %}
@@ -450,16 +451,38 @@
             {% endif %}
         </form>
         {% else %}
-        <form method="POST" action="/jobs/apply/{{ job.id }}/" style="margin:0;">
-            {% csrf_token %}
             {% if job.closed %}
             <button type="button" class="btn-apply" disabled>Applications Closed</button>
             {% elif job.has_applied %}
-            <button type="submit" class="btn-apply applied">✓ Applied</button>
+            <button type="button" class="btn-apply applied" disabled>✓ Applied</button>
             {% else %}
-            <button type="submit" class="btn-apply">Apply Now</button>
+            <form method="POST" action="/jobs/apply/{{ job.id }}/" id="applyForm" style="width:100%;">
+                {% csrf_token %}
+                <div style="background:#f9fbf9; border:1px solid #E0E9E1; border-radius:12px; padding:20px; margin-top:10px;">
+                    <label style="display:block; font-size:13px; font-weight:700; color:var(--primary); margin-bottom:10px;">Why should we choose you?</label>
+                    <textarea name="cover_letter" id="cover_letter" rows="4" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; font-family:'DM Sans', sans-serif; font-size:14px; resize:vertical; outline:none;" placeholder="Write at least 100 characters..." minlength="100" maxlength="1000" required></textarea>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <span id="charCount" style="font-size:12px; color:var(--muted);">0 / 1000</span>
+                        <button type="submit" class="btn-apply" id="btnApply" disabled>Submit Application</button>
+                    </div>
+                </div>
+            </form>
+            <script>
+                document.getElementById('cover_letter').addEventListener('input', function() {
+                    var len = this.value.trim().length;
+                    var btn = document.getElementById('btnApply');
+                    var counter = document.getElementById('charCount');
+                    counter.textContent = len + ' / 1000';
+                    if (len >= 100 && len <= 1000) {
+                        btn.disabled = false;
+                        counter.style.color = 'var(--muted)';
+                    } else {
+                        btn.disabled = true;
+                        counter.style.color = 'var(--danger)';
+                    }
+                });
+            </script>
             {% endif %}
-        </form>
         {% endif %}
     </div>
 </div>
