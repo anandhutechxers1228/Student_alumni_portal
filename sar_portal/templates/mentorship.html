@@ -429,11 +429,11 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Question Title</label>
-                    <input type="text" name="title" placeholder="What's your question?" maxlength="100" required>
+                    <input type="text" name="title" placeholder="What's your question?" maxlength="100" pattern=".*[a-zA-Z].*" title="Must contain at least one letter." required>
                 </div>
                 <div class="form-group">
                     <label>Details</label>
-                    <textarea name="body" placeholder="Add more context or details about your question..." maxlength="2000" required></textarea>
+                    <textarea name="body" placeholder="Add more context or details about your question..." maxlength="2000" oninput="this.setCustomValidity(this.value.trim() === '' || this.value.match(/[a-zA-Z]/) ? '' : 'Must contain at least one letter.')" required></textarea>
                 </div>
             </div>
             <div class="modal-actions">

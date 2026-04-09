@@ -345,23 +345,23 @@
                 </div>
                 <div class="form-group">
                     <label>Title</label>
-                    <input type="text" name="title" value="{{ job.title }}" maxlength="150" required>
+                    <input type="text" name="title" value="{{ job.title }}" maxlength="150" pattern=".*[a-zA-Z].*" title="Must contain at least one letter." required>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Company Name</label>
-                <input type="text" name="company_name" value="{{ job.company_name }}" maxlength="150" required>
+                <input type="text" name="company_name" value="{{ job.company_name }}" maxlength="150" pattern=".*[a-zA-Z].*" title="Must contain at least one letter." required>
             </div>
 
             <div class="form-group">
                 <label>Description <span class="opt-label">(optional)</span></label>
-                <textarea name="description" rows="4" maxlength="1000">{{ job.description }}</textarea>
+                <textarea name="description" rows="4" maxlength="1000" oninput="this.setCustomValidity(this.value.trim() === '' || this.value.match(/[a-zA-Z]/) ? '' : 'Must contain at least one letter.')">{{ job.description }}</textarea>
             </div>
 
             <div class="form-group">
                 <label>Company Description <span class="opt-label">(optional)</span></label>
-                <textarea name="company_description" rows="3" maxlength="1000">{{ job.company_description }}</textarea>
+                <textarea name="company_description" rows="3" maxlength="1000" oninput="this.setCustomValidity(this.value.trim() === '' || this.value.match(/[a-zA-Z]/) ? '' : 'Must contain at least one letter.')">{{ job.company_description }}</textarea>
             </div>
 
             <div class="section-label">Compensation & Experience</div>
@@ -441,6 +441,11 @@
         var limit = tagLimits[name] || 75;
         if (val.length > limit) {
             alert('Too long! Maximum ' + limit + ' characters allowed.');
+            input.focus();
+            return;
+        }
+        if (!val.match(/[a-zA-Z]/)) {
+            alert('Must contain at least one letter.');
             input.focus();
             return;
         }
