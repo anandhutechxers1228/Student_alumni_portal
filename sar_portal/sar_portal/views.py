@@ -6,8 +6,10 @@ from .db_connector import get_db
 from bson import ObjectId
 import os
 import uuid
+import traceback
 from datetime import datetime, timezone, timedelta
 import json
+from .recommender import build_user_text, build_job_text, calculate_similarity, rank_by_similarity
 
 STREAMS = [
     'Computer Science',
@@ -258,10 +260,35 @@ def profile_view(request):
         'streams': STREAMS,
     })
 
+def _cleanup_old_jobs(db):
+    cutoff = datetime.utcnow() - timedelta(days=45)
+    old_jobs = list(db.sar_jobs.find({'closed': True, 'posted_at': {'$lt': cutoff}}, {'_id': 1}))
+    if old_jobs:
+        old_job_ids = [str(j['_id']) for j in old_jobs]
+        db.sar_jobs.delete_many({'_id': {'$in': [j['_id'] for j in old_jobs]}})
+        db.sar_job_applications.delete_many({'job_id': {'$in': old_job_ids}})
+
+def _get_job_recommendations(user, db, all_jobs):
+    try:
+        user_text = build_user_text(user)
+        job_texts = [build_job_text(j) for j in all_jobs]
+        ranked = rank_by_similarity(user_text, all_jobs, job_texts)
+        valid_recs = []
+        for j, s in ranked:
+            score_pct = round(s * 100, 1)
+            if score_pct > 50.0:
+                valid_recs.append((j, score_pct))
+        return valid_recs[:3]
+    except Exception as e:
+        print("RECOMMENDATION ERROR IN _GET_JOB_RECOMMENDATIONS:")
+        traceback.print_exc()
+        return []
+
 @login_required
 def job_portal_view(request):
     user = get_current_user(request)
     db = get_db()
+    _cleanup_old_jobs(db)
     if user.get('status') == 'alumni':
         jobs = list(db.sar_jobs.find({'posted_by': {'$ne': user['id']}, 'type': {'$ne': 'internship'}}).sort('posted_at', -1))
     else:
@@ -275,7 +302,12 @@ def job_portal_view(request):
             j['posted_at_str'] = ''
         j['has_applied'] = j['id'] in user_applied
         j['closed'] = j.get('closed', False)
-    return render(request, 'job_portal.html', {'user': user, 'jobs': jobs, 'recommended_jobs': _get_job_recommendations(user, db, jobs)})
+        
+    recommended_jobs = _get_job_recommendations(user, db, jobs)
+    rec_ids = set(j['id'] for j, score in recommended_jobs)
+    normal_jobs = [j for j in jobs if j['id'] not in rec_ids]
+    
+    return render(request, 'job_portal.html', {'user': user, 'jobs': normal_jobs, 'recommended_jobs': recommended_jobs})
 
 @login_required
 def job_detail_view(request, job_id):
@@ -314,29 +346,31 @@ def job_apply_view(request, job_id):
     if not job:
         return redirect('/jobs/')
         
-    cover_letter = request.POST.get('cover_letter', '').strip()
-    if len(cover_letter) < 100 or len(cover_letter) > 1000:
-        return redirect(f'/jobs/{str(job["_id"])}/')
-        
     job_id_str = str(job['_id'])
     if job.get('posted_by') == user['id'] or job.get('closed'):
         return redirect(f'/jobs/{job_id_str}/')
         
     existing = db.sar_job_applications.find_one({'job_id': job_id_str, 'applicant_id': user['id']})
     if existing:
-        pass
+        db.sar_job_applications.delete_one({'_id': existing['_id']})
     else:
+        cover_letter = request.POST.get('cover_letter', '').strip()
+        if len(cover_letter) < 100 or len(cover_letter) > 1000:
+            return redirect(f'/jobs/{job_id_str}/')
+            
         now = datetime.utcnow()
         score = 0.0
         try:
-            from .recommender import build_user_text, build_job_text, calculate_similarity
             applicant_text = build_user_text(user) + " | Why choose me: " + cover_letter
             job_text = build_job_text(job)
             poster = db.sar_users.find_one({'_id': ObjectId(job.get('posted_by'))})
             poster_text = build_user_text(poster) if poster else ""
             target_text = job_text + " | Poster Profile: " + poster_text
             score = calculate_similarity(applicant_text, target_text)
-        except Exception:
+            print("APPLICATION SCORE CALCULATED:", score)
+        except Exception as e:
+            print("SCORE CALCULATION ERROR IN JOB_APPLY_VIEW:")
+            traceback.print_exc()
             score = 0.0
 
         db.sar_job_applications.insert_one({
@@ -429,6 +463,19 @@ def job_toggle_close_view(request, job_id):
     return redirect(f'/jobs/{job_id}/')
 
 @login_required
+def job_delete_view(request, job_id):
+    if request.method == 'POST':
+        user = get_current_user(request)
+        db = get_db()
+        job = db.sar_jobs.find_one({'_id': ObjectId(job_id), 'posted_by': user['id']})
+        if job:
+            db.sar_jobs.delete_one({'_id': ObjectId(job_id)})
+            db.sar_job_applications.delete_many({'job_id': job_id})
+            if job.get('type') == 'internship':
+                return redirect('/internships/mine/')
+    return redirect('/jobs/mine/')
+
+@login_required
 def job_add_view(request):
     user = get_current_user(request)
     if user.get('status') != 'alumni':
@@ -506,6 +553,7 @@ def job_mine_view(request):
     if user.get('status') != 'alumni':
         return redirect('/jobs/')
     db = get_db()
+    _cleanup_old_jobs(db)
     jobs = list(db.sar_jobs.find({'posted_by': user['id'], 'type': {'$ne': 'internship'}}).sort('posted_at', -1))
     for j in jobs:
         j['id'] = str(j['_id'])
@@ -523,6 +571,7 @@ def internship_mine_view(request):
     if user.get('status') != 'alumni':
         return redirect('/internships/')
     db = get_db()
+    _cleanup_old_jobs(db)
     jobs = list(db.sar_jobs.find({'posted_by': user['id'], 'type': 'internship'}).sort('posted_at', -1))
     for j in jobs:
         j['id'] = str(j['_id'])
@@ -599,6 +648,7 @@ def job_edit_view(request, job_id):
 def internship_view(request):
     user = get_current_user(request)
     db = get_db()
+    _cleanup_old_jobs(db)
     if user.get('status') == 'alumni':
         jobs = list(db.sar_jobs.find({'posted_by': {'$ne': user['id']}, 'type': 'internship'}).sort('posted_at', -1))
     else:
@@ -612,7 +662,12 @@ def internship_view(request):
             j['posted_at_str'] = ''
         j['has_applied'] = j['id'] in user_applied
         j['closed'] = j.get('closed', False)
-    return render(request, 'internship.html', {'user': user, 'jobs': jobs, 'recommended_jobs': _get_job_recommendations(user, db, jobs)})
+        
+    recommended_jobs = _get_job_recommendations(user, db, jobs)
+    rec_ids = set(j['id'] for j, score in recommended_jobs)
+    normal_jobs = [j for j in jobs if j['id'] not in rec_ids]
+    
+    return render(request, 'internship.html', {'user': user, 'jobs': normal_jobs, 'recommended_jobs': recommended_jobs})
 
 @login_required
 def notifications_view(request):
@@ -982,16 +1037,6 @@ def chat_unread_api(request):
     rooms = list(db.sar_chat_rooms.find({'participants': user['id']}, {f'unread.{user["id"]}': 1}))
     total = sum(r.get('unread', {}).get(user['id'], 0) for r in rooms)
     return JsonResponse({'count': total})
-
-def _get_job_recommendations(user, db, all_jobs):
-    try:
-        from .recommender import build_user_text, build_job_text, rank_by_similarity
-        user_text = build_user_text(user)
-        job_texts = [build_job_text(j) for j in all_jobs]
-        ranked = rank_by_similarity(user_text, all_jobs, job_texts)[:3]
-        return [(j, round(s * 100, 1)) for j, s in ranked]
-    except Exception:
-        return []
 
 def admin_login_required(view_func):
     def wrapper(request, *args, **kwargs):

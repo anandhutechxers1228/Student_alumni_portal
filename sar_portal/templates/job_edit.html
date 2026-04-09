@@ -326,7 +326,7 @@
     <div class="form-card">
         {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
 
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" id="jobForm">
             {% csrf_token %}
 
             <div class="section-label">Details</div>
@@ -491,5 +491,12 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+
+    document.getElementById('jobForm').addEventListener('submit', function() {
+        var locInput = document.getElementById('locations-input');
+        if (locInput && locInput.value.trim()) addTag('locations');
+        var elInput = document.getElementById('eligibility-input');
+        if (elInput && elInput.value.trim()) addTag('eligibility');
+    });
 </script>
 {% endblock %}

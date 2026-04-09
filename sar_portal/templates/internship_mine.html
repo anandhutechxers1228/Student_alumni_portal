@@ -351,6 +351,7 @@
         .job-actions {
             flex-direction: row;
             align-items: center;
+            flex-wrap: wrap;
         }
     }
 {% endblock %}
@@ -409,14 +410,20 @@
                     <div class="job-actions">
                         <a href="/jobs/edit/{{ job.id }}/" class="btn-edit">Edit</a>
                         <a href="/jobs/applicants/{{ job.id }}/" class="btn-applicants">👥 {{ job.applicant_count }} Applicant{{ job.applicant_count|pluralize }}</a>
-                        <form method="POST" action="/jobs/close/{{ job.id }}/" style="margin:0;">
-                            {% csrf_token %}
-                            {% if job.closed %}
-                            <button type="submit" class="btn-reopen-small">▶ Reopen</button>
-                            {% else %}
-                            <button type="submit" class="btn-close-small">✕ Close</button>
-                            {% endif %}
-                        </form>
+                        <div style="display:flex; gap:8px;">
+                            <form method="POST" action="/jobs/close/{{ job.id }}/" style="margin:0;">
+                                {% csrf_token %}
+                                {% if job.closed %}
+                                <button type="submit" class="btn-reopen-small">▶ Reopen</button>
+                                {% else %}
+                                <button type="submit" class="btn-close-small">✕ Close</button>
+                                {% endif %}
+                            </form>
+                            <form method="POST" action="/jobs/delete/{{ job.id }}/" style="margin:0;" onsubmit="return confirm('Delete this posting permanently?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-close-small" style="color:var(--danger); border-color:#f5c6c2;">🗑 Delete</button>
+                            </form>
+                        </div>
                         <div class="job-date">{{ job.posted_at_str }}</div>
                     </div>
                 </div>

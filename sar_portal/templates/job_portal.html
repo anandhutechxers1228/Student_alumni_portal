@@ -394,6 +394,7 @@
 {% block content %}
 <div class="page">
     <div class="page-header">
+        <div class="page-title">Jobs</div>
         {% if user.status == 'alumni' %}
         <div class="header-actions">
             <a href="/jobs/add/" class="btn-primary">+ Post a Job</a>
@@ -476,7 +477,7 @@
                 </div>
             </a>
             {% endfor %}
-        {% else %}
+        {% elif not recommended_jobs %}
         <div class="empty-state">
             <div class="empty-icon">💼</div>
             <div class="empty-title">No Jobs Yet</div>

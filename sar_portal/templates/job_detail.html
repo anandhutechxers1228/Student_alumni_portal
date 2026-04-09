@@ -261,11 +261,6 @@
 
     .btn-apply.applied {
         background: #2D6A4F;
-        cursor: default;
-    }
-
-    .btn-apply.applied:hover {
-        transform: none;
     }
 
     .btn-apply:disabled {
@@ -450,11 +445,18 @@
             <button type="submit" class="btn-close">✕ Close Applications</button>
             {% endif %}
         </form>
+        <form method="POST" action="/jobs/delete/{{ job.id }}/" style="margin:0;" onsubmit="return confirm('Delete this posting permanently?')">
+            {% csrf_token %}
+            <button type="submit" class="btn-close" style="color:var(--danger); border-color:#f5c6c2;">🗑 Delete</button>
+        </form>
         {% else %}
             {% if job.closed %}
             <button type="button" class="btn-apply" disabled>Applications Closed</button>
             {% elif job.has_applied %}
-            <button type="button" class="btn-apply applied" disabled>✓ Applied</button>
+            <form method="POST" action="/jobs/apply/{{ job.id }}/" style="width:100%; margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="btn-apply applied" onclick="return confirm('Withdraw your application?')">✓ Applied (Click to withdraw)</button>
+            </form>
             {% else %}
             <form method="POST" action="/jobs/apply/{{ job.id }}/" id="applyForm" style="width:100%;">
                 {% csrf_token %}
