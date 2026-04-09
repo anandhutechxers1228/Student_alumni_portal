@@ -174,7 +174,7 @@
 
     <form method="POST" class="broadcast-form" onsubmit="return confirm('Broadcast this message to all users?')">
         {% csrf_token %}
-        <textarea name="content" rows="4" placeholder="Write a message to broadcast to all registered users..." required></textarea>
+        <textarea name="content" rows="4" placeholder="Write a message to broadcast to all registered users..." maxlength="1000" required></textarea>
         <button type="submit" class="btn-primary">Send Broadcast</button>
     </form>
 

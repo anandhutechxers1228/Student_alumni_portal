@@ -356,12 +356,12 @@
 
             <div class="form-group">
                 <label>Description <span class="opt-label">(optional)</span></label>
-                <textarea name="description" rows="4">{{ job.description }}</textarea>
+                <textarea name="description" rows="4" maxlength="1000">{{ job.description }}</textarea>
             </div>
 
             <div class="form-group">
                 <label>Company Description <span class="opt-label">(optional)</span></label>
-                <textarea name="company_description" rows="3">{{ job.company_description }}</textarea>
+                <textarea name="company_description" rows="3" maxlength="1000">{{ job.company_description }}</textarea>
             </div>
 
             <div class="section-label">Compensation & Experience</div>

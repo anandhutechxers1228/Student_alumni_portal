@@ -1034,10 +1034,10 @@
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group"><label>Full Name</label><input type="text" name="name" value="{{ user.name }}" required></div>
-                    <div class="form-group"><label>Phone</label><input type="text" name="phone" value="{{ user.phone }}"></div>
+                    <div class="form-group"><label>Full Name</label><input type="text" name="name" value="{{ user.name }}" maxlength="100" required></div>
+                    <div class="form-group"><label>Phone</label><input type="text" name="phone" value="{{ user.phone }}" maxlength="15"></div>
                 </div>
-                <div class="form-group"><label>Location</label><input type="text" name="location" value="{{ user.location|default:'' }}" placeholder="e.g. Kochi, Kerala"></div>
+                <div class="form-group"><label>Location</label><input type="text" name="location" value="{{ user.location|default:'' }}" placeholder="e.g. Kochi, Kerala" maxlength="100"></div>
                 <div class="form-row">
                     <div class="form-group"><label>Admission Year</label><input type="number" name="admission_year" value="{{ user.admission_year }}" min="1990" max="2030"></div>
                     <div class="form-group">
@@ -1101,8 +1101,8 @@
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="change_password">
-                <div class="form-group"><label>Current Password</label><input type="password" name="old_password" required></div>
-                <div class="form-group"><label>New Password</label><input type="password" name="new_password" required></div>
+                <div class="form-group"><label>Current Password</label><input type="password" name="old_password" maxlength="100" required></div>
+                <div class="form-group"><label>New Password</label><input type="password" name="new_password" maxlength="100" required></div>
                 <div class="modal-actions" style="padding:0;border:none;margin-top:8px;">
                     <button type="button" class="btn-cancel" onclick="document.getElementById('pwModal').classList.remove('open')">Cancel</button>
                     <button type="submit" class="btn-save">Update Password</button>
@@ -1139,8 +1139,8 @@
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Company Name</label><input type="text" name="current_company_name" value="{{ user.current_company_name|default:'' }}" placeholder="Company name"></div>
-                    <div class="form-group"><label id="currentCompanyYearLabel">{% if user.current_status == 'owning' %}Started Year{% else %}Joined Year{% endif %}</label><input type="text" name="current_company_year" value="{{ user.current_company_year|default:'' }}" placeholder="e.g. 2022"></div>
+                    <div class="form-group"><label>Company Name</label><input type="text" name="current_company_name" value="{{ user.current_company_name|default:'' }}" placeholder="Company name" maxlength="100"></div>
+                    <div class="form-group"><label id="currentCompanyYearLabel">{% if user.current_status == 'owning' %}Started Year{% else %}Joined Year{% endif %}</label><input type="text" name="current_company_year" value="{{ user.current_company_year|default:'' }}" placeholder="e.g. 2022" maxlength="100"></div>
                 </div>
                 <div class="modal-section-label">Previously Owned Companies</div>
                 <div class="dynamic-list" id="prevOwnedList"></div>
@@ -1166,10 +1166,10 @@
                 </div>
                 <div id="startupFields" style="display:{% if user.startup %}block{% else %}none{% endif %};">
                     <div class="form-row">
-                        <div class="form-group"><label>Startup Name</label><input type="text" name="startup_name" value="{{ user.startup.name|default:'' }}" placeholder="Your startup name"></div>
-                        <div class="form-group"><label>Started Year</label><input type="text" name="startup_started_year" value="{{ user.startup.started_year|default:'' }}" placeholder="e.g. 2023"></div>
+                        <div class="form-group"><label>Startup Name</label><input type="text" name="startup_name" value="{{ user.startup.name|default:'' }}" placeholder="Your startup name" maxlength="100"></div>
+                        <div class="form-group"><label>Started Year</label><input type="text" name="startup_started_year" value="{{ user.startup.started_year|default:'' }}" placeholder="e.g. 2023" maxlength="100"></div>
                     </div>
-                    <div class="form-group"><label>Description <span style="font-size:11px;color:var(--muted);text-transform:none;font-weight:400;">(optional)</span></label><textarea name="startup_description" rows="3" placeholder="Brief description of your startup...">{{ user.startup.description|default:'' }}</textarea></div>
+                    <div class="form-group"><label>Description <span style="font-size:11px;color:var(--muted);text-transform:none;font-weight:400;">(optional)</span></label><textarea name="startup_description" rows="3" placeholder="Brief description of your startup..." maxlength="1000">{{ user.startup.description|default:'' }}</textarea></div>
                 </div>
                 {% endif %}
 
@@ -1342,9 +1342,9 @@
             return '<div class="dynamic-entry">' +
                 '<button type="button" class="remove-btn" onclick="removePrevOwned(' + i + ')">×</button>' +
                 '<div class="form-row"><div class="form-group"><label>Company Name</label>' +
-                '<input type="text" placeholder="Company name" value="' + escHtml(co.name) + '" oninput="prevOwnedData[' + i + '].name=this.value;syncPrevOwned()"></div>' +
+                '<input type="text" placeholder="Company name" value="' + escHtml(co.name) + '" oninput="prevOwnedData[' + i + '].name=this.value;syncPrevOwned()" maxlength="100"></div>' +
                 '<div class="form-group"><label>Started Year</label>' +
-                '<input type="text" placeholder="e.g. 2018" value="' + escHtml(co.started_year) + '" oninput="prevOwnedData[' + i + '].started_year=this.value;syncPrevOwned()"></div></div></div>';
+                '<input type="text" placeholder="e.g. 2018" value="' + escHtml(co.started_year) + '" oninput="prevOwnedData[' + i + '].started_year=this.value;syncPrevOwned()" maxlength="100"></div></div></div>';
         }).join('');
     }
 
@@ -1379,17 +1379,17 @@
             return '<div class="dynamic-entry">' +
                 '<button type="button" class="remove-btn" onclick="removeExperience(' + i + ')">×</button>' +
                 '<div class="form-group"><label>Company Name</label>' +
-                '<input type="text" placeholder="Company name" value="' + escHtml(exp.company) + '" oninput="experienceData[' + i + '].company=this.value;syncExperience()"></div>' +
+                '<input type="text" placeholder="Company name" value="' + escHtml(exp.company) + '" oninput="experienceData[' + i + '].company=this.value;syncExperience()" maxlength="100"></div>' +
                 '<div class="form-row">' +
                 '<div class="form-group"><label>From Year</label>' +
-                '<input type="text" placeholder="e.g. 2020" value="' + escHtml(exp.from_year) + '" oninput="experienceData[' + i + '].from_year=this.value;syncExperience()"></div>' +
+                '<input type="text" placeholder="e.g. 2020" value="' + escHtml(exp.from_year) + '" oninput="experienceData[' + i + '].from_year=this.value;syncExperience()" maxlength="100"></div>' +
                 '<div class="form-group"><label>To Year</label>' +
                 '<div class="input-with-btn">' +
-                '<input type="text" id="' + toId + '" placeholder="e.g. 2023" value="' + escHtml(exp.to_year) + '" oninput="experienceData[' + i + '].to_year=this.value;syncExperience();updatePresentBtn(\'' + toId + '\',\'exp_topresent_' + i + '\')">' +
+                '<input type="text" id="' + toId + '" placeholder="e.g. 2023" value="' + escHtml(exp.to_year) + '" oninput="experienceData[' + i + '].to_year=this.value;syncExperience();updatePresentBtn(\'' + toId + '\',\'exp_topresent_' + i + '\')" maxlength="100">' +
                 '<button type="button" id="exp_topresent_' + i + '" class="present-btn' + (isPresent ? ' active' : '') + '" onclick="togglePresentExp(' + i + ',\'' + toId + '\',this)">Present</button>' +
                 '</div></div></div>' +
                 '<div class="form-group"><label>Description <span style="font-size:11px;color:var(--muted);text-transform:none;font-weight:400;">(optional)</span></label>' +
-                '<textarea rows="2" placeholder="Brief description..." oninput="experienceData[' + i + '].description=this.value;syncExperience();autoResizeTextarea(this)">' + escHtml(exp.description) + '</textarea></div></div>';
+                '<textarea rows="2" placeholder="Brief description..." oninput="experienceData[' + i + '].description=this.value;syncExperience();autoResizeTextarea(this)" maxlength="1000">' + escHtml(exp.description) + '</textarea></div></div>';
         }).join('');
         list.querySelectorAll('textarea').forEach(function(ta) { autoResizeTextarea(ta); });
     }
@@ -1449,12 +1449,12 @@
             return '<div class="dynamic-entry">' +
                 '<button type="button" class="remove-btn" onclick="removeAchievement(' + i + ')">×</button>' +
                 '<div class="form-group"><label>Achievement</label>' +
-                '<input type="text" placeholder="e.g. Best Paper Award" value="' + escHtml(ach.name) + '" oninput="achievementsData[' + i + '].name=this.value;syncAchievements()"></div>' +
+                '<input type="text" placeholder="e.g. Best Paper Award" value="' + escHtml(ach.name) + '" oninput="achievementsData[' + i + '].name=this.value;syncAchievements()" maxlength="100"></div>' +
                 '<div class="form-row"><div class="form-group"><label>Start Year</label>' +
-                '<input type="text" placeholder="e.g. 2022" value="' + escHtml(ach.start_year) + '" oninput="achievementsData[' + i + '].start_year=this.value;syncAchievements()"></div>' +
+                '<input type="text" placeholder="e.g. 2022" value="' + escHtml(ach.start_year) + '" oninput="achievementsData[' + i + '].start_year=this.value;syncAchievements()" maxlength="100"></div>' +
                 '<div class="form-group"><label>End Year</label>' +
                 '<div class="input-with-btn">' +
-                '<input type="text" id="' + endId + '" placeholder="e.g. 2023" value="' + escHtml(ach.end_year) + '" oninput="achievementsData[' + i + '].end_year=this.value;syncAchievements();updateAchPresentBtn(\'' + endId + '\',\'ach_endpresent_' + i + '\')">' +
+                '<input type="text" id="' + endId + '" placeholder="e.g. 2023" value="' + escHtml(ach.end_year) + '" oninput="achievementsData[' + i + '].end_year=this.value;syncAchievements();updateAchPresentBtn(\'' + endId + '\',\'ach_endpresent_' + i + '\')" maxlength="100">' +
                 '<button type="button" id="ach_endpresent_' + i + '" class="present-btn' + (isPresent ? ' active' : '') + '" onclick="togglePresentAch(' + i + ',\'' + endId + '\',this)">Present</button>' +
                 '</div></div></div></div>';
         }).join('');

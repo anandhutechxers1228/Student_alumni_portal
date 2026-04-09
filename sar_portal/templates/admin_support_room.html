@@ -203,7 +203,7 @@
     <form class="chat-input-area" id="supportForm">
         {% csrf_token %}
         <input type="file" name="images" id="fileInput" multiple accept="image/*" class="file-input" title="Upload up to 10 images">
-        <textarea class="chat-input" id="chatInput" name="content" placeholder="Reply to {{ profile_user.name }}..."></textarea>
+        <textarea class="chat-input" id="chatInput" name="content" placeholder="Reply to {{ profile_user.name }}..." maxlength="1000"></textarea>
         <button type="submit" class="send-btn" id="sendBtn">➤</button>
     </form>
 </div>
