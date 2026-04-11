@@ -248,6 +248,22 @@
             font-size: 13px;
             color: var(--muted);
         }
+        
+        .advanced-search-link {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background: #f5f7f5;
+            color: var(--primary-mid);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border-top: 1px solid var(--border);
+        }
+        
+        .advanced-search-link:hover {
+            background: #eef4ef;
+        }
 
         .nav-notif-wrap {
             position: relative;
@@ -473,6 +489,7 @@
                 <div class="nav-search-results" id="navSearchResults">
                     <div class="search-hint">Type at least 4 letters to search</div>
                 </div>
+                <a href="/search/advanced/" class="advanced-search-link">Advanced Search →</a>
             </div>
         </div>
         <div class="nav-notif-wrap">
@@ -572,7 +589,7 @@
                         var avatar = u.profile_pic
                             ? '<img src="/media/' + u.profile_pic + '" alt="">'
                             : '<span>' + u.name.charAt(0).toUpperCase() + '</span>';
-                        return '<a href="/users/' + u.id + '/\" class="search-result-item">' +
+                        return '<a href="/users/' + u.id + '/" class="search-result-item">' +
                             '<div class="search-avatar-sm">' + avatar + '</div>' +
                             '<div class="search-result-info">' +
                             '<div class="search-result-name">' + u.name + '</div>' +

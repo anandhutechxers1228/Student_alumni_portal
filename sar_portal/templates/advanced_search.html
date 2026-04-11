@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+
+{% block title %}Advanced Search — SAR Portal{% endblock %}
+
+{% block extra_css %}
+    .page {
+        padding: 36px 48px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 28px;
+        color: var(--primary);
+        margin-bottom: 28px;
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+        padding: 24px;
+        margin-bottom: 32px;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
+        font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        background: white;
+        transition: border-color 0.2s;
+        width: 100%;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-mid);
+        box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    }
+
+    .btn-search {
+        padding: 10px 24px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-search:hover {
+        background: var(--primary-mid);
+        transform: translateY(-1px);
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #E0E9E1;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+    }
+
+    .result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(27,67,50,0.08);
+        border-color: #c8e6d4;
+    }
+
+    .result-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+        color: white;
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .result-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .result-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .result-name {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--primary);
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .result-sub {
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .result-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 6px;
+    }
+
+    .result-badge.alumni { background: var(--accent-light); color: #8a6d15; }
+    .result-badge.student { background: #f0f7f3; color: var(--primary-mid); }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #E0E9E1;
+    }
+
+    .empty-state h3 {
+        font-family: 'DM Serif Display', serif;
+        color: var(--primary);
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .page { padding: 20px; }
+        .filter-grid { grid-template-columns: 1fr; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="page-title">Advanced Search</div>
+
+    <div class="filter-card">
+        <form method="GET" action="/search/advanced/">
+            <input type="hidden" name="search" value="1">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status" id="statusFilter" onchange="toggleStatusFields()">
+                        <option value="">Any Status</option>
+                        <option value="student" {% if request.GET.status == 'student' %}selected{% endif %}>Student</option>
+                        <option value="alumni" {% if request.GET.status == 'alumni' %}selected{% endif %}>Alumni</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Stream</label>
+                    <select name="stream">
+                        <option value="">Any Stream</option>
+                        {% for s in streams %}
+                        <option value="{{ s }}" {% if request.GET.stream == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" value="{{ request.GET.location }}" placeholder="e.g. Kochi" maxlength="100" pattern=".*[a-zA-Z].*" title="Must contain at least one letter.">
+                </div>
+
+                <div class="form-group">
+                    <label>Specific Skill</label>
+                    <input type="text" name="skill" value="{{ request.GET.skill }}" placeholder="e.g. Python" maxlength="75" pattern=".*[a-zA-Z].*" title="Must contain at least one letter.">
+                </div>
+
+                <div class="form-group" id="studentYearGroup" style="display:none;">
+                    <label>Current Year (Students Only)</label>
+                    <select name="current_year">
+                        <option value="">Any Year</option>
+                        <option value="First" {% if request.GET.current_year == 'First' %}selected{% endif %}>First Year</option>
+                        <option value="Second" {% if request.GET.current_year == 'Second' %}selected{% endif %}>Second Year</option>
+                        <option value="Third" {% if request.GET.current_year == 'Third' %}selected{% endif %}>Third Year</option>
+                        <option value="Fourth" {% if request.GET.current_year == 'Fourth' %}selected{% endif %}>Fourth Year</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="alumniYearGroup" style="display:none;">
+                    <label>Passout Year (Alumni Only)</label>
+                    <input type="number" name="passout_year" value="{{ request.GET.passout_year }}" placeholder="e.g. 2024" min="1990" max="2030">
+                </div>
+            </div>
+            
+            <div style="text-align: right;">
+                <a href="/search/advanced/" style="color:var(--muted); font-size:13px; font-weight:600; text-decoration:none; margin-right:16px;">Clear Filters</a>
+                <button type="submit" class="btn-search">Search Network</button>
+            </div>
+        </form>
+    </div>
+
+    {% if has_searched %}
+        {% if results %}
+        <div class="results-grid">
+            {% for r in results %}
+            <a href="/users/{{ r.id }}/" class="result-card">
+                <div class="result-avatar">
+                    {% if r.profile_pic %}
+                    <img src="/media/{{ r.profile_pic }}" alt="">
+                    {% else %}
+                    {{ r.name|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <div class="result-info">
+                    <div class="result-name">{{ r.name }}</div>
+                    <div class="result-sub">{{ r.stream|default:"Stream not set" }}</div>
+                    <div class="result-badge {{ r.status }}">{{ r.status }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No Matches Found</h3>
+            <p>Try adjusting your filters to see more results.</p>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<script>
+    function toggleStatusFields() {
+        var status = document.getElementById('statusFilter').value;
+        document.getElementById('studentYearGroup').style.display = status === 'student' ? 'flex' : 'none';
+        document.getElementById('alumniYearGroup').style.display = status === 'alumni' ? 'flex' : 'none';
+    }
+    toggleStatusFields();
+</script>
+{% endblock %}
