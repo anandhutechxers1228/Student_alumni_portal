@@ -1263,6 +1263,52 @@ def admin_dashboard_view(request):
     })
 
 @admin_login_required
+def admin_advanced_search_view(request):
+    db = get_db()
+    results = []
+    has_searched = False
+    
+    if request.method == 'GET' and 'search' in request.GET:
+        has_searched = True
+        query = {}
+        
+        status = request.GET.get('status')
+        if status:
+            query['status'] = status
+            
+        stream = request.GET.get('stream')
+        if stream:
+            query['stream'] = stream
+            
+        location = request.GET.get('location', '').strip()
+        if location:
+            query['location'] = {'$regex': location, '$options': 'i'}
+            
+        skill = request.GET.get('skill', '').strip()
+        if skill:
+            query['skills'] = {'$regex': f'^{skill}$', '$options': 'i'}
+            
+        if status == 'student':
+            current_year = request.GET.get('current_year')
+            if current_year:
+                query['current_year'] = current_year
+        elif status == 'alumni':
+            passout_year = request.GET.get('passout_year', '').strip()
+            if passout_year:
+                try:
+                    int_year = int(passout_year)
+                    query['admission_year'] = {'$lte': str(int_year - 4)}
+                except ValueError:
+                    pass
+                    
+        users_raw = list(db.sar_users.find(query).limit(50))
+        for u in users_raw:
+            u['id'] = str(u['_id'])
+            results.append(u)
+            
+    return render(request, 'admin_advanced_search.html', {'results': results, 'has_searched': has_searched, 'streams': STREAMS})
+
+@admin_login_required
 def admin_users_view(request):
     db = get_db()
     users = list(db.sar_users.find({}).sort('_id', -1))

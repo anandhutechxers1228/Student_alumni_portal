@@ -120,6 +120,151 @@
             flex-shrink: 0;
         }
 
+        .nav-search-wrap {
+            position: relative;
+        }
+
+        .nav-search-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .nav-search-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .nav-search-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            width: 320px;
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(27,67,50,0.18);
+            border: 1px solid var(--border);
+            z-index: 400;
+            overflow: hidden;
+        }
+
+        .nav-search-panel.open {
+            display: block;
+        }
+
+        .nav-search-input-wrap {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            gap: 8px;
+        }
+
+        .nav-search-input-wrap span {
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        .nav-search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+
+        .nav-search-results {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            transition: background 0.15s;
+        }
+
+        .search-result-item:hover {
+            background: #f0f5f1;
+        }
+
+        .search-avatar-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .search-avatar-sm img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .search-result-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .search-result-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 1px;
+        }
+
+        .search-hint {
+            padding: 14px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .advanced-search-link {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background: #f5f7f5;
+            color: var(--primary-mid);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border-top: 1px solid var(--border);
+        }
+
+        .advanced-search-link:hover {
+            background: #eef4ef;
+        }
+
         .nav-logout {
             padding: 7px 16px;
             background: rgba(181,48,42,0.15);
@@ -170,6 +315,20 @@
                 margin-right: 0;
                 font-size: 18px;
             }
+            .nav-search-panel {
+                width: calc(100vw - 32px);
+                right: -16px;
+                max-width: 320px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-search-panel {
+                width: calc(100vw - 32px);
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
         }
 
         {% block extra_css %}{% endblock %}
@@ -189,6 +348,19 @@
         <a href="/admin/support/" class="nav-link {% if '/admin/support' in request.path %}active{% endif %}">Support<span class="chat-badge" id="adminSupportBadge"></span></a>
     </div>
     <div class="nav-right">
+        <div class="nav-search-wrap" id="navSearchWrap">
+            <button class="nav-search-btn" onclick="toggleSearch(event)" title="Find People">🔍</button>
+            <div class="nav-search-panel" id="navSearchPanel">
+                <div class="nav-search-input-wrap">
+                    <span>🔍</span>
+                    <input type="text" class="nav-search-input" id="navSearchInput" placeholder="Search people by name..." autocomplete="off">
+                </div>
+                <div class="nav-search-results" id="navSearchResults">
+                    <div class="search-hint">Type at least 4 letters to search</div>
+                </div>
+                <a href="/admin/search/advanced/" class="advanced-search-link">Advanced Search →</a>
+            </div>
+        </div>
         <a href="/admin/logout/" class="nav-logout">Logout</a>
     </div>
 </nav>
@@ -198,6 +370,61 @@
 </div>
 
 <script>
+    function toggleSearch(e) {
+        e.stopPropagation();
+        var panel = document.getElementById('navSearchPanel');
+        panel.classList.toggle('open');
+        if (panel.classList.contains('open')) {
+            document.getElementById('navSearchInput').focus();
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        var wrap = document.getElementById('navSearchWrap');
+        if (wrap && !wrap.contains(e.target)) {
+            document.getElementById('navSearchPanel').classList.remove('open');
+        }
+    });
+
+    var searchTimer = null;
+    var searchInput = document.getElementById('navSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            var q = this.value.trim();
+            var results = document.getElementById('navSearchResults');
+            clearTimeout(searchTimer);
+            if (q.length < 4) {
+                results.innerHTML = '<div class="search-hint">Type at least 4 letters to search</div>';
+                return;
+            }
+            results.innerHTML = '<div class="search-hint">Searching...</div>';
+            searchTimer = setTimeout(function() {
+                fetch('/search/?q=' + encodeURIComponent(q))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data.users || data.users.length === 0) {
+                            results.innerHTML = '<div class="search-hint">No users found</div>';
+                            return;
+                        }
+                        results.innerHTML = data.users.map(function(u) {
+                            var avatar = u.profile_pic
+                                ? '<img src="/media/' + u.profile_pic + '" alt="">'
+                                : '<span>' + u.name.charAt(0).toUpperCase() + '</span>';
+                            return '<a href="/admin/users/' + u.id + '/" class="search-result-item">' +
+                                '<div class="search-avatar-sm">' + avatar + '</div>' +
+                                '<div class="search-result-info">' +
+                                '<div class="search-result-name">' + u.name + '</div>' +
+                                '<div class="search-result-sub">' + (u.stream || '') + ' &middot; ' + (u.status || '') + '</div>' +
+                                '</div></a>';
+                        }).join('');
+                    })
+                    .catch(function() {
+                        results.innerHTML = '<div class="search-hint">Search failed</div>';
+                    });
+            }, 300);
+        });
+    }
+
     function updateAdminSupportBadge() {
         fetch('/admin/api/unread_support/')
             .then(function(r) { return r.json(); })
