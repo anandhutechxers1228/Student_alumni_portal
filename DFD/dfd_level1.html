@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DFD Level 1 — Main Processes</title>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+<style> body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background: #fafafa; } </style>
+</head>
+<body>
+<h2>DATA FLOW DIAGRAM — LEVEL 1</h2>
+<p style="color: #555; font-size: 14px;">Main Process Decomposition</p>
+<div class="mermaid">
+flowchart TD
+    %% Custom Colors
+    classDef process fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
+    classDef entity fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+    classDef admin fill:#ffebee,stroke:#f44336,stroke-width:2px;
+    classDef store fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px;
+
+    U[Users<br/>Student/Alumni]:::entity
+    A[Admin]:::admin
+
+    %% Processes
+    P1(("1.0 Manage Users<br/>& Profiles")):::process
+    P2(("2.0 Jobs & NLP<br/>Recommendations")):::process
+    P3(("3.0 Mentorship<br/>Q&A")):::process
+    P4(("4.0 Real-time<br/>Chat (WS)")):::process
+    P5(("5.0 Support &<br/>Broadcasts (WS)")):::process
+    P6(("6.0 Admin<br/>Moderation")):::process
+
+    %% Data Stores (MongoDB)
+    D1[("D1 sar_users")]:::store
+    D2[("D2 sar_jobs")]:::store
+    D3[("D3 sar_job_apps")]:::store
+    D4[("D4 sar_questions<br/>& replies")]:::store
+    D5[("D5 sar_chat_msgs")]:::store
+    D6[("D6 sar_support<br/>& broadcasts")]:::store
+    D7[("D7 sar_notifications")]:::store
+
+    %% 1.0 User Management
+    U -- "Credentials, Profile/Skills" --> P1
+    P1 <-->|"Create/Read Profile"| D1
+
+    %% 2.0 Jobs
+    U -- "Post Job, Apply, View" --> P2
+    P2 <-->|"Write/Read Job"| D2
+    P2 <-->|"Write Application"| D3
+    P2 -.->|"Fetch User Skills for NLP"| D1
+
+    %% 3.0 Mentorship
+    U -- "Ask, Reply, Vote" --> P3
+    P3 <-->|"Store Q&A, Votes"| D4
+
+    %% 4.0 Chat
+    U -- "WS Messages" --> P4
+    P4 <-->|"Store & Retrieve DMs"| D5
+
+    %% 5.0 Support & Broadcasts
+    U -- "WS Support Request, Images" --> P5
+    A -- "Broadcasts, Support Reply" --> P5
+    P5 <-->|"Store Support & Broadcasts"| D6
+
+    %% 6.0 Moderation
+    A -- "Flag, Delete" --> P6
+    P6 -.->|"Flag Users"| D1
+    P6 -.->|"Delete/Flag Jobs"| D2
+    P6 -.->|"Delete/Flag Q&A"| D4
+
+    %% Notifications
+    P2 -- "Trigger Notif" --> D7
+    P3 -- "Trigger Notif" --> D7
+    P4 -- "Trigger Notif" --> D7
+    P5 -- "Trigger Notif" --> D7
+    P6 -- "Trigger Notif" --> D7
+    D7 -- "Push Unread Alerts" --> U
+</div>
+</body>
+</html>

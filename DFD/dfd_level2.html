@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DFD Level 2 — Jobs & Recommendations</title>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+<style> body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background: #fafafa; } </style>
+</head>
+<body>
+<h2>DATA FLOW DIAGRAM — LEVEL 2</h2>
+<p style="color: #555; font-size: 14px;">Explosion of Process 2.0 (Jobs & NLP Recommendations)</p>
+<div class="mermaid">
+flowchart TD
+    %% Custom Colors
+    classDef process fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
+    classDef entity fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+    classDef store fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px;
+    classDef note fill:#fcfcfc,stroke:#999,stroke-width:1px,stroke-dasharray: 4 4;
+
+    AL[Alumni]:::entity
+    ST[Student/User]:::entity
+
+    %% Input Stores at the top
+    D1[("D1 sar_users")]:::store
+    D2[("D2 sar_jobs")]:::store
+    D3[("D3 sar_job_applications")]:::store
+    D7[("D7 sar_notifications")]:::store
+
+    %% Core Processes
+    P21(("2.1 Manage Job<br/>Postings")):::process
+    P22(("2.2 Process<br/>Application")):::process
+    P23(("2.3 NLP Match<br/>Score Calculation")):::process
+    P24(("2.4 Generate Job<br/>Recommendations")):::process
+
+    %% Subgraph for NLP Engine
+    subgraph NLP_Engine ["SentenceTransformers (Machine Learning)"]
+        direction TB
+        P23
+        P24
+    end
+
+    %% Alumni Flow
+    AL -- "Job details, Type, Image" --> P21
+    P21 -- "Insert/Update/Close" --> D2
+    P21 -- "Create 'New Job' Alert" --> D7
+    AL -- "View Applicants" --> D3
+
+    %% Student Flow
+    ST -- "View Feed" --> P24
+    D1 -- "Fetch User Skills/Exp" --> P24
+    D2 -- "Fetch Open Jobs" --> P24
+    P24 -- "Similarity Matrix<br/>(Top 3 > 50%)" --> ST
+
+    ST -- "Submit Cover Letter" --> P22
+    P22 -- "Request Similarity Score" --> P23
+
+    %% Similarity Flow
+    D1 -. "Applicant Profile" .-> P23
+    D2 -. "Target Job Description" .-> P23
+    P23 -- "Return Score (0-100%)" --> P22
+
+    P22 -- "Insert Application<br/>(with Match Score)" --> D3
+    P22 -- "Create 'New Applicant' Alert" --> D7
+
+    %% Logic Notes attached visually
+    N1["Similarity Formula:<br/>Cosine Similarity using<br/>'all-MiniLM-L6-v2'"]:::note -.-> NLP_Engine
+    N2["Recommendation Filter:<br/>Only jobs with score > 50%"]:::note -.-> P24
+
+</div>
+</body>
+</html>
